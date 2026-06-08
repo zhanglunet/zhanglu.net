@@ -19,11 +19,5 @@
       "qrcode": "/wechat-qr.jpg",
       "icon": "wechat"
     },
-    {
-      "label": "Email",
-      "handle": "TODO@TODO.com",
-      "url": "mailto:TODO@TODO.com",
-      "icon": "mail"
-    }
   ]
 }

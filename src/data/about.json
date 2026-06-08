@@ -1,9 +1,9 @@
 {
   "name": "张路",
   "handle": "zhanglunet",
-  "tagline": "TODO: 用一句话告诉访客你是谁、在做什么（在 src/data/about.json 改）",
-  "bio": "TODO: 2-3 句话扩展介绍。可以提：背景、当下关注、欢迎被联系的方向。",
-  "tags": ["AI", "Claude Skills", "品牌判断"],
+  "tagline": "用 Claude Skill 把复杂判断变成可追溯的流水线",
+  "bio": "在做 mbabrand（5 位评委合议给品牌做量化判断）和 qiji-roadshow-2026（一夜跑完 56 个路演项目的投资级 DD）两个项目。本机攒了 30 多个 Claude Skill，碎碎念发在公众号「张路的碎碎念」。",
+  "tags": ["Claude Skill", "多 Agent", "品牌判断", "路演 DD"],
   "location": "",
   "avatar": "/avatar.png"
 }
