@@ -2,17 +2,26 @@
 import social from '../data/social.json';
 const links = social.links;
 ---
-<ul class="space-y-2">
+<ul class="space-y-4">
   {links.map((l) => (
-    <li class="flex items-center gap-3 text-sm">
-      <span class="font-mono text-[var(--color-muted)] w-20 shrink-0">{l.label}</span>
-      {l.url && !l.url.includes('TODO') ? (
-        <a href={l.url} class="text-[var(--color-accent)] hover:underline" target="_blank" rel="noopener">
-          {l.handle}
-        </a>
-      ) : (
-        <span class="text-[var(--color-muted)]">{l.handle}</span>
-      )}
+    <li class="flex items-start gap-3 text-sm">
+      <span class="font-mono text-[var(--color-muted)] w-20 shrink-0 pt-0.5">{l.label}</span>
+      <div class="flex-1">
+        {l.url && !l.url.includes('TODO') ? (
+          <a href={l.url} class="text-[var(--color-accent)] hover:underline" target="_blank" rel="noopener">
+            {l.handle}
+          </a>
+        ) : l.qrcode ? (
+          <details class="group">
+            <summary class="cursor-pointer text-[var(--color-accent)] hover:underline list-none">
+              {l.handle} <span class="text-xs text-[var(--color-muted)] group-open:hidden">[展开二维码]</span><span class="text-xs text-[var(--color-muted)] hidden group-open:inline">[收起]</span>
+            </summary>
+            <img src={l.qrcode} alt={`${l.label} 二维码`} width="180" height="180" class="mt-3 rounded border border-[var(--color-rule)]" />
+          </details>
+        ) : (
+          <span class="text-[var(--color-muted)]">{l.handle}</span>
+        )}
+      </div>
     </li>
   ))}
 </ul>

@@ -14,9 +14,9 @@
     },
     {
       "label": "微信公众号",
-      "handle": "TODO 公众号名",
+      "handle": "扫码关注",
       "url": "",
-      "qrcode": "/wechat-qr.png",
+      "qrcode": "/wechat-qr.jpg",
       "icon": "wechat"
     },
     {
