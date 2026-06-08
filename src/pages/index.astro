@@ -1,0 +1,91 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import SkillCard from '../components/SkillCard.astro';
+import about from '../data/about.json';
+
+const allProjects = await getCollection('projects');
+const featuredProjects = allProjects
+  .filter((p) => p.data.featured)
+  .sort((a, b) => a.data.order - b.data.order);
+
+const allArticles = await getCollection('articles', ({ id }) => id !== 'README.md');
+const recentArticles = allArticles
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0, 5);
+
+const allSkills = await getCollection('skills');
+const featuredSkills = allSkills
+  .filter((s) => s.data.featured || s.data.handwritten)
+  .slice(0, 6);
+const otherSkills = allSkills
+  .filter((s) => !s.data.featured && !s.data.handwritten);
+---
+<Base>
+  <section class="py-10 sm:py-16">
+    <h1 class="font-serif text-4xl sm:text-5xl font-semibold tracking-tight mb-4">
+      {about.name}
+    </h1>
+    <p class="font-serif text-xl sm:text-2xl text-[var(--color-ink)] mb-6 leading-snug">
+      {about.tagline}
+    </p>
+    <p class="text-[var(--color-muted)] max-w-2xl leading-relaxed">
+      {about.bio}
+    </p>
+    <div class="mt-6 flex flex-wrap gap-2">
+      {about.tags.map((t) => (
+        <span class="text-xs px-2 py-1 bg-[var(--color-paper-2)] rounded font-mono">{t}</span>
+      ))}
+    </div>
+  </section>
+
+  <section class="py-8 border-t border-[var(--color-rule)]">
+    <div class="flex items-baseline justify-between mb-6">
+      <h2 class="font-serif text-2xl font-semibold">精选项目</h2>
+      <a href="/projects" class="text-sm text-[var(--color-muted)] hover:text-[var(--color-ink)]">全部 →</a>
+    </div>
+    <div class="grid sm:grid-cols-2 gap-4">
+      {featuredProjects.map((p) => <ProjectCard entry={p} />)}
+    </div>
+  </section>
+
+  {recentArticles.length > 0 && (
+    <section class="py-8 border-t border-[var(--color-rule)]">
+      <div class="flex items-baseline justify-between mb-2">
+        <h2 class="font-serif text-2xl font-semibold">最近文章</h2>
+        <a href="/articles" class="text-sm text-[var(--color-muted)] hover:text-[var(--color-ink)]">全部 →</a>
+      </div>
+      <div>
+        {recentArticles.map((a) => <ArticleCard entry={a} />)}
+      </div>
+    </section>
+  )}
+
+  <section class="py-8 border-t border-[var(--color-rule)]">
+    <div class="flex items-baseline justify-between mb-6">
+      <h2 class="font-serif text-2xl font-semibold">Skills</h2>
+      <a href="/skills" class="text-sm text-[var(--color-muted)] hover:text-[var(--color-ink)]">
+        全部 {allSkills.length} 个 →
+      </a>
+    </div>
+    {featuredSkills.length > 0 && (
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
+        {featuredSkills.map((s) => <SkillCard entry={s} />)}
+      </div>
+    )}
+    {otherSkills.length > 0 && (
+      <p class="text-sm text-[var(--color-muted)]">
+        以及另外 {otherSkills.length} 个 skill：
+        {otherSkills.slice(0, 20).map((s, i) => (
+          <>
+            {i > 0 && <span>, </span>}
+            <a href={`/skills/${s.slug}`} class="font-mono hover:text-[var(--color-ink)]">/{s.data.name}</a>
+          </>
+        ))}
+        {otherSkills.length > 20 && <span> …</span>}
+      </p>
+    )}
+  </section>
+</Base>

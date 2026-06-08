@@ -1,0 +1,23 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import SkillCard from '../../components/SkillCard.astro';
+
+const skills = (await getCollection('skills'))
+  .sort((a, b) => {
+    const aw = (a.data.featured ? 2 : 0) + (a.data.handwritten ? 1 : 0);
+    const bw = (b.data.featured ? 2 : 0) + (b.data.handwritten ? 1 : 0);
+    if (aw !== bw) return bw - aw;
+    return a.data.name.localeCompare(b.data.name);
+  });
+---
+<Base title="Skills" description="我用的 / 我做的 Claude Skills">
+  <h1 class="font-serif text-3xl font-semibold mb-2">Skills</h1>
+  <p class="text-[var(--color-muted)] mb-8">
+    本机 <code>~/.claude/skills/</code> 同步而来，共 {skills.length} 个。
+    ★ 标记是精选，✎ 标记是手写介绍版本。
+  </p>
+  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+    {skills.map((s) => <SkillCard entry={s} />)}
+  </div>
+</Base>

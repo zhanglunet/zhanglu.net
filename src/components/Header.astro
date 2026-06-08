@@ -1,0 +1,36 @@
+---
+import about from '../data/about.json';
+interface Props { pathname: string }
+const { pathname } = Astro.props;
+const nav = [
+  { href: '/', label: '首页' },
+  { href: '/projects', label: '项目' },
+  { href: '/articles', label: '文章' },
+  { href: '/skills', label: 'Skills' },
+  { href: '/about', label: '关于' },
+];
+const isActive = (href: string) =>
+  href === '/' ? pathname === '/' : pathname.startsWith(href);
+---
+<header class="border-b border-[var(--color-rule)] bg-[var(--color-paper)]">
+  <div class="max-w-4xl mx-auto px-6 py-5 flex items-center justify-between flex-wrap gap-4">
+    <a href="/" class="font-serif text-xl font-semibold tracking-tight">
+      {about.name}<span class="text-[var(--color-accent)]">.</span>
+    </a>
+    <nav class="flex items-center gap-5 text-sm">
+      {nav.map((item) => (
+        <a
+          href={item.href}
+          class:list={[
+            'transition-colors',
+            isActive(item.href)
+              ? 'text-[var(--color-ink)] font-medium'
+              : 'text-[var(--color-muted)] hover:text-[var(--color-ink)]',
+          ]}
+        >
+          {item.label}
+        </a>
+      ))}
+    </nav>
+  </div>
+</header>

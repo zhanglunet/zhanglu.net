@@ -1,0 +1,29 @@
+{
+  "links": [
+    {
+      "label": "GitHub",
+      "handle": "@zhanglunet",
+      "url": "https://github.com/zhanglunet",
+      "icon": "github"
+    },
+    {
+      "label": "X",
+      "handle": "TODO",
+      "url": "https://x.com/TODO",
+      "icon": "x"
+    },
+    {
+      "label": "微信公众号",
+      "handle": "TODO 公众号名",
+      "url": "",
+      "qrcode": "/wechat-qr.png",
+      "icon": "wechat"
+    },
+    {
+      "label": "Email",
+      "handle": "TODO@TODO.com",
+      "url": "mailto:TODO@TODO.com",
+      "icon": "mail"
+    }
+  ]
+}

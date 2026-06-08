@@ -1,0 +1,18 @@
+---
+import social from '../data/social.json';
+const links = social.links;
+---
+<ul class="space-y-2">
+  {links.map((l) => (
+    <li class="flex items-center gap-3 text-sm">
+      <span class="font-mono text-[var(--color-muted)] w-20 shrink-0">{l.label}</span>
+      {l.url && !l.url.includes('TODO') ? (
+        <a href={l.url} class="text-[var(--color-accent)] hover:underline" target="_blank" rel="noopener">
+          {l.handle}
+        </a>
+      ) : (
+        <span class="text-[var(--color-muted)]">{l.handle}</span>
+      )}
+    </li>
+  ))}
+</ul>

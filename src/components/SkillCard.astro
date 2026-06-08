@@ -1,0 +1,21 @@
+---
+import type { CollectionEntry } from 'astro:content';
+interface Props { entry: CollectionEntry<'skills'> }
+const { entry } = Astro.props;
+const { name, description, featured, handwritten } = entry.data;
+---
+<article class="border border-[var(--color-rule)] rounded-md p-4 hover:border-[var(--color-ink)] transition-colors">
+  <div class="flex items-start justify-between gap-2 mb-1.5">
+    <h3 class="font-mono text-sm font-semibold">
+      <a href={`/skills/${entry.slug}`} class="hover:text-[var(--color-accent)]">
+        /{name}
+      </a>
+    </h3>
+    {(featured || handwritten) && (
+      <span class="text-[10px] uppercase tracking-wider text-[var(--color-accent)]">
+        {featured ? '★' : ''}{handwritten ? '✎' : ''}
+      </span>
+    )}
+  </div>
+  <p class="text-xs text-[var(--color-muted)] leading-relaxed line-clamp-3">{description}</p>
+</article>

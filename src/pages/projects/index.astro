@@ -1,0 +1,15 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+
+const projects = (await getCollection('projects'))
+  .sort((a, b) => (a.data.order || 999) - (b.data.order || 999));
+---
+<Base title="项目" description="我做过的项目列表">
+  <h1 class="font-serif text-3xl font-semibold mb-2">项目</h1>
+  <p class="text-[var(--color-muted)] mb-8">共 {projects.length} 个。</p>
+  <div class="grid sm:grid-cols-2 gap-4">
+    {projects.map((p) => <ProjectCard entry={p} />)}
+  </div>
+</Base>

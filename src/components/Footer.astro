@@ -1,0 +1,21 @@
+---
+import about from '../data/about.json';
+import social from '../data/social.json';
+const year = new Date().getFullYear();
+const visibleLinks = social.links.filter((l) => l.url && !l.url.includes('TODO'));
+---
+<footer class="border-t border-[var(--color-rule)] mt-16">
+  <div class="max-w-4xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-sm text-[var(--color-muted)]">
+    <div>
+      © {year} {about.name}. 用 Astro + Cloudflare Pages 搭建。
+    </div>
+    <div class="flex items-center gap-4">
+      {visibleLinks.map((l) => (
+        <a href={l.url} class="hover:text-[var(--color-ink)] transition-colors" rel="noopener" target="_blank">
+          {l.label}
+        </a>
+      ))}
+      <a href="/rss.xml" class="hover:text-[var(--color-ink)] transition-colors">RSS</a>
+    </div>
+  </div>
+</footer>
