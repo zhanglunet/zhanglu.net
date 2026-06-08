@@ -1,15 +1,34 @@
 ---
 name: "turnstile-spin"
 description: |
-  Set up Cloudflare Turnstile end-to-end in a project — scan the codebase, create the widget via the Cloudflare API, deploy the managed siteverify Worker, write the frontend snippets, validate, and persist the skill. Load this when a user asks to add Turnstile, set up CAPTCHA, protect a form from bots, or fix a Turnstile integration. Mirrors developers.cloudflare.com/turnstile/spin.
+  在项目里端到端装好 Cloudflare Turnstile。
+  扫描代码库 → 调 Cloudflare API 建 widget → 部署 managed siteverify Worker → 写前端片段 → 验证 → 固化 skill。
 source: local
 featured: false
-handwritten: false
+handwritten: true
 synced_at: "2026-06-08"
 ---
 
-本 skill 来源于本机 `~/.claude/skills/turnstile-spin/SKILL.md`，由 `pnpm run sync:skills` 自动同步。
+## 用途
 
-## 描述
+端到端在项目里装好 Cloudflare Turnstile。
 
-Set up Cloudflare Turnstile end-to-end in a project — scan the codebase, create the widget via the Cloudflare API, deploy the managed siteverify Worker, write the frontend snippets, validate, and persist the skill. Load this when a user asks to add Turnstile, set up CAPTCHA, protect a form from bots, or fix a Turnstile integration. Mirrors developers.cloudflare.com/turnstile/spin.
+## 做哪些事
+
+1. 扫描代码库
+2. 调 Cloudflare API 创建 widget
+3. 部署 managed siteverify Worker
+4. 写前端片段
+5. 验证
+6. 固化 skill
+
+## 何时加载
+
+- 加 Turnstile
+- 设置 CAPTCHA
+- 保护表单防 bot
+- 修 Turnstile 集成
+
+## 参考
+
+镜像 [developers.cloudflare.com/turnstile/spin](https://developers.cloudflare.com/turnstile/spin)。

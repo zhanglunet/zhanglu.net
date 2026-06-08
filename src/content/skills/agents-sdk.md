@@ -1,15 +1,32 @@
 ---
 name: "agents-sdk"
 description: |
-  Build AI agents on Cloudflare Workers using the Agents SDK. Load when creating stateful agents, durable workflows, real-time WebSocket apps, scheduled tasks, MCP servers, chat applications, voice agents, or browser automation. Covers Agent class, state management, callable RPC, Workflows, durable execution, queues, retries, observability, and React hooks. Biases towards retrieval from Cloudflare docs over pre-trained knowledge.
+  在 Cloudflare Workers 上用 Agents SDK 构建 AI 智能体。
+  要做有状态 agent、持久化 workflow、实时 WebSocket 应用、定时任务、MCP server、聊天 / 语音 agent、浏览器自动化时加载。
 source: local
 featured: false
-handwritten: false
+handwritten: true
 synced_at: "2026-06-08"
 ---
 
-本 skill 来源于本机 `~/.claude/skills/agents-sdk/SKILL.md`，由 `pnpm run sync:skills` 自动同步。
+## 用途
 
-## 描述
+在 Cloudflare Workers 上用 Agents SDK 构建 AI 智能体。
 
-Build AI agents on Cloudflare Workers using the Agents SDK. Load when creating stateful agents, durable workflows, real-time WebSocket apps, scheduled tasks, MCP servers, chat applications, voice agents, or browser automation. Covers Agent class, state management, callable RPC, Workflows, durable execution, queues, retries, observability, and React hooks. Biases towards retrieval from Cloudflare docs over pre-trained knowledge.
+## 何时加载
+
+- 创建有状态 agent
+- 写持久化 workflow
+- 做实时 WebSocket 应用
+- 定时任务
+- MCP server
+- 聊天 agent / 语音 agent
+- 浏览器自动化
+
+## 覆盖范围
+
+Agent class、状态管理、可调用 RPC、Workflows、持久化执行、queue、重试、可观测性、React hooks。
+
+## 知识倾向
+
+偏向检索 Cloudflare 文档，而非依赖预训练知识。

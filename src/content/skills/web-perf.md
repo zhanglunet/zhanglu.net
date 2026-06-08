@@ -1,15 +1,35 @@
 ---
 name: "web-perf"
 description: |
-  Analyzes web performance using Chrome DevTools MCP. Measures Core Web Vitals (LCP, INP, CLS) and supplementary metrics (FCP, TBT, Speed Index), identifies render-blocking resources, network dependency chains, layout shifts, caching issues, and accessibility gaps. Use when asked to audit, profile, debug, or optimize page load performance, Lighthouse scores, or site speed. Biases towards retrieval from current documentation over pre-trained knowledge.
+  用 Chrome DevTools MCP 分析 web 性能。
+  测 Core Web Vitals（LCP、INP、CLS）+ 辅助指标（FCP、TBT、Speed Index），找渲染阻塞、网络依赖链、布局偏移、缓存和可访问性问题。
 source: local
 featured: false
-handwritten: false
+handwritten: true
 synced_at: "2026-06-08"
 ---
 
-本 skill 来源于本机 `~/.claude/skills/web-perf/SKILL.md`，由 `pnpm run sync:skills` 自动同步。
+## 用途
 
-## 描述
+用 Chrome DevTools MCP 分析 web 性能。
 
-Analyzes web performance using Chrome DevTools MCP. Measures Core Web Vitals (LCP, INP, CLS) and supplementary metrics (FCP, TBT, Speed Index), identifies render-blocking resources, network dependency chains, layout shifts, caching issues, and accessibility gaps. Use when asked to audit, profile, debug, or optimize page load performance, Lighthouse scores, or site speed. Biases towards retrieval from current documentation over pre-trained knowledge.
+## 测什么
+
+- **Core Web Vitals**：LCP、INP、CLS
+- **辅助指标**：FCP、TBT、Speed Index
+
+## 查什么
+
+- 渲染阻塞资源
+- 网络依赖链
+- 布局偏移
+- 缓存问题
+- 可访问性缺口
+
+## 何时用
+
+审计、profile、debug 或优化页面加载性能、Lighthouse 分数、站点速度。
+
+## 知识倾向
+
+偏向检索最新文档，而非依赖预训练知识。

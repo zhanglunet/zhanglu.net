@@ -1,15 +1,31 @@
 ---
 name: "durable-objects"
 description: |
-  Create and review Cloudflare Durable Objects. Use when building stateful coordination (chat rooms, multiplayer games, booking systems), implementing RPC methods, SQLite storage, alarms, WebSockets, or reviewing DO code for best practices. Covers Workers integration, wrangler config, and testing with Vitest. Biases towards retrieval from Cloudflare docs over pre-trained knowledge.
+  创建和评审 Cloudflare Durable Objects。
+  要做有状态协调（聊天室、多人游戏、预订系统）、RPC、SQLite 存储、闹钟、WebSocket，或按最佳实践评审 DO 代码时用。
 source: local
 featured: false
-handwritten: false
+handwritten: true
 synced_at: "2026-06-08"
 ---
 
-本 skill 来源于本机 `~/.claude/skills/durable-objects/SKILL.md`，由 `pnpm run sync:skills` 自动同步。
+## 用途
 
-## 描述
+创建和评审 Cloudflare Durable Objects。
 
-Create and review Cloudflare Durable Objects. Use when building stateful coordination (chat rooms, multiplayer games, booking systems), implementing RPC methods, SQLite storage, alarms, WebSockets, or reviewing DO code for best practices. Covers Workers integration, wrangler config, and testing with Vitest. Biases towards retrieval from Cloudflare docs over pre-trained knowledge.
+## 何时用
+
+- 构建有状态协调系统（聊天室、多人游戏、预订系统）
+- 实现 RPC 方法
+- SQLite 存储
+- 闹钟（alarms）
+- WebSockets
+- 按最佳实践评审 DO 代码
+
+## 覆盖范围
+
+Workers 集成、wrangler 配置、Vitest 测试。
+
+## 知识倾向
+
+偏向检索 Cloudflare 文档，而非依赖预训练知识。

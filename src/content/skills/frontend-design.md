@@ -1,15 +1,27 @@
 ---
 name: "frontend-design"
 description: |
-  Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, artifacts, posters, or applications (examples include websites, landing pages, dashboards, React components, HTML/CSS layouts, or when styling/beautifying any web UI). Generates creative, polished code and UI design that avoids generic AI aesthetics.
+  做有辨识度、生产级的前端界面。
+  要做 web 组件、页面、artifact、海报、应用，或给任何 web UI 加样式时用——避开通用 AI 风的设计。
 source: local
 featured: false
-handwritten: false
+handwritten: true
 synced_at: "2026-06-08"
 ---
 
-本 skill 来源于本机 `~/.claude/skills/frontend-design/SKILL.md`，由 `pnpm run sync:skills` 自动同步。
+## 用途
 
-## 描述
+做有辨识度、生产级、设计质量高的前端界面。
 
-Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, artifacts, posters, or applications (examples include websites, landing pages, dashboards, React components, HTML/CSS layouts, or when styling/beautifying any web UI). Generates creative, polished code and UI design that avoids generic AI aesthetics.
+## 何时用
+
+用户要做：
+
+- Web 组件、页面、artifact、海报、应用
+- 网站、landing page、dashboard
+- React 组件、HTML / CSS 布局
+- 给任何 web UI 加样式 / 美化
+
+## 设计倾向
+
+生成有创意、打磨过的代码和 UI——**避开通用 AI 美学**：干净但有辨识度，不像批量生成的样板。

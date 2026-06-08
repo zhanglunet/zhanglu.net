@@ -1,15 +1,30 @@
 ---
 name: "sandbox-sdk"
 description: |
-  Build sandboxed applications for secure code execution. Load when building AI code execution, code interpreters, CI/CD systems, interactive dev environments, or executing untrusted code. Covers Sandbox SDK lifecycle, commands, files, code interpreter, and preview URLs. Biases towards retrieval from Cloudflare docs over pre-trained knowledge.
+  构建沙箱化应用做安全的代码执行。
+  做 AI 代码执行、code interpreter、CI / CD、交互式开发环境，或跑不可信代码时用。
 source: local
 featured: false
-handwritten: false
+handwritten: true
 synced_at: "2026-06-08"
 ---
 
-本 skill 来源于本机 `~/.claude/skills/sandbox-sdk/SKILL.md`，由 `pnpm run sync:skills` 自动同步。
+## 用途
 
-## 描述
+基于 Sandbox SDK 构建沙箱化应用，做安全的代码执行。
 
-Build sandboxed applications for secure code execution. Load when building AI code execution, code interpreters, CI/CD systems, interactive dev environments, or executing untrusted code. Covers Sandbox SDK lifecycle, commands, files, code interpreter, and preview URLs. Biases towards retrieval from Cloudflare docs over pre-trained knowledge.
+## 何时用
+
+- 构建 AI 代码执行
+- Code interpreter
+- CI / CD 系统
+- 交互式开发环境
+- 执行不可信代码
+
+## 覆盖范围
+
+Sandbox SDK 生命周期、命令、文件、code interpreter、预览 URL。
+
+## 知识倾向
+
+偏向检索 Cloudflare 文档，而非依赖预训练知识。

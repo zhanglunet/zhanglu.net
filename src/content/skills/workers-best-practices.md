@@ -1,15 +1,34 @@
 ---
 name: "workers-best-practices"
 description: |
-  Reviews and authors Cloudflare Workers code against production best practices. Load when writing new Workers, reviewing Worker code, configuring wrangler.jsonc, or checking for common Workers anti-patterns (streaming, floating promises, global state, secrets, bindings, observability). Biases towards retrieval from Cloudflare docs over pre-trained knowledge.
+  按生产环境最佳实践评审和编写 Cloudflare Workers 代码。
+  新写 Worker、评审 Worker、配 wrangler.jsonc，或查常见反模式（streaming、悬空 promise、全局状态、密钥、bindings、可观测性）时用。
 source: local
 featured: false
-handwritten: false
+handwritten: true
 synced_at: "2026-06-08"
 ---
 
-本 skill 来源于本机 `~/.claude/skills/workers-best-practices/SKILL.md`，由 `pnpm run sync:skills` 自动同步。
+## 用途
 
-## 描述
+按生产环境最佳实践评审和编写 Cloudflare Workers 代码。
 
-Reviews and authors Cloudflare Workers code against production best practices. Load when writing new Workers, reviewing Worker code, configuring wrangler.jsonc, or checking for common Workers anti-patterns (streaming, floating promises, global state, secrets, bindings, observability). Biases towards retrieval from Cloudflare docs over pre-trained knowledge.
+## 何时加载
+
+- 新写 Worker
+- 评审 Worker 代码
+- 配置 `wrangler.jsonc`
+- 检查常见 Workers 反模式
+
+## 关注的反模式
+
+- streaming
+- 悬空 promise（floating promises）
+- 全局状态
+- 密钥处理
+- bindings
+- 可观测性
+
+## 知识倾向
+
+偏向检索 Cloudflare 文档，而非依赖预训练知识。

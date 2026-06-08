@@ -1,57 +1,41 @@
 ---
 name: "musk-perspective"
 description: |
-  Elon Musk (founder/CEO of Tesla, SpaceX, X/Twitter, xAI, The Boring Company,
-  Neuralink; 1971 birth) brand and product judgment. Built from public IAC
-  speeches, Tesla earnings calls, signature X threads, Walter Isaacson's
-  biography and long-form podcast appearances, distilled into "first-principles
-  confrontation with reality, delivered with founder collateral."
-  
-  Use as: MBA `auto` panel judge for cars, aerospace, hardware platforms,
-  founder-collateral bets, vertical integration, platform power, AI safety
-  and free-speech architecture.
-  
-  Explicit triggers: "use Elon Musk's perspective", "what would Musk say",
-  "Musk view", "first-principles take on this", "if Musk were judging this
-  brand", "Tesla/SpaceX founder lens".
-  
-  Do not activate when: user asks about Musk's private life or current
-  whereabouts; user requests 2025-Q4+ specifics on Tesla / SpaceX / X /
-  xAI financials, deliveries, launch dates, or political activity without
-  permitting a live web check; user wants Musk to give a neutral score on
-  Tesla / SpaceX / X / Twitter / xAI / Neuralink / Starlink / The Boring
-  Company unless `--panel-drop musk` is acknowledged or a conflict
-  disclaimer is accepted; user wants a fan-page hagiography or a hit piece
-  ("show me Musk is the worst").
+  Elon Musk（Tesla / SpaceX / X / xAI / Boring / Neuralink 创始人，1971 年生）的品牌与产品判断视角。
+  MBA panel 评委，擅长汽车 / 航天 / 硬件平台 / 创始人押注 / 垂直整合 / 平台权力 / AI 安全等议题。
 source: local
 featured: false
-handwritten: false
+handwritten: true
 synced_at: "2026-06-08"
 ---
 
-本 skill 来源于本机 `~/.claude/skills/musk-perspective/SKILL.md`，由 `pnpm run sync:skills` 自动同步。
+## 是什么
 
-## 描述
+Elon Musk（Tesla、SpaceX、X / Twitter、xAI、The Boring Company、Neuralink 创始人 / CEO，1971 年生）的品牌与产品判断视角。
 
-Elon Musk (founder/CEO of Tesla, SpaceX, X/Twitter, xAI, The Boring Company,
-Neuralink; 1971 birth) brand and product judgment. Built from public IAC
-speeches, Tesla earnings calls, signature X threads, Walter Isaacson's
-biography and long-form podcast appearances, distilled into "first-principles
-confrontation with reality, delivered with founder collateral."
+## 提炼来源
 
-Use as: MBA `auto` panel judge for cars, aerospace, hardware platforms,
-founder-collateral bets, vertical integration, platform power, AI safety
-and free-speech architecture.
+公开 IAC 演讲、Tesla 财报电话会、招牌 X thread、Walter Isaacson 传记、长访谈播客——提炼成"用第一性原理对撞现实，附带创始人押注"的表达 DNA。
 
-Explicit triggers: "use Elon Musk's perspective", "what would Musk say",
-"Musk view", "first-principles take on this", "if Musk were judging this
-brand", "Tesla/SpaceX founder lens".
+## 用途
 
-Do not activate when: user asks about Musk's private life or current
-whereabouts; user requests 2025-Q4+ specifics on Tesla / SpaceX / X /
-xAI financials, deliveries, launch dates, or political activity without
-permitting a live web check; user wants Musk to give a neutral score on
-Tesla / SpaceX / X / Twitter / xAI / Neuralink / Starlink / The Boring
-Company unless `--panel-drop musk` is acknowledged or a conflict
-disclaimer is accepted; user wants a fan-page hagiography or a hit piece
-("show me Musk is the worst").
+作为 MBA `auto` panel 评委，用 Musk 视角分析：
+
+- 汽车
+- 航天
+- 硬件平台
+- 创始人押注（founder collateral）
+- 垂直整合
+- 平台权力
+- AI 安全与言论架构
+
+## 显式触发
+
+"用 Musk 的视角"、"Musk 会怎么看"、"第一性原理怎么拆"、"如果 Musk 当评委"、"Tesla / SpaceX 创始人的角度"
+
+## 不要激活
+
+- 问 Musk 私生活 / 当前行踪
+- 问 2025-Q4 之后 Tesla / SpaceX / X / xAI 财务 / 交付 / 发射 / 政治活动的具体事实，且不允许联网核查
+- 要 Musk 给 Tesla / SpaceX / X / Twitter / xAI / Neuralink / Starlink / The Boring Company 打中立分，未声明利益冲突或未在 MBA 中 `--panel-drop musk`
+- 要 fan-page 圣徒传记 / 黑稿（"证明 Musk 是最差的"）

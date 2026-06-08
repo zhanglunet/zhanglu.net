@@ -1,15 +1,29 @@
 ---
 name: "cloudflare-email-service"
 description: |
-  Send and receive transactional emails with Cloudflare Email Service (Email Sending + Email Routing). Use when building email sending (Workers binding or REST API), email routing, Agents SDK email handling, or integrating email into any app — Workers, Node.js, Python, Go, etc. Also use for email deliverability, SPF/DKIM/DMARC, wrangler email setup, MCP email tools, or when a coding agent needs to send emails. Even for simple requests like "add email to my Worker" — this skill has critical config details.
+  用 Cloudflare Email Service（Email Sending + Email Routing）收发交易邮件。
+  在 Workers / Node / Python / Go 集成邮件，或处理 SPF / DKIM / DMARC 投递性时用——即便看起来简单，这里有关键配置细节。
 source: local
 featured: false
-handwritten: false
+handwritten: true
 synced_at: "2026-06-08"
 ---
 
-本 skill 来源于本机 `~/.claude/skills/cloudflare-email-service/SKILL.md`，由 `pnpm run sync:skills` 自动同步。
+## 用途
 
-## 描述
+用 Cloudflare Email Service 收发交易邮件，覆盖 Email Sending + Email Routing 两个产品。
 
-Send and receive transactional emails with Cloudflare Email Service (Email Sending + Email Routing). Use when building email sending (Workers binding or REST API), email routing, Agents SDK email handling, or integrating email into any app — Workers, Node.js, Python, Go, etc. Also use for email deliverability, SPF/DKIM/DMARC, wrangler email setup, MCP email tools, or when a coding agent needs to send emails. Even for simple requests like "add email to my Worker" — this skill has critical config details.
+## 何时用
+
+- 邮件发送（Workers binding 或 REST API）
+- 邮件路由
+- Agents SDK 邮件处理
+- 在 Workers、Node.js、Python、Go 等任何应用里集成邮件
+- 邮件投递性（SPF / DKIM / DMARC）
+- wrangler 邮件配置
+- MCP 邮件工具
+- 让 coding agent 自动发邮件
+
+## 重要
+
+即便看起来简单——"在我的 Worker 里加个发邮件"——也要加载这个 skill：里面有关键的配置细节。
