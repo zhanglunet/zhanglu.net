@@ -1,35 +1,67 @@
 # zhanglu.net
 
-张路的个人站。Astro 5 + Tailwind 4 + Cloudflare Pages。
+张路的个人站。聚合：项目、公众号文章、本机 Claude Skills、社交链接。
 
-## 开发
+- **线上**: https://zhanglu.net
+- **备用**: https://zhanglu-net.pages.dev
+- **仓库**: https://github.com/zhanglunet/zhanglu.net
+
+## 预览
+
+[![首页](docs/screenshots/home.png)](https://zhanglu.net)
+
+| Skills 列表 | 关于页 |
+|---|---|
+| [![Skills](docs/screenshots/skills.png)](https://zhanglu.net/skills/) | [![关于](docs/screenshots/about.png)](https://zhanglu.net/about/) |
+
+## 技术栈
+
+Astro 5 · Tailwind 4 · MDX · Cloudflare Pages · Node 22 · pnpm 9
+
+所有内容是 markdown / JSON 文件，无 CMS、无数据库。`git push` 即部署。
+
+## 本地开发
 
 ```bash
 pnpm install
-pnpm dev          # 本地起服 http://localhost:4321
-pnpm build        # 产出 dist/
+pnpm dev          # http://localhost:4321
+pnpm build        # 出 dist/
 pnpm preview      # 看构建结果
 ```
 
-## 内容更新
+## 内容更新（速查）
 
-所有内容是 markdown / JSON 文件，无 CMS。
+| 想做什么 | 改什么 |
+|---|---|
+| 加项目 | `src/content/projects/<slug>.md` 或 `pnpm run new:project -- ...` |
+| 加文章入口 | `src/content/articles/<slug>.md` |
+| 同步本机 skills | `pnpm run sync:skills` |
+| 改首页 tagline / bio | `src/data/about.json` |
+| 改社交链接 | `src/data/social.json` |
+| 改首页排版 / 加新区块 | `src/pages/index.astro` |
+| 重截截图 | `agent-browser open <url> && agent-browser screenshot --full docs/screenshots/<name>.png` |
 
-| 想做什么            | 改什么文件                              |
-| ------------------- | --------------------------------------- |
-| 加项目              | `src/content/projects/<slug>.md`        |
-| 加文章入口          | `src/content/articles/<slug>.md`        |
-| 同步本机 skills     | `pnpm run sync:skills`                  |
-| 改首页文案 / bio    | `src/data/about.json`                   |
-| 改社交链接          | `src/data/social.json`                  |
-| 改首页排版          | `src/pages/index.astro`                 |
+**详细指南**: [AGENTS.md](./AGENTS.md)（必读，含 schema、踩过的坑、CF Pages 配置、排错表）
 
-详细指南：[AGENTS.md](./AGENTS.md)
+## 部署链路
 
-## 部署
+```
+git push origin main → Cloudflare Pages (project: zhanglu-net) → 1-2 min → zhanglu.net
+```
 
-push 到 `main` → Cloudflare Pages 自动构建部署。
+`main` 分支自动部署，PR 自动出 preview URL。
 
-## 协作
+## AI 协作
 
-AI agent (Claude Code / Codex / Hermes / ...) 用 `AGENTS.md` 作为更新指南。
+本仓库设计成可被多 agent（Claude Code / Codex / Hermes）维护：
+
+- 所有内容是强类型 markdown + JSON，Zod schema 在 `src/content/config.ts` 校验
+- `AGENTS.md` 是所有 agent 通用的权威指南
+- `CLAUDE.md` 用 `@AGENTS.md` 导入，Claude Code 自动加载
+- Codex / Hermes 等其它 agent 应在 system prompt / context 里挂上 `AGENTS.md`
+
+改任何内容前先读 `AGENTS.md`。
+
+## License
+
+MIT
