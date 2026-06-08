@@ -5,7 +5,7 @@
 
 ## 1. 项目长什么样
 
-`zhanglu.net` — 张鲁的个人站。
+`zhanglu.net` — 张路的个人站。
 
 - **框架**: Astro 5 + Tailwind 4 + Content Collections (Zod 校验)
 - **托管**: Cloudflare Pages（直连 GitHub `zhanglunet/zhanglu.net`，push 即部署）

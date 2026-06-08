@@ -1,6 +1,6 @@
 # zhanglu.net
 
-张鲁的个人站。Astro 5 + Tailwind 4 + Cloudflare Pages。
+张路的个人站。Astro 5 + Tailwind 4 + Cloudflare Pages。
 
 ## 开发
 
