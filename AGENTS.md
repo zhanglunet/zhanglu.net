@@ -175,23 +175,31 @@ pnpm run new:project -- <slug> "项目名" "一句话标语" https://url.com 202
 - `order: 1` / `2` / ... 控制顺序（数字小靠前）
 - `tech` 数组超过 4 个卡片上只显示前 4 个
 
-### 5.2 加公众号文章
+### 5.2 加文章入口（写作索引）
+
+`articles/` 是**写作索引**，链接指向**原始出处** —— 优先用原始博客 / 项目站点的 URL，
+不要用公众号转载的 URL（公众号反爬，agent 抓不到正文；而且原始页通常排版更好）。
+也可以指向 `/posts/<slug>` —— 站内长文也是合法的"原始出处"。
 
 写 `src/content/articles/<slug>.md`:
 
 ```yaml
 ---
 title: "文章原标题"
-source: wechat
-url: https://mp.weixin.qq.com/s/xxxxxxxxx
-date: 2026-06-08
+source: blog          # blog | wechat | substack | x | other
+url: https://your-original-url.com/path
+                       # 优先原始博客 URL; 或 https://zhanglu.net/posts/<slug>
+date: 2026-06-09
 summary: 一两句话摘要, 列表卡片直接显示, <80 字。
 tags: [skill, claude, 自动化]
+featured: false       # true 可选, 暂未启用首页过滤
 ---
 ```
 
-**slug 命名**: 不要用 WeChat URL 的 hash（丑），用 `日期-关键词` 或纯关键词。  
-**WebFetch 抓不到 WeChat**: 公众号有反爬，必须用户手喂标题 / 日期 / 摘要 / tags。
+**ArticleCard 行为**：URL 起始为站点 origin（`https://zhanglu.net/...`）时按"站内"渲染、同 tab 打开；否则按 source 标签渲染、新 tab 打开。
+
+**slug 命名**: 不要用 URL 的 hash，用 `日期-关键词` 或纯关键词。  
+**特殊：公众号正文**: 公众号有反爬，WebFetch 抓不到。如果同一篇内容既在公众号也在原始博客发了，**优先用博客 URL**（agent 友好）。
 
 ### 5.3 同步本机 skills
 
@@ -377,12 +385,12 @@ YAML `|` block 在 frontmatter 里保留 `\n`，但 HTML 默认折叠空白。`S
 
 ---
 
-## 11. 当前内容快照（截至 2026-06-09）
+## 11. 当前内容快照（截至 2026-06-10）
 
 | collection | 数量 | featured |
 |---|---|---|
 | projects | 3 | mbabrand, qiji-roadshow-2026, qcc-agent |
-| articles | 1 | (none featured 字段未启用首页过滤) |
+| articles | 2 | agent-cli (站内 /posts/), qiji-56-projects-one-night (qiji 项目站) |
 | skills | 30 | zhanglu（14 个 handwritten:true） |
 
 `src/data/about.json` 当前 hero / bio 是基于公开项目信息撰写的占位描述，可随时替换为本人定义版。
@@ -513,8 +521,15 @@ CLI 与站点端点松耦合 —— 改端点 schema 时若不破坏向下兼容
 
 | 集合 / 路径 | 内容 | URL 字段 |
 |---|---|---|
-| `src/content/articles/` | 公众号 / Substack / 博客的**外链入口** | 必填，外链 |
-| `src/pages/posts/*.astro` | **站内长文**（无外链备份的原生 post） | 不适用 |
+| `src/content/articles/` | **写作索引** — 指向原始出处（外部博客 / 公众号 / 站内 `/posts/<slug>`） | 必填 URL（绝对地址）|
+| `src/pages/posts/*.astro` | **站内长文** — 原生 post 页面 | 不适用 |
 | `docs/*.md` | 仓库内部文档，不上站 | 不适用 |
+
+`articles/` 不再只是"外链入口"。一篇站内 post 应该同时：
+1. 写 `src/pages/posts/<slug>.astro`（站内渲染）
+2. 写 `src/content/articles/<slug>.md`（写作索引，url 指向 `https://zhanglu.net/posts/<slug>`）
+
+这样 `/articles/` 就是完整的写作索引，`/posts/` 是站内长文列表，两者互补。
+`ArticleCard` 自动识别站内 URL，用同 tab 而非新 tab 打开。
 
 如果未来 posts 多了，把 `src/pages/posts/*.astro` 改成 `src/content/posts/*.md` 集合 + `[slug].astro` 渲染，schema 加进 `config.ts`。

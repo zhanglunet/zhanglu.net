@@ -170,18 +170,13 @@ build + test + commit:     15 分钟
 - 站点：zhanglu.net
 - GitHub：@zhanglunet
 
-## 发布后
+## 现状（2026-06-10 更新）
 
-把 WeChat URL 填到 `src/content/articles/agent-cli.md`：
+**已在站上发表**：站内长文路径 `/posts/agent-cli`，对应的写作索引条目
+`src/content/articles/agent-cli.md` 已经入库，URL 指向站内 `https://zhanglu.net/posts/agent-cli`。
 
-```yaml
----
-title: "给 agent 写了个 CLI：用一行 npx zhanglu 替代 HTML 抓取"
-source: wechat
-url: https://mp.weixin.qq.com/s/<填进来>
-date: 2026-06-09
-summary: 给 zhanglu.net 加了 9 个 JSON 端点 + 一个零依赖 CLI，agent 端 npx zhanglu list skills 就能用。1.5 小时上线。
-tags: [skill, agent, claude, infra]
-featured: true
----
-```
+**还没发的话**：可以把本文作为公众号底稿，但不要再额外加一份 `articles/` 入口，
+因为 `articles/` 只收"原始出处"——站内 post 就是原始出处，公众号是转载。
+（如果同一篇内容公众号阅读量很大、想单独列出来，可以把现有 `articles/agent-cli.md`
+的 url 改成公众号链接。但这样 ArticleCard 会把它标成"公众号"而不是"站内"，并新 tab 打开。
+不推荐：原始出处优先。）

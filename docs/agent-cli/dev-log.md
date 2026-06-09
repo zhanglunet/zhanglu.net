@@ -98,8 +98,15 @@ const entry = props.entry as Awaited<ReturnType<typeof getCollection<'skills'>>>
 
 ## 后续 TODO
 
-- [ ] 发 `zhanglu` 到 npm（`cd cli && npm publish`），让 `npx zhanglu` 一键可用
-- [ ] 公众号文章发布后，加 `src/content/articles/agent-cli-design.md` 入口
+- [x] 写 `/agents` 站内接入指南页（hero + 端点表 + CLI + curl + Claude Code 集成）
+- [x] 写 `/posts/agent-cli` 站内长文（基于 wechat-draft.md 重排版）
+- [x] 把 `articles` 集合从"外链入口"放宽到"写作索引"（站内 `/posts/` 也是合法 URL），
+      并加 `articles/agent-cli.md` 入口指向站内 post
+- [x] 把 qiji 文章入口的 URL 从公众号换成原始项目站 `qiji-roadshow-2026.pages.dev/story`
+      （agent 友好 + 原始出处优先原则）
+- [ ] 发 `zhanglu` 到 npm（`cd cli && npm publish --access public`），让 `npx zhanglu` 一键可用。
+      **需要用户 npm auth**：`npm login` 之后 publish。在这之前文章 / 文档里的 `npx zhanglu`
+      只是"将来会工作"，本机开发用 `node cli/bin/zhanglu.mjs` 替代。
 - [ ] 观察 7 天的 `/api/*.json` 访问日志，看是否需要进一步优化
 - [ ] 如果有人请求 MCP server，写一个 CF Worker 包装现有端点
 
