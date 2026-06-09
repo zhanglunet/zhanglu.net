@@ -181,7 +181,7 @@ CORS：所有端点带 `Access-Control-Allow-Origin: *`，浏览器端 agent 也
 
 ```
 cli/
-├── package.json   # name: "zhanglu-net", bin: { "zhanglu-net": "./bin/zhanglu.mjs" }
+├── package.json   # name: "zhanglu-net", bin: { "zhanglu-net": "./bin/zhanglu-net.mjs" }
 ├── bin/
 │   └── zhanglu.mjs  # 单文件, ~270 行
 └── README.md
@@ -260,9 +260,9 @@ npx zhanglu-net --help
 ## 8. 测试 / 验证
 
 1. `pnpm run build` 必须过，所有 `/api/*.json` 落到 `dist/api/`
-2. `node cli/bin/zhanglu.mjs endpoints --base http://localhost:4321` 拿到 manifest
-3. `node cli/bin/zhanglu.mjs list skills` 输出非空
-4. `node cli/bin/zhanglu.mjs search "MCP" --json` JSON parsable
+2. `node cli/bin/zhanglu-net.mjs endpoints --base http://localhost:4321` 拿到 manifest
+3. `node cli/bin/zhanglu-net.mjs list skills` 输出非空
+4. `node cli/bin/zhanglu-net.mjs search "MCP" --json` JSON parsable
 5. CF Pages 部署后，`curl https://zhanglu.net/api/index.json` 200 且 `Content-Type: application/json`
 
 ## 9. 时间盒子

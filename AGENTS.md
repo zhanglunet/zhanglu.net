@@ -460,13 +460,13 @@ cli/
 调用方式：
 - `npx zhanglu-net <cmd>` —— 推荐，不用装
 - `npm i -g zhanglu-net` —— 全局装
-- `node cli/bin/zhanglu.mjs <cmd>` —— 本地开发
+- `node cli/bin/zhanglu-net.mjs <cmd>` —— 本地开发
 
 环境变量：
 - `ZHANGLU_BASE_URL=http://localhost:4321` 切到本地 dev
 - `NO_COLOR=1` 关 ANSI 颜色
 
-CLI 是端点的薄包装。改命令逻辑改 `cli/bin/zhanglu.mjs`，改数据形状改端点。
+CLI 是端点的薄包装。改命令逻辑改 `cli/bin/zhanglu-net.mjs`，改数据形状改端点。
 
 ### 14.3 发布到 npm
 
