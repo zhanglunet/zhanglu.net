@@ -26,7 +26,7 @@
 
 ### 起因
 
-zhanglu.net 上线两周，攒了 30 个 Claude Skill 索引、几个项目、几篇公众号文章入口。问题来了：
+zhanglu.net 昨天上线。开站第一版就装了 30 个 Claude Skill 索引、3 个项目、1 篇公众号文章入口。问题来了：
 
 > AI agent 想引用我站上的内容，怎么办？
 

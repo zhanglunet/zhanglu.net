@@ -4,7 +4,7 @@
 
 ## 起因
 
-zhanglu.net 上线两周，站内已经聚了 30 个 Claude Skill、3 个项目、1 篇公众号文章入口。但是站点只有 HTML 视图 —— agent（Claude Code / Codex / Hermes / OpenClaw）想引用，要么 parse HTML，要么作罢。决定加一层 JSON API + CLI。
+zhanglu.net 2026-06-08 上线，今天（06-09）开始挂 agent 接口。开站第一版装了 30 个 Claude Skill、3 个项目、1 篇公众号文章入口。但是站点只有 HTML 视图 —— agent（Claude Code / Codex / Hermes / OpenClaw）想引用，要么 parse HTML，要么作罢。决定加一层 JSON API + CLI。
 
 ## 决策记录
 
