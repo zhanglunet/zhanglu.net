@@ -1,0 +1,34 @@
+# zhanglu.net
+
+> 张路的个人站。用 Claude Skill 把复杂判断变成可追溯的流水线。
+> 在做 mbabrand（5 评委合议给品牌做量化判断）和 qiji-roadshow-2026（一夜跑完 56 个路演项目的投资级 DD）。
+> 本机攒了 30 多个 Claude Skill。
+
+## For AI agents
+
+JSON API (build-time generated, free to fetch, CORS open):
+
+- /api/index.json — manifest with all endpoints + counts
+- /api/projects.json — projects list
+- /api/projects/{slug}.json — single project with body_md
+- /api/articles.json — 公众号 / blog 文章入口列表
+- /api/skills.json — Claude Skills 索引
+- /api/skills/{slug}.json — single skill with body_md
+- /api/about.json — bio + tags
+- /api/social.json — public socials (email scrubbed)
+- /api/search.json — flat corpus for client-side substring search
+
+## CLI
+
+```
+npx zhanglu list skills
+npx zhanglu list projects --featured
+npx zhanglu get skill mba --md
+npx zhanglu search "品牌判断"
+npx zhanglu about
+npx zhanglu endpoints
+```
+
+Source: https://github.com/zhanglunet/zhanglu.net
+Author: 张路 (@zhanglunet)
+公众号: 张路的碎碎念

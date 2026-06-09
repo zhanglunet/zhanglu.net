@@ -377,13 +377,13 @@ YAML `|` block 在 frontmatter 里保留 `\n`，但 HTML 默认折叠空白。`S
 
 ---
 
-## 11. 当前内容快照（截至 2026-06-08）
+## 11. 当前内容快照（截至 2026-06-09）
 
 | collection | 数量 | featured |
 |---|---|---|
-| projects | 2 | mbabrand, qiji-roadshow-2026 |
+| projects | 3 | mbabrand, qiji-roadshow-2026, qcc-agent |
 | articles | 1 | (none featured 字段未启用首页过滤) |
-| skills | 29 | (none featured，14 个 handwritten:true) |
+| skills | 30 | zhanglu（14 个 handwritten:true） |
 
 `src/data/about.json` 当前 hero / bio 是基于公开项目信息撰写的占位描述，可随时替换为本人定义版。
 
@@ -405,3 +405,95 @@ YAML `|` block 在 frontmatter 里保留 `\n`，但 HTML 默认折叠空白。`S
 ## 13. 文档同步
 
 改完代码 / 内容如果发现本指南某条过时了：**直接改本文件**，不要单开 changelog。本文是给未来你和其它 agent 看的快照，保持准确比保持历史重要。
+
+---
+
+## 14. Agent CLI 接口 (`/api/*.json` + `npx zhanglu`)
+
+> **目的**：让任何 AI agent（Claude Code / Codex / Hermes / OpenClaw / 自己写的）能用 HTTP GET 读站内结构化内容，不用 parse HTML。
+
+### 14.1 端点（build 时静态生成）
+
+| 端点 | 实现文件 | 说明 |
+|---|---|---|
+| `/api/index.json` | `src/pages/api/index.json.ts` | manifest: counts + 所有端点 |
+| `/api/projects.json` | `src/pages/api/projects.json.ts` | 项目列表 |
+| `/api/projects/{slug}.json` | `src/pages/api/projects/[slug].json.ts` | 单项目（含 `body_md`）|
+| `/api/articles.json` | `src/pages/api/articles.json.ts` | 公众号 / blog 入口 |
+| `/api/skills.json` | `src/pages/api/skills.json.ts` | Skill 索引 |
+| `/api/skills/{slug}.json` | `src/pages/api/skills/[slug].json.ts` | 单 skill（含 `body_md`）|
+| `/api/about.json` | `src/pages/api/about.json.ts` | 简介 |
+| `/api/social.json` | `src/pages/api/social.json.ts` | 公开社交（过滤邮箱）|
+| `/api/search.json` | `src/pages/api/search.json.ts` | 扁平语料给 CLI 客户端搜 |
+| `/llms.txt` | `public/llms.txt` | agent 自发现入口 |
+| `/robots.txt` | `public/robots.txt` | 标明 sitemap + allow all |
+
+所有端点：
+- 静态生成（`pnpm build` 时 → `dist/api/*.json`）
+- `Content-Type: application/json; charset=utf-8`
+- `Access-Control-Allow-Origin: *`（浏览器端 agent 也能用）
+
+**改字段**：先改 `src/content/config.ts` schema，再改对应端点 `.json.ts` 文件。Schema 是单一事实源。
+
+### 14.2 CLI（`cli/` 子目录）
+
+独立 package，bin name `zhanglu`，零运行时依赖。
+
+```
+cli/
+├── package.json    # name: "zhanglu"
+├── bin/zhanglu.mjs # 单文件 ~270 行 ESM
+└── README.md
+```
+
+调用方式：
+- `npx zhanglu <cmd>` —— 推荐，不用装
+- `npm i -g zhanglu` —— 全局装
+- `node cli/bin/zhanglu.mjs <cmd>` —— 本地开发
+
+环境变量：
+- `ZHANGLU_BASE_URL=http://localhost:4321` 切到本地 dev
+- `NO_COLOR=1` 关 ANSI 颜色
+
+CLI 是端点的薄包装。改命令逻辑改 `cli/bin/zhanglu.mjs`，改数据形状改端点。
+
+### 14.3 发布到 npm
+
+第一次发：
+
+```bash
+cd cli
+npm login                # 或 npm config set //registry.npmjs.org/:_authToken ...
+npm publish --access public
+```
+
+后续 bump 版本：改 `cli/package.json` 的 `version`，`npm publish` 再发一次。
+
+CLI 与站点端点松耦合 —— 改端点 schema 时若不破坏向下兼容，CLI 不需要发新版。
+
+### 14.4 加新端点 / 字段（流程）
+
+1. **数据源**：如果是新字段，先改 `src/content/config.ts` Zod schema；如果是新 collection，加 `defineCollection`
+2. **markdown / JSON 落数据**：`src/content/<...>` 或 `src/data/*.json`
+3. **端点**：复制现有的 `*.json.ts` 改字段
+4. **CLI**（可选）：如果想让 CLI 也能拿，在 `bin/zhanglu.mjs` 加子命令
+5. **manifest**：在 `src/pages/api/index.json.ts` 的 `endpoints` 里登记新端点
+6. **llms.txt**：`public/llms.txt` 里加一行说明
+7. **测**：`pnpm build` 过 → `curl localhost:4321/api/<新端点>.json` 看数据
+
+### 14.5 不要做的事
+
+- ❌ **不要在端点里塞业务逻辑**。端点只做"读 collection + JSON 序列化"。变换 / 过滤交给 CLI 或 agent。
+- ❌ **不要给端点加鉴权**。站点公开，鉴权之外的内容不该出现在 `src/content/`。
+- ❌ **不要把 `social.json` 的邮箱字段加回来再让端点出**。端点的脱敏过滤是兜底，别依赖它而推任意 PII 进 source。
+- ❌ **不要让端点依赖外部 fetch**。所有数据来自仓库内 markdown / JSON，否则 CF Pages build 不稳定。
+- ❌ **不要做服务端搜索**。语料 < 100 项，`/api/search.json` 客户端 substring 够用。要换 MiniSearch 等"语料涨到 200+"。
+- ❌ **CLI 不要加运行时依赖**。`parseArgs` / `fetch` / ANSI 都是 Node 18+ 内置。加 `chalk` / `commander` 是品味问题不是必要。
+
+### 14.6 文档
+
+- `docs/agent-cli/design.md` —— 设计文档，端点 schema、决策记录、可演进路径
+- `docs/agent-cli/dev-log.md` —— 开发记录，踩过的坑
+- `docs/agent-cli/wechat-draft.md` —— 公众号文章草稿
+- `cli/README.md` —— CLI 用户文档
+- `public/llms.txt` —— agent 自发现入口

@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# For AI agents: structured data lives under /api/
+# See /llms.txt for a self-describing manifest.
+
+Sitemap: https://zhanglu.net/sitemap-index.xml

@@ -62,6 +62,28 @@ git push origin main → Cloudflare Pages (project: zhanglu-net) → 1-2 min →
 
 改任何内容前先读 `AGENTS.md`。
 
+## 给 AI agent 读
+
+站点所有结构化内容在 build 时落成静态 JSON，挂在 `/api/*.json`。任何 agent 用 HTTP GET 直接拿，CORS 全开。
+
+```bash
+# 自发现入口
+curl https://zhanglu.net/llms.txt
+curl https://zhanglu.net/api/index.json
+
+# 或用 CLI（零依赖）
+npx zhanglu list skills --featured
+npx zhanglu get skill mba --md
+npx zhanglu search "品牌判断" --type skill
+```
+
+完整设计 / 端点 schema / CLI 文档见：
+
+- [`docs/agent-cli/design.md`](./docs/agent-cli/design.md) — 设计文档
+- [`docs/agent-cli/dev-log.md`](./docs/agent-cli/dev-log.md) — 开发记录
+- [`cli/README.md`](./cli/README.md) — CLI 用户文档
+- [`AGENTS.md`](./AGENTS.md) §14 — 维护指南
+
 ## License
 
 MIT

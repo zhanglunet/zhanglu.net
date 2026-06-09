@@ -25,7 +25,7 @@ source: local
 category: "knowledge-base"
 featured: false
 handwritten: false
-synced_at: "2026-06-08"
+synced_at: "2026-06-09"
 ---
 
 本 skill 来源于本机 `~/.claude/skills/tian-wiki-ingest/SKILL.md`，由 `pnpm run sync:skills` 自动同步。
