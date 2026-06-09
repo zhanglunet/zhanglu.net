@@ -33,7 +33,7 @@ export const GET: APIRoute = async ({ site }) => {
       social: `${base}/api/social.json`,
       search: `${base}/api/search.json`,
     },
-    cli: 'npx zhanglu --help',
+    cli: 'npx zhanglu-net --help',
     docs: `${base}/llms.txt`,
     rss: `${base}/rss.xml`,
     sitemap: `${base}/sitemap-index.xml`,

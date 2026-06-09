@@ -31,7 +31,7 @@ const desc = '给 AI agent (Claude Code / Codex / Hermes / OpenClaw) 一个统�
     <p class="text-[var(--color-muted)] leading-relaxed max-w-2xl mb-6">
       站点所有结构化内容在 build 时落成静态 JSON，挂在 <code class="font-mono text-sm bg-[var(--color-paper-2)] px-1.5 py-0.5 rounded">/api/*.json</code>。
       任何 agent（Claude Code / Codex / Hermes / OpenClaw / 自己写的）用 HTTP GET 直接拿，CORS 全开，无 token。
-      另带一个零依赖 CLI <code class="font-mono text-sm bg-[var(--color-paper-2)] px-1.5 py-0.5 rounded">npx zhanglu</code>。
+      另带一个零依赖 CLI <code class="font-mono text-sm bg-[var(--color-paper-2)] px-1.5 py-0.5 rounded">npx zhanglu-net</code>。
     </p>
     <div class="flex flex-wrap gap-3 text-sm">
       <a href="/llms.txt" class="px-3 py-1.5 border border-[var(--color-rule)] rounded hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors">/llms.txt 自发现</a>
@@ -56,11 +56,11 @@ curl -s https://zhanglu.net/api/skills/mba.json \
       </div>
       <div>
         <p class="text-xs font-mono text-[var(--color-muted)] mb-2 tracking-wider">CLI</p>
-        <pre class="bg-[#1a1a1a] text-[#f3f1ea] p-4 rounded text-xs leading-relaxed overflow-x-auto"><code>npx zhanglu endpoints
-npx zhanglu list skills --featured
-npx zhanglu get skill mba --md
-npx zhanglu search "品牌判断" --type skill
-npx zhanglu about --json</code></pre>
+        <pre class="bg-[#1a1a1a] text-[#f3f1ea] p-4 rounded text-xs leading-relaxed overflow-x-auto"><code>npx zhanglu-net endpoints
+npx zhanglu-net list skills --featured
+npx zhanglu-net get skill mba --md
+npx zhanglu-net search "品牌判断" --type skill
+npx zhanglu-net about --json</code></pre>
       </div>
     </div>
   </section>
@@ -91,7 +91,7 @@ npx zhanglu about --json</code></pre>
     <h2 class="font-serif text-2xl font-semibold mb-2">CLI</h2>
     <p class="text-[var(--color-muted)] text-sm mb-5">
       包名 <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">zhanglu</code>，零运行时依赖。
-      Node 18+ 直接 <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">npx</code> 跑，或 <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">npm i -g zhanglu</code>。
+      Node 18+ 直接 <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">npx</code> 跑，或 <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">npm i -g zhanglu-net</code>。
     </p>
 
     <h3 class="font-serif text-lg font-semibold mt-6 mb-3">命令</h3>
@@ -147,7 +147,7 @@ npx zhanglu about --json</code></pre>
   <section class="mb-12">
     <h2 class="font-serif text-2xl font-semibold mb-2">Claude Code 集成</h2>
     <p class="text-[var(--color-muted)] text-sm mb-5">
-      有个 <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">/zhanglu</code> skill，触发词包括「查张路的 skill」「zhanglu 上的 X」「张路在做什么项目」。Skill 会自动调 <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">npx zhanglu</code>。
+      有个 <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">/zhanglu</code> skill，触发词包括「查张路的 skill」「zhanglu 上的 X」「张路在做什么项目」。Skill 会自动调 <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">npx zhanglu-net</code>。
     </p>
     <a href="/skills/zhanglu" class="inline-flex items-center gap-2 px-4 py-2 border border-[var(--color-rule)] rounded text-sm hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors">
       看 /zhanglu skill 详情 →
@@ -183,7 +183,7 @@ npx zhanglu about --json</code></pre>
     <div class="space-y-3 text-sm">
       <a href="/posts/agent-cli" class="block hover:text-[var(--color-accent)] transition-colors">
         <span class="font-mono text-xs text-[var(--color-muted)] mr-2">[文章]</span>
-        给 agent 写了个 CLI：用一行 npx zhanglu 替代 HTML 抓取
+        给 agent 写了个 CLI：用一行 npx zhanglu-net 替代 HTML 抓取
       </a>
       <a href="https://github.com/zhanglunet/zhanglu.net/blob/main/docs/agent-cli/design.md" class="block hover:text-[var(--color-accent)] transition-colors">
         <span class="font-mono text-xs text-[var(--color-muted)] mr-2">[design]</span>

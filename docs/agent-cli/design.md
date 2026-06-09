@@ -40,7 +40,7 @@ zhanglu.net 上的内容（30+ Claude Skill 索引、几个项目、公众号文
                                   │
                 ┌─────────────────┴─────────────────┐
                 │                                   │
-            curl / fetch                    npx zhanglu (CLI)
+            curl / fetch                    npx zhanglu-net (CLI)
             (任何 agent)                     (Node 18+, 零运行时 deps)
 ```
 
@@ -64,7 +64,7 @@ zhanglu.net 上的内容（30+ Claude Skill 索引、几个项目、公众号文
     "project": "https://zhanglu.net/api/projects/{slug}.json",
     "...": "..."
   },
-  "cli": "npx zhanglu --help",
+  "cli": "npx zhanglu-net --help",
   "docs": "https://zhanglu.net/llms.txt"
 }
 ```
@@ -181,7 +181,7 @@ CORS：所有端点带 `Access-Control-Allow-Origin: *`，浏览器端 agent 也
 
 ```
 cli/
-├── package.json   # name: "zhanglu", bin: { zhanglu: "./bin/zhanglu.mjs" }
+├── package.json   # name: "zhanglu-net", bin: { "zhanglu-net": "./bin/zhanglu.mjs" }
 ├── bin/
 │   └── zhanglu.mjs  # 单文件, ~270 行
 └── README.md
@@ -231,7 +231,7 @@ cli/
 - ...
 
 ## CLI
-npx zhanglu --help
+npx zhanglu-net --help
 ```
 
 `/robots.txt` 顺手加，明确允许所有 user agent + sitemap 链接。

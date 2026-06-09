@@ -23,10 +23,10 @@ const c = {
   red: (s) => (COLOR ? `\x1b[31m${s}\x1b[0m` : s),
 };
 
-const HELP = `${c.bold('zhanglu')} ${c.dim('v' + VERSION)}  — agent-friendly CLI for zhanglu.net
+const HELP = `${c.bold('zhanglu-net')} ${c.dim('v' + VERSION)}  — agent-friendly CLI for zhanglu.net
 
 ${c.bold('USAGE')}
-  npx zhanglu <command> [args] [--flags]
+  npx zhanglu-net <command> [args] [--flags]
 
 ${c.bold('COMMANDS')}
   list <kind>          列出 skills | projects | articles
@@ -50,12 +50,12 @@ ${c.bold('FLAGS')}
   --base <url>         覆盖站点根（默认 ${DEFAULT_BASE}）
 
 ${c.bold('EXAMPLES')}
-  npx zhanglu list skills --featured
-  npx zhanglu list projects --status live --json
-  npx zhanglu get skill mba --md
-  npx zhanglu get project qcc-agent
-  npx zhanglu search "品牌判断" --type skill
-  npx zhanglu about --json
+  npx zhanglu-net list skills --featured
+  npx zhanglu-net list projects --status live --json
+  npx zhanglu-net get skill mba --md
+  npx zhanglu-net get project qcc-agent
+  npx zhanglu-net search "品牌判断" --type skill
+  npx zhanglu-net about --json
 
 ${c.bold('ENV')}
   ZHANGLU_BASE_URL=http://localhost:4321   # 本地 dev 改这里
@@ -138,13 +138,13 @@ async function cmdList(base, kind, flags) {
     const desc = truncate(item.description || item.tagline || item.summary, Math.max(20, width - 28 - 4 - 2));
     process.stdout.write(`${c.bold(slug)} ${marks} ${c.dim(desc)}\n`);
   }
-  process.stdout.write('\n' + c.dim('hint: ') + `npx zhanglu get ${kind.replace(/s$/, '')} <slug>\n`);
+  process.stdout.write('\n' + c.dim('hint: ') + `npx zhanglu-net get ${kind.replace(/s$/, '')} <slug>\n`);
 }
 
 async function cmdGet(base, kind, slug, flags) {
   const map = { skill: 'skills', project: 'projects', article: 'articles' };
   if (!map[kind]) die(`unknown kind "${kind}". try: skill / project / article`);
-  if (!slug) die(`missing <slug>. try: npx zhanglu list ${map[kind]}`);
+  if (!slug) die(`missing <slug>. try: npx zhanglu-net list ${map[kind]}`);
 
   if (kind === 'article') {
     // articles don't have a per-slug endpoint; pull from list and filter
@@ -192,7 +192,7 @@ async function cmdGet(base, kind, slug, flags) {
 }
 
 async function cmdSearch(base, kw, flags) {
-  if (!kw) die('usage: npx zhanglu search <keyword> [--type skill|project|article] [--limit N]');
+  if (!kw) die('usage: npx zhanglu-net search <keyword> [--type skill|project|article] [--limit N]');
   const data = await fetchJson(base, '/api/search.json');
   const needle = kw.toLowerCase();
 
@@ -276,7 +276,7 @@ async function main() {
     return;
   }
   if (argv[0] === 'version' || argv[0] === '--version' || argv[0] === '-v') {
-    process.stdout.write(`zhanglu v${VERSION}\n`);
+    process.stdout.write(`zhanglu-net v${VERSION}\n`);
     return;
   }
 
@@ -323,7 +323,7 @@ async function main() {
     case 'manifest':
       return cmdEndpoints(base, flags);
     default:
-      die(`unknown command "${cmd}". try: npx zhanglu --help`);
+      die(`unknown command "${cmd}". try: npx zhanglu-net --help`);
   }
 }
 

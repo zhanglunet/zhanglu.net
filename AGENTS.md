@@ -416,7 +416,7 @@ YAML `|` block 在 frontmatter 里保留 `\n`，但 HTML 默认折叠空白。`S
 
 ---
 
-## 14. Agent CLI 接口 (`/api/*.json` + `npx zhanglu`)
+## 14. Agent CLI 接口 (`/api/*.json` + `npx zhanglu-net`)
 
 > **目的**：让任何 AI agent（Claude Code / Codex / Hermes / OpenClaw / 自己写的）能用 HTTP GET 读站内结构化内容，不用 parse HTML。
 
@@ -458,8 +458,8 @@ cli/
 ```
 
 调用方式：
-- `npx zhanglu <cmd>` —— 推荐，不用装
-- `npm i -g zhanglu` —— 全局装
+- `npx zhanglu-net <cmd>` —— 推荐，不用装
+- `npm i -g zhanglu-net` —— 全局装
 - `node cli/bin/zhanglu.mjs <cmd>` —— 本地开发
 
 环境变量：

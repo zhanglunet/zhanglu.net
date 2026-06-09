@@ -1,8 +1,8 @@
 ---
 import Base from '../../layouts/Base.astro';
 
-const title = '给 agent 写了个 CLI：用一行 npx zhanglu 替代 HTML 抓取';
-const desc = '给 zhanglu.net 加了 9 个 JSON 端点 + 一个零依赖 CLI，agent 端 npx zhanglu list skills 就能用。1.5 小时上线。';
+const title = '给 agent 写了个 CLI：用一行 npx zhanglu-net 替代 HTML 抓取';
+const desc = '给 zhanglu.net 加了 9 个 JSON 端点 + 一个零依赖 CLI，agent 端 npx zhanglu-net list skills 就能用。1.5 小时上线。';
 const date = '2026-06-09';
 ---
 <Base title={title} description={desc}>
@@ -50,7 +50,7 @@ HTML 页面     /api/*.json     /llms.txt
                   │
        ┌──────────┴──────────┐
        │                     │
-   curl / fetch         npx zhanglu (CLI)
+   curl / fetch         npx zhanglu-net (CLI)
    (任何 agent)         (Node 18+，零运行时依赖)`}</code></pre>
 
       <h3>第一层：9 个静态 JSON 端点</h3>
@@ -69,10 +69,10 @@ HTML 页面     /api/*.json     /llms.txt
 
       <h3>第二层：CLI</h3>
 
-      <pre><code>{`npx zhanglu list skills --featured
-npx zhanglu get skill mba --md
-npx zhanglu search "品牌判断" --type skill
-npx zhanglu about --json`}</code></pre>
+      <pre><code>{`npx zhanglu-net list skills --featured
+npx zhanglu-net get skill mba --md
+npx zhanglu-net search "品牌判断" --type skill
+npx zhanglu-net about --json`}</code></pre>
 
       <p>CLI 是 JSON 端点的薄包装。<code>--json</code> 给 agent pipe，默认人类可读，带 ANSI 颜色（agent 端非 TTY 自动关）。</p>
 
@@ -82,7 +82,7 @@ npx zhanglu about --json`}</code></pre>
 
       <p><strong>不做服务端搜索。</strong>语料就 30 条 skill + 3 个项目 + 几篇文章，全文 &lt; 100KB。CLI 拉一份 <code>/api/search.json</code>，本地 <code>text.toLowerCase().includes(needle)</code> 就够。简单评分：title 命中 +5、出现次数累加。语料涨到几百再换 MiniSearch。</p>
 
-      <p><strong>CLI 零运行时依赖。</strong>Node 18+ 内置的 <code>fetch</code> 替代 <code>node-fetch</code>，<code>node:util</code> 的 <code>parseArgs</code> 替代 <code>commander</code>，ANSI escape codes 手拼替代 <code>chalk</code>。<code>npx zhanglu</code> 启动快，agent 调也不卡。</p>
+      <p><strong>CLI 零运行时依赖。</strong>Node 18+ 内置的 <code>fetch</code> 替代 <code>node-fetch</code>，<code>node:util</code> 的 <code>parseArgs</code> 替代 <code>commander</code>，ANSI escape codes 手拼替代 <code>chalk</code>。<code>npx zhanglu-net</code> 启动快，agent 调也不卡。</p>
 
       <p><strong>公众号正文不做端点。</strong>公众号 URL 反爬，WebFetch 抓不到。站内只存入口（title / date / summary / url），正文跳外链。</p>
 
@@ -100,13 +100,13 @@ npx zhanglu about --json`}</code></pre>
 - ...
 
 ## CLI
-npx zhanglu --help`}</code></pre>
+npx zhanglu-net --help`}</code></pre>
 
       <p>任何 agent 拿到 <code>https://zhanglu.net</code>，先 <code>GET /llms.txt</code>，自己就知道下一步去哪了。</p>
 
       <h2>怎么用</h2>
 
-      <p><strong>Claude Code 里</strong>：我写了个 <code>/zhanglu</code> skill，触发词包括「查张路的 skill」「zhanglu 上的 X」。skill 会自动调 <code>npx zhanglu</code>。</p>
+      <p><strong>Claude Code 里</strong>：我写了个 <code>/zhanglu</code> skill，触发词包括「查张路的 skill」「zhanglu 上的 X」。skill 会自动调 <code>npx zhanglu-net</code>。</p>
 
       <p><strong>其他 agent</strong>：</p>
 
@@ -124,9 +124,9 @@ curl -s https://zhanglu.net/api/search.json \\
 
       <p>或者直接：</p>
 
-      <pre><code>{`npx zhanglu list skills --featured --json
-npx zhanglu get skill mba --md
-npx zhanglu search "品牌"`}</code></pre>
+      <pre><code>{`npx zhanglu-net list skills --featured --json
+npx zhanglu-net get skill mba --md
+npx zhanglu-net search "品牌"`}</code></pre>
 
       <h2>实施时间</h2>
 
@@ -148,7 +148,7 @@ build + test + commit:     15 分钟
         <li>站点接入指南：<a href="/agents">/agents</a></li>
         <li>自发现入口：<a href="/llms.txt">/llms.txt</a></li>
         <li>Manifest：<a href="/api/index.json">/api/index.json</a></li>
-        <li>CLI：<code>npx zhanglu --help</code></li>
+        <li>CLI：<code>npx zhanglu-net --help</code></li>
         <li>源码：<a href="https://github.com/zhanglunet/zhanglu.net">github.com/zhanglunet/zhanglu.net</a></li>
         <li>设计文档：<a href="https://github.com/zhanglunet/zhanglu.net/blob/main/docs/agent-cli/design.md">docs/agent-cli/design.md</a></li>
       </ul>

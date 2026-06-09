@@ -1,10 +1,10 @@
 {
-  "name": "zhanglu",
+  "name": "zhanglu-net",
   "version": "0.1.0",
   "description": "CLI for agents to read zhanglu.net — Claude Skills index, projects, articles, search.",
   "type": "module",
   "bin": {
-    "zhanglu": "./bin/zhanglu.mjs"
+    "zhanglu-net": "./bin/zhanglu.mjs"
   },
   "files": [
     "bin/",

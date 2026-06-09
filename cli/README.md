@@ -3,12 +3,12 @@
 > Agent-friendly CLI for [zhanglu.net](https://zhanglu.net) — Claude Skills 索引、项目、文章、搜索，全走静态 JSON 端点，零依赖。
 
 ```bash
-npx zhanglu --help
-npx zhanglu list skills
-npx zhanglu list projects --featured
-npx zhanglu get skill mba --md
-npx zhanglu search "品牌判断" --type skill
-npx zhanglu about --json
+npx zhanglu-net --help
+npx zhanglu-net list skills
+npx zhanglu-net list projects --featured
+npx zhanglu-net get skill mba --md
+npx zhanglu-net search "品牌判断" --type skill
+npx zhanglu-net about --json
 ```
 
 ## 为什么
@@ -26,13 +26,13 @@ npx zhanglu about --json
 不用装，直接：
 
 ```bash
-npx zhanglu <cmd>
+npx zhanglu-net <cmd>
 ```
 
 或全局：
 
 ```bash
-npm i -g zhanglu
+npm i -g zhanglu-net
 zhanglu <cmd>
 ```
 

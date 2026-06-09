@@ -72,9 +72,9 @@ curl https://zhanglu.net/llms.txt
 curl https://zhanglu.net/api/index.json
 
 # 或用 CLI（零依赖）
-npx zhanglu list skills --featured
-npx zhanglu get skill mba --md
-npx zhanglu search "品牌判断" --type skill
+npx zhanglu-net list skills --featured
+npx zhanglu-net get skill mba --md
+npx zhanglu-net search "品牌判断" --type skill
 ```
 
 站上对应页面（给读者看）：

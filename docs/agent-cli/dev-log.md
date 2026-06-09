@@ -31,7 +31,7 @@ zhanglu.net 2026-06-08 上线，今天（06-09）开始挂 agent 接口。开站
 - global `fetch` 替代 `node-fetch`
 - ANSI escape codes 手拼替代 `chalk`
 
-**结论**：零运行时 deps。`npx zhanglu` 启动快，agent 跑也不卡。
+**结论**：零运行时 deps。`npx zhanglu-net` 启动快，agent 跑也不卡。
 
 ### D4 — Skill body 放哪？
 
@@ -96,6 +96,17 @@ const entry = props.entry as Awaited<ReturnType<typeof getCollection<'skills'>>>
 - [x] `ZHANGLU_BASE_URL=http://localhost:4321` 对本地 dev server 工作
 - [x] CORS header 在所有端点
 
+### P4 — npm 包名 `zhanglu` 被占
+
+准备发包前 `npm view zhanglu`，返回 `zhanglu@1.0.0`（2021 年别人发的占名包，1 个版本，0 deps）。
+`zhanglu-cli` 也被占（另一个脚手架）。
+
+**解决**：包名改成 `zhanglu-net`（匹配域名 zhanglu.net）。bin 也叫 `zhanglu-net`。
+全仓库 `npx zhanglu` → `npx zhanglu-net`、`npm i -g zhanglu` → `npm i -g zhanglu-net`、
+HELP / version 输出、所有文档 / 文章 / SKILL.md 一并替换。skill 名仍然是 `/zhanglu`（Claude 侧标识不变）。
+
+经验：**起名前 `npm view <name>` 先验**，别等代码全写完才发现。
+
 ## 后续 TODO
 
 - [x] 写 `/agents` 站内接入指南页（hero + 端点表 + CLI + curl + Claude Code 集成）
@@ -104,8 +115,9 @@ const entry = props.entry as Awaited<ReturnType<typeof getCollection<'skills'>>>
       并加 `articles/agent-cli.md` 入口指向站内 post
 - [x] 把 qiji 文章入口的 URL 从公众号换成原始项目站 `qiji-roadshow-2026.pages.dev/story`
       （agent 友好 + 原始出处优先原则）
-- [ ] 发 `zhanglu` 到 npm（`cd cli && npm publish --access public`），让 `npx zhanglu` 一键可用。
-      **需要用户 npm auth**：`npm login` 之后 publish。在这之前文章 / 文档里的 `npx zhanglu`
+- [x] 处理 npm 包名冲突：`zhanglu` 被占 → 改用 `zhanglu-net`，全仓库改名
+- [ ] 发 `zhanglu-net` 到 npm（`cd cli && npm publish --access public`），让 `npx zhanglu-net` 一键可用。
+      **需要用户 npm auth**：`npm login` 之后 publish。在这之前文章 / 文档里的 `npx zhanglu-net`
       只是"将来会工作"，本机开发用 `node cli/bin/zhanglu.mjs` 替代。
 - [ ] 观察 7 天的 `/api/*.json` 访问日志，看是否需要进一步优化
 - [ ] 如果有人请求 MCP server，写一个 CF Worker 包装现有端点

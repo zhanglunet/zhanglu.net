@@ -26,12 +26,12 @@ JSON API (build-time generated, free to fetch, CORS open):
 ## CLI
 
 ```
-npx zhanglu list skills
-npx zhanglu list projects --featured
-npx zhanglu get skill mba --md
-npx zhanglu search "品牌判断"
-npx zhanglu about
-npx zhanglu endpoints
+npx zhanglu-net list skills
+npx zhanglu-net list projects --featured
+npx zhanglu-net get skill mba --md
+npx zhanglu-net search "品牌判断"
+npx zhanglu-net about
+npx zhanglu-net endpoints
 ```
 
 Source: https://github.com/zhanglunet/zhanglu.net
