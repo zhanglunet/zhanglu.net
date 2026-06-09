@@ -1,0 +1,207 @@
+---
+import Base from '../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const [projects, articles, skills] = await Promise.all([
+  getCollection('projects'),
+  getCollection('articles', ({ id }) => id !== 'README.md'),
+  getCollection('skills'),
+]);
+
+const endpoints: Array<{ path: string; desc: string; sample?: string }> = [
+  { path: '/api/index.json',           desc: 'Manifest — counts + 所有端点 URL', sample: '{ "counts": { "skills": ' + skills.length + ' }, "endpoints": { … } }' },
+  { path: '/api/projects.json',        desc: '项目列表',                          sample: `{ "count": ${projects.length}, "items": [{ "slug", "title", "tech": [], "year", … }] }` },
+  { path: '/api/projects/{slug}.json', desc: '单项目（含 body_md）',              sample: '{ …list 字段, "body_md": "## 是什么\\n…" }' },
+  { path: '/api/articles.json',        desc: '公众号 / 博客文章入口',             sample: `{ "count": ${articles.length}, "items": [{ "title", "source", "url", "date", "summary" }] }` },
+  { path: '/api/skills.json',          desc: 'Claude Skills 索引',                sample: `{ "count": ${skills.length}, "items": [{ "slug", "name", "description", "source", "featured" }] }` },
+  { path: '/api/skills/{slug}.json',   desc: '单 skill（含 body_md）',            sample: '{ …list 字段, "body_md": "本 skill 来源于…" }' },
+  { path: '/api/about.json',           desc: '作者简介 + tags',                   sample: '{ "name": "张路", "tagline", "bio", "tags": [], "permalink" }' },
+  { path: '/api/social.json',          desc: '公开社交链接（邮箱已脱敏）',         sample: '{ "links": [{ "label", "url", "handle", "icon" }] }' },
+  { path: '/api/search.json',          desc: '扁平语料给 CLI 客户端搜',           sample: '{ "items": [{ "type", "slug", "title", "text", "url" }] }' },
+];
+
+const title = 'For Agents';
+const desc = '给 AI agent (Claude Code / Codex / Hermes / OpenClaw) 一个统一的 HTTP / CLI 接口读 zhanglu.net 内容。';
+---
+<Base title={title} description={desc}>
+  <!-- Hero -->
+  <section class="pb-8 border-b border-[var(--color-rule)] mb-10">
+    <p class="text-xs font-mono text-[var(--color-accent)] mb-3 tracking-wider">FOR AI AGENTS</p>
+    <h1 class="font-serif text-3xl sm:text-4xl font-semibold mb-4">不抓 HTML，走 JSON。</h1>
+    <p class="text-[var(--color-muted)] leading-relaxed max-w-2xl mb-6">
+      站点所有结构化内容在 build 时落成静态 JSON，挂在 <code class="font-mono text-sm bg-[var(--color-paper-2)] px-1.5 py-0.5 rounded">/api/*.json</code>。
+      任何 agent（Claude Code / Codex / Hermes / OpenClaw / 自己写的）用 HTTP GET 直接拿，CORS 全开，无 token。
+      另带一个零依赖 CLI <code class="font-mono text-sm bg-[var(--color-paper-2)] px-1.5 py-0.5 rounded">npx zhanglu</code>。
+    </p>
+    <div class="flex flex-wrap gap-3 text-sm">
+      <a href="/llms.txt" class="px-3 py-1.5 border border-[var(--color-rule)] rounded hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors">/llms.txt 自发现</a>
+      <a href="/api/index.json" class="px-3 py-1.5 border border-[var(--color-rule)] rounded hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors">/api/index.json manifest</a>
+      <a href="/posts/agent-cli" class="px-3 py-1.5 border border-[var(--color-rule)] rounded hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors">为什么这么做 →</a>
+    </div>
+  </section>
+
+  <!-- Quick start -->
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-5">30 秒上手</h2>
+    <div class="grid md:grid-cols-2 gap-4">
+      <div>
+        <p class="text-xs font-mono text-[var(--color-muted)] mb-2 tracking-wider">CURL</p>
+        <pre class="bg-[#1a1a1a] text-[#f3f1ea] p-4 rounded text-xs leading-relaxed overflow-x-auto"><code>curl -s https://zhanglu.net/api/index.json | jq
+
+curl -s https://zhanglu.net/api/skills.json \
+  | jq '.items[] | select(.featured) | .name'
+
+curl -s https://zhanglu.net/api/skills/mba.json \
+  | jq -r .body_md</code></pre>
+      </div>
+      <div>
+        <p class="text-xs font-mono text-[var(--color-muted)] mb-2 tracking-wider">CLI</p>
+        <pre class="bg-[#1a1a1a] text-[#f3f1ea] p-4 rounded text-xs leading-relaxed overflow-x-auto"><code>npx zhanglu endpoints
+npx zhanglu list skills --featured
+npx zhanglu get skill mba --md
+npx zhanglu search "品牌判断" --type skill
+npx zhanglu about --json</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- Endpoints -->
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-2">端点</h2>
+    <p class="text-[var(--color-muted)] text-sm mb-5">
+      所有端点 build 时静态生成，Content-Type 是 <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">application/json</code>，带 <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">Access-Control-Allow-Origin: *</code>。
+    </p>
+    <div class="border border-[var(--color-rule)] rounded overflow-hidden">
+      {endpoints.map((e, i) => (
+        <div class:list={['p-4', i !== endpoints.length - 1 && 'border-b border-[var(--color-rule)]']}>
+          <div class="flex items-baseline gap-3 flex-wrap mb-1">
+            <a href={e.path.includes('{') ? '#' : e.path} class="font-mono text-sm text-[var(--color-accent)] hover:underline">{e.path}</a>
+            <span class="text-sm text-[var(--color-muted)]">{e.desc}</span>
+          </div>
+          {e.sample && (
+            <pre class="bg-[var(--color-paper-2)] p-2 rounded text-xs font-mono text-[var(--color-muted)] mt-2 overflow-x-auto"><code>{e.sample}</code></pre>
+          )}
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- CLI commands -->
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-2">CLI</h2>
+    <p class="text-[var(--color-muted)] text-sm mb-5">
+      包名 <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">zhanglu</code>，零运行时依赖。
+      Node 18+ 直接 <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">npx</code> 跑，或 <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">npm i -g zhanglu</code>。
+    </p>
+
+    <h3 class="font-serif text-lg font-semibold mt-6 mb-3">命令</h3>
+    <div class="text-sm">
+      <div class="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 font-mono">
+        <code class="text-[var(--color-accent)]">list &lt;kind&gt;</code>
+        <span class="text-[var(--color-muted)]">列出 skills / projects / articles</span>
+        <code class="text-[var(--color-accent)]">get &lt;kind&gt; &lt;slug&gt;</code>
+        <span class="text-[var(--color-muted)]">读一条 skill / project / article</span>
+        <code class="text-[var(--color-accent)]">search &lt;keyword&gt;</code>
+        <span class="text-[var(--color-muted)]">在所有内容里搜关键词</span>
+        <code class="text-[var(--color-accent)]">about</code>
+        <span class="text-[var(--color-muted)]">作者简介 + tags</span>
+        <code class="text-[var(--color-accent)]">social</code>
+        <span class="text-[var(--color-muted)]">公开社交链接</span>
+        <code class="text-[var(--color-accent)]">endpoints</code>
+        <span class="text-[var(--color-muted)]">打印 manifest</span>
+      </div>
+    </div>
+
+    <h3 class="font-serif text-lg font-semibold mt-6 mb-3">通用 flags</h3>
+    <div class="text-sm grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 font-mono">
+      <code class="text-[var(--color-accent)]">--json</code>
+      <span class="text-[var(--color-muted)]">输出原始 JSON（agent 默认要的）</span>
+      <code class="text-[var(--color-accent)]">--md</code>
+      <span class="text-[var(--color-muted)]">get 时只输出 body_md</span>
+      <code class="text-[var(--color-accent)]">--featured</code>
+      <span class="text-[var(--color-muted)]">只看 featured 项</span>
+      <code class="text-[var(--color-accent)]">--source &lt;s&gt;</code>
+      <span class="text-[var(--color-muted)]">按 source 过滤（list skills/articles）</span>
+      <code class="text-[var(--color-accent)]">--status &lt;s&gt;</code>
+      <span class="text-[var(--color-muted)]">按 status 过滤（list projects）</span>
+      <code class="text-[var(--color-accent)]">--type &lt;t&gt;</code>
+      <span class="text-[var(--color-muted)]">只搜 skill / project / article</span>
+      <code class="text-[var(--color-accent)]">--since &lt;date&gt;</code>
+      <span class="text-[var(--color-muted)]">按日期过滤（list articles）</span>
+      <code class="text-[var(--color-accent)]">--limit &lt;N&gt;</code>
+      <span class="text-[var(--color-muted)]">最多 N 项</span>
+      <code class="text-[var(--color-accent)]">--base &lt;url&gt;</code>
+      <span class="text-[var(--color-muted)]">覆盖站点根（默认 https://zhanglu.net）</span>
+    </div>
+
+    <h3 class="font-serif text-lg font-semibold mt-6 mb-3">环境变量</h3>
+    <div class="text-sm grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 font-mono">
+      <code class="text-[var(--color-accent)]">ZHANGLU_BASE_URL</code>
+      <span class="text-[var(--color-muted)]">切换 base，本地 dev 用 http://localhost:4321</span>
+      <code class="text-[var(--color-accent)]">NO_COLOR=1</code>
+      <span class="text-[var(--color-muted)]">关 ANSI 颜色</span>
+    </div>
+  </section>
+
+  <!-- Claude Code integration -->
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-2">Claude Code 集成</h2>
+    <p class="text-[var(--color-muted)] text-sm mb-5">
+      有个 <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">/zhanglu</code> skill，触发词包括「查张路的 skill」「zhanglu 上的 X」「张路在做什么项目」。Skill 会自动调 <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">npx zhanglu</code>。
+    </p>
+    <a href="/skills/zhanglu" class="inline-flex items-center gap-2 px-4 py-2 border border-[var(--color-rule)] rounded text-sm hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors">
+      看 /zhanglu skill 详情 →
+    </a>
+  </section>
+
+  <!-- Other agent integrations -->
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-2">其他 agent 接入</h2>
+    <div class="space-y-4 text-sm leading-relaxed">
+      <div>
+        <p class="font-mono text-xs text-[var(--color-muted)] tracking-wider mb-1">CODEX / OPENAI FUNCTION CALLING</p>
+        <p class="text-[var(--color-muted)]">把端点注册成 tool。每个端点是一次 GET。返回 JSON 直接喂给模型。</p>
+      </div>
+      <div>
+        <p class="font-mono text-xs text-[var(--color-muted)] tracking-wider mb-1">HERMES / OPENCLAW</p>
+        <p class="text-[var(--color-muted)]">支持 HTTP tool 的 agent 框架都能直接调。把 <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">/api/index.json</code> 加进 system prompt，agent 自己会找下一步。</p>
+      </div>
+      <div>
+        <p class="font-mono text-xs text-[var(--color-muted)] tracking-wider mb-1">MCP SERVER</p>
+        <p class="text-[var(--color-muted)]">目前没出。如果 Claude Code 之外的 MCP 用户多了，会在 Cloudflare Worker 上包一层 MCP server，复用现有端点。</p>
+      </div>
+      <div>
+        <p class="font-mono text-xs text-[var(--color-muted)] tracking-wider mb-1">浏览器端 (JS)</p>
+        <p class="text-[var(--color-muted)]">CORS 全开，<code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">fetch('https://zhanglu.net/api/skills.json')</code> 直接用，无 preflight。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Design / source -->
+  <section class="mb-8 pt-8 border-t border-[var(--color-rule)]">
+    <h2 class="font-serif text-2xl font-semibold mb-4">深入</h2>
+    <div class="space-y-3 text-sm">
+      <a href="/posts/agent-cli" class="block hover:text-[var(--color-accent)] transition-colors">
+        <span class="font-mono text-xs text-[var(--color-muted)] mr-2">[文章]</span>
+        给 agent 写了个 CLI：用一行 npx zhanglu 替代 HTML 抓取
+      </a>
+      <a href="https://github.com/zhanglunet/zhanglu.net/blob/main/docs/agent-cli/design.md" class="block hover:text-[var(--color-accent)] transition-colors">
+        <span class="font-mono text-xs text-[var(--color-muted)] mr-2">[design]</span>
+        设计文档 — 端点 schema、决策记录、可演进路径
+      </a>
+      <a href="https://github.com/zhanglunet/zhanglu.net/blob/main/docs/agent-cli/dev-log.md" class="block hover:text-[var(--color-accent)] transition-colors">
+        <span class="font-mono text-xs text-[var(--color-muted)] mr-2">[dev-log]</span>
+        开发记录 — 实施顺序、踩过的坑
+      </a>
+      <a href="https://github.com/zhanglunet/zhanglu.net/tree/main/cli" class="block hover:text-[var(--color-accent)] transition-colors">
+        <span class="font-mono text-xs text-[var(--color-muted)] mr-2">[source]</span>
+        CLI 源码（单文件 ~270 行，零依赖）
+      </a>
+      <a href="https://github.com/zhanglunet/zhanglu.net/tree/main/src/pages/api" class="block hover:text-[var(--color-accent)] transition-colors">
+        <span class="font-mono text-xs text-[var(--color-muted)] mr-2">[source]</span>
+        端点源码（Astro 静态 API routes）
+      </a>
+    </div>
+  </section>
+
+</Base>

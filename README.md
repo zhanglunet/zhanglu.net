@@ -77,7 +77,12 @@ npx zhanglu get skill mba --md
 npx zhanglu search "品牌判断" --type skill
 ```
 
-完整设计 / 端点 schema / CLI 文档见：
+站上对应页面（给读者看）：
+
+- [zhanglu.net/agents](https://zhanglu.net/agents) — 接入指南（端点表 + CLI + curl）
+- [zhanglu.net/posts/agent-cli](https://zhanglu.net/posts/agent-cli) — 设计文章
+
+仓库内文档（给维护者看）：
 
 - [`docs/agent-cli/design.md`](./docs/agent-cli/design.md) — 设计文档
 - [`docs/agent-cli/dev-log.md`](./docs/agent-cli/dev-log.md) — 开发记录

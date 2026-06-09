@@ -4,6 +4,11 @@
 > 在做 mbabrand（5 评委合议给品牌做量化判断）和 qiji-roadshow-2026（一夜跑完 56 个路演项目的投资级 DD）。
 > 本机攒了 30 多个 Claude Skill。
 
+## Human-facing pages for agents
+
+- /agents — 接入指南（端点表 + CLI 用法 + curl 示例 + Claude Code 集成）
+- /posts/agent-cli — 设计文章（为什么这么做，1.5 小时上线的全过程）
+
 ## For AI agents
 
 JSON API (build-time generated, free to fetch, CORS open):

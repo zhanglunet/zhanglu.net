@@ -427,6 +427,9 @@ YAML `|` block 在 frontmatter 里保留 `\n`，但 HTML 默认折叠空白。`S
 | `/api/search.json` | `src/pages/api/search.json.ts` | 扁平语料给 CLI 客户端搜 |
 | `/llms.txt` | `public/llms.txt` | agent 自发现入口 |
 | `/robots.txt` | `public/robots.txt` | 标明 sitemap + allow all |
+| `/agents` | `src/pages/agents.astro` | 人类向的接入指南（端点表 + CLI + curl + Claude Code）|
+| `/posts/agent-cli` | `src/pages/posts/agent-cli.astro` | 设计文章（在站站内长文版本）|
+| `/posts` | `src/pages/posts/index.astro` | 长文索引 |
 
 所有端点：
 - 静态生成（`pnpm build` 时 → `dist/api/*.json`）
@@ -492,8 +495,26 @@ CLI 与站点端点松耦合 —— 改端点 schema 时若不破坏向下兼容
 
 ### 14.6 文档
 
+仓库里：
+
 - `docs/agent-cli/design.md` —— 设计文档，端点 schema、决策记录、可演进路径
 - `docs/agent-cli/dev-log.md` —— 开发记录，踩过的坑
-- `docs/agent-cli/wechat-draft.md` —— 公众号文章草稿
+- `docs/agent-cli/wechat-draft.md` —— 公众号文章草稿（markdown 版）
 - `cli/README.md` —— CLI 用户文档
 - `public/llms.txt` —— agent 自发现入口
+
+站上（给读者看的）：
+
+- `/agents` —— 人类向接入指南，含端点表 / CLI / curl / Claude Code 集成 / 其他 agent 接入思路
+- `/posts/agent-cli` —— 设计文章站内版本（公众号也会发一份）
+- `/posts` —— 长文索引
+
+### 14.7 三种"文章"职责区分
+
+| 集合 / 路径 | 内容 | URL 字段 |
+|---|---|---|
+| `src/content/articles/` | 公众号 / Substack / 博客的**外链入口** | 必填，外链 |
+| `src/pages/posts/*.astro` | **站内长文**（无外链备份的原生 post） | 不适用 |
+| `docs/*.md` | 仓库内部文档，不上站 | 不适用 |
+
+如果未来 posts 多了，把 `src/pages/posts/*.astro` 改成 `src/content/posts/*.md` 集合 + `[slug].astro` 渲染，schema 加进 `config.ts`。

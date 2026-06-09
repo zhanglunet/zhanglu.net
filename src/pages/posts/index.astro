@@ -1,0 +1,28 @@
+---
+import Base from '../../layouts/Base.astro';
+
+const posts = [
+  {
+    slug: 'agent-cli',
+    title: '给 agent 写了个 CLI：用一行 npx zhanglu 替代 HTML 抓取',
+    date: '2026-06-09',
+    summary: '不做 MCP，不做 SDK，做 9 个静态 JSON 端点和一个 270 行的 CLI。1.5 小时上线。',
+  },
+];
+---
+<Base title="Posts" description="站内长文">
+  <h1 class="font-serif text-3xl font-semibold mb-2">Posts</h1>
+  <p class="text-[var(--color-muted)] mb-8">站内长文，区别于 <a href="/articles" class="text-[var(--color-accent)] underline underline-offset-4">文章入口</a>（外链到公众号 / 博客）。共 {posts.length} 篇。</p>
+
+  <div class="space-y-6">
+    {posts.map((p) => (
+      <a href={`/posts/${p.slug}`} class="block group p-5 border border-[var(--color-rule)] rounded hover:border-[var(--color-accent)] transition-colors">
+        <div class="flex items-baseline justify-between gap-4 mb-2">
+          <h2 class="font-serif text-xl font-semibold group-hover:text-[var(--color-accent)] transition-colors">{p.title}</h2>
+          <time class="text-xs font-mono text-[var(--color-muted)] shrink-0">{p.date}</time>
+        </div>
+        <p class="text-sm text-[var(--color-muted)] leading-relaxed">{p.summary}</p>
+      </a>
+    ))}
+  </div>
+</Base>
