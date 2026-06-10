@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  html, body { margin: 0; padding: 0; background: #faf7f1; }
+  .canvas {
+    width: 960px; height: 540px;
+    padding: 40px;
+    box-sizing: border-box;
+    font-family: 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+    color: #2d2a26;
+    position: relative;
+  }
+  .title {
+    text-align: center;
+    font-family: 'Source Serif 4', 'Noto Serif SC', Georgia, serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: #1a1815;
+    margin-bottom: 6px;
+  }
+  .subtitle {
+    text-align: center;
+    color: #8a857a;
+    font-size: 13px;
+    margin-bottom: 28px;
+  }
+  svg { width: 100%; height: 420px; }
+  .node-box {
+    fill: #ffffff;
+    stroke: #d4cdb8;
+    stroke-width: 1.5;
+    rx: 6; ry: 6;
+  }
+  .node-box-accent {
+    fill: #ffffff;
+    stroke: #b14b3a;
+    stroke-width: 2;
+    rx: 6; ry: 6;
+  }
+  .node-box-dark {
+    fill: #2a2622;
+    stroke: #2a2622;
+    rx: 6; ry: 6;
+  }
+  .node-text {
+    font-family: 'SF Mono', 'Menlo', monospace;
+    font-size: 14px;
+    fill: #2d2a26;
+    text-anchor: middle;
+    dominant-baseline: middle;
+  }
+  .node-text-light {
+    font-family: 'SF Mono', 'Menlo', monospace;
+    font-size: 14px;
+    fill: #f5f3ee;
+    text-anchor: middle;
+    dominant-baseline: middle;
+  }
+  .node-text-accent {
+    font-family: 'SF Mono', 'Menlo', monospace;
+    font-size: 14px;
+    fill: #b14b3a;
+    font-weight: 600;
+    text-anchor: middle;
+    dominant-baseline: middle;
+  }
+  .label {
+    font-family: 'PingFang SC', sans-serif;
+    font-size: 12px;
+    fill: #8a857a;
+    text-anchor: middle;
+    dominant-baseline: middle;
+  }
+  .edge {
+    stroke: #b8b09c;
+    stroke-width: 1.5;
+    fill: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="canvas">
+  <div class="title">zhanglu.net agent 接入两层架构</div>
+  <div class="subtitle">人和 agent 共用同一份源数据,各自走自己的接口</div>
+
+  <svg viewBox="0 0 880 420" xmlns="http://www.w3.org/2000/svg">
+    <!-- Root: zhanglu.net -->
+    <rect class="node-box-accent" x="290" y="10" width="300" height="50"/>
+    <text class="node-text-accent" x="440" y="28">zhanglu.net</text>
+    <text class="label" x="440" y="48">Cloudflare Pages · 全静态构建</text>
+
+    <!-- Vertical from root -->
+    <line class="edge" x1="440" y1="60" x2="440" y2="90"/>
+    <!-- Horizontal split -->
+    <line class="edge" x1="160" y1="90" x2="720" y2="90"/>
+    <!-- Three drops -->
+    <line class="edge" x1="160" y1="90" x2="160" y2="120"/>
+    <line class="edge" x1="440" y1="90" x2="440" y2="120"/>
+    <line class="edge" x1="720" y1="90" x2="720" y2="120"/>
+
+    <!-- Layer 1: HTML 页面 -->
+    <rect class="node-box" x="40" y="120" width="240" height="60"/>
+    <text class="node-text" x="160" y="142">HTML 页面</text>
+    <text class="label" x="160" y="164">给人看</text>
+
+    <!-- Layer 1: /api/*.json -->
+    <rect class="node-box-accent" x="320" y="120" width="240" height="60"/>
+    <text class="node-text-accent" x="440" y="142">/api/*.json</text>
+    <text class="label" x="440" y="164">给 agent · 9 个端点</text>
+
+    <!-- Layer 1: /llms.txt -->
+    <rect class="node-box" x="600" y="120" width="240" height="60"/>
+    <text class="node-text" x="720" y="142">/llms.txt</text>
+    <text class="label" x="720" y="164">自发现入口</text>
+
+    <!-- From /api/*.json down -->
+    <line class="edge" x1="440" y1="180" x2="440" y2="220"/>
+    <!-- Split to two -->
+    <line class="edge" x1="220" y1="220" x2="660" y2="220"/>
+    <line class="edge" x1="220" y1="220" x2="220" y2="250"/>
+    <line class="edge" x1="660" y1="220" x2="660" y2="250"/>
+
+    <!-- Layer 2: curl / fetch -->
+    <rect class="node-box-dark" x="80" y="250" width="280" height="70"/>
+    <text class="node-text-light" x="220" y="276">curl / fetch</text>
+    <text class="label" x="220" y="300" style="fill: #b8b09c;">任何 agent · 任何语言</text>
+
+    <!-- Layer 2: npx zhanglu-net -->
+    <rect class="node-box-dark" x="520" y="250" width="280" height="70"/>
+    <text class="node-text-light" x="660" y="276">npx zhanglu-net</text>
+    <text class="label" x="660" y="300" style="fill: #b8b09c;">CLI · Node 18+ · 零运行时依赖</text>
+
+    <!-- Bottom label -->
+    <text class="label" x="440" y="380" style="font-size: 13px;">build 时一次生成 → CF 边缘 cache → CORS 全开</text>
+    <text class="label" x="440" y="402" style="font-size: 13px; fill: #b14b3a;">合计 1.5 小时上线</text>
+  </svg>
+</div>
+
+</body>
+</html>

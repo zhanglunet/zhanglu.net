@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>给 agent 写了个 CLI:用一行 npx zhanglu-net 替代 HTML 抓取</title>
+<style>
+  body { background: #f5f3ee; margin: 0; padding: 32px 16px; }
+  .root { max-width: 720px; margin: 0 auto; background: #ffffff; padding: 36px 28px; }
+  .hint { max-width: 720px; margin: 0 auto 16px; font: 13px/1.6 -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif; color: #8a857a; padding: 0 28px; }
+  .hint code { background: #ece7dc; padding: 2px 6px; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="hint">
+  Cmd+A 全选这块 → Cmd+C 复制 → 公众号编辑器 Cmd+V 粘贴。<br>
+  公众号会保留所有 <code>style="..."</code> inline 样式,删 class。代码块、引用、加粗都会保留。
+</div>
+
+<div class="root" style="color: #2d2a26; font: 16px/1.85 -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', sans-serif;">
+
+  <!-- 副标题 / lede -->
+  <p style="margin: 0 0 28px; padding: 12px 16px; border-left: 3px solid #b14b3a; background: #faf7f1; color: #5a554c; font-size: 15px; line-height: 1.75;">
+    不做 MCP,不做 SDK,做 9 个静态 JSON 端点和一个 270 行的 CLI。1.5 小时上线。
+  </p>
+
+  <!-- 起因 -->
+  <h2 style="margin: 36px 0 16px; padding-bottom: 8px; border-bottom: 1px solid #e8e3d8; font: 600 22px/1.4 'Source Serif 4', 'Noto Serif SC', Georgia, serif; color: #1a1815;">起因</h2>
+
+  <p style="margin: 0 0 16px;">zhanglu.net 昨天上线。开站第一版就装了 30 个 Claude Skill 索引、3 个项目、1 篇公众号文章入口。问题来了:</p>
+
+  <blockquote style="margin: 0 0 16px; padding: 10px 16px; border-left: 3px solid #b14b3a; background: #faf7f1; color: #5a554c; font-style: normal;">
+    AI agent 想引用我站上的内容,怎么办?
+  </blockquote>
+
+  <p style="margin: 0 0 16px;">目前的选项很糟糕:</p>
+
+  <ol style="margin: 0 0 16px; padding-left: 24px;">
+    <li style="margin-bottom: 6px;"><strong style="color: #b14b3a;">抓 HTML</strong> —— agent 拿到的是给人看的版式,要解析。Token 浪费、字段不稳。</li>
+    <li style="margin-bottom: 6px;"><strong style="color: #b14b3a;">MCP server</strong> —— Claude Code 支持,但 Codex / Hermes / OpenClaw / 我自己写的小 agent 不一定支持。</li>
+    <li style="margin-bottom: 6px;"><strong style="color: #b14b3a;">不接</strong> —— 那我建这个站干嘛。</li>
+  </ol>
+
+  <p style="margin: 0 0 16px;">我选了第四条:<strong>给站点加一层 JSON API + 一个 CLI</strong>。</p>
+
+  <!-- 设计的两层 -->
+  <h2 style="margin: 36px 0 16px; padding-bottom: 8px; border-bottom: 1px solid #e8e3d8; font: 600 22px/1.4 'Source Serif 4', 'Noto Serif SC', Georgia, serif; color: #1a1815;">设计的两层</h2>
+
+  <p style="margin: 0 0 12px; color: #8a857a; font-size: 14px;">↓ 整体架构(也可在此处插一张架构图替代下面 ASCII)</p>
+
+  <pre style="margin: 0 0 16px; padding: 16px; background: #2a2622; color: #e8e3d8; border-radius: 4px; overflow-x: auto; font: 13px/1.6 'SF Mono', 'Menlo', 'Consolas', monospace; white-space: pre;"><code style="background: none; color: inherit;">       zhanglu.net (Cloudflare Pages,全静态)
+                  │
+   ┌──────────────┼──────────────┐
+   │              │              │
+HTML 页面     /api/*.json     /llms.txt
+(给人看)      (给 agent)      (自发现)
+                  │
+       ┌──────────┴──────────┐
+       │                     │
+   curl / fetch         npx zhanglu-net
+   (任何 agent)         (Node 18+,零依赖)</code></pre>
+
+  <h3 style="margin: 28px 0 12px; font: 600 18px/1.4 'Source Serif 4', 'Noto Serif SC', Georgia, serif; color: #1a1815;">第一层:9 个静态 JSON 端点</h3>
+
+  <pre style="margin: 0 0 16px; padding: 16px; background: #2a2622; color: #e8e3d8; border-radius: 4px; overflow-x: auto; font: 13px/1.6 'SF Mono', 'Menlo', 'Consolas', monospace; white-space: pre;"><code style="background: none; color: inherit;">/api/index.json              manifest(counts + 所有端点)
+/api/projects.json           项目列表
+/api/projects/{slug}.json    单项目(含 body_md)
+/api/articles.json           公众号文章入口
+/api/skills.json             Claude Skill 索引
+/api/skills/{slug}.json      单 skill(含 body_md)
+/api/about.json              简介
+/api/social.json             公开社交(脱敏过滤邮箱)
+/api/search.json             扁平语料,CLI 客户端搜</code></pre>
+
+  <p style="margin: 0 0 16px;">build 时一次性生成静态文件,CF Pages 边缘 cache 友好,<code style="background: #f0ebe0; padding: 2px 5px; border-radius: 3px; font: 13px 'SF Mono', monospace;">Access-Control-Allow-Origin: *</code>,浏览器端 agent 也能直接用。</p>
+
+  <h3 style="margin: 28px 0 12px; font: 600 18px/1.4 'Source Serif 4', 'Noto Serif SC', Georgia, serif; color: #1a1815;">第二层:CLI</h3>
+
+  <pre style="margin: 0 0 16px; padding: 16px; background: #2a2622; color: #e8e3d8; border-radius: 4px; overflow-x: auto; font: 13px/1.6 'SF Mono', 'Menlo', 'Consolas', monospace; white-space: pre;"><code style="background: none; color: inherit;">npx zhanglu-net list skills --featured
+npx zhanglu-net get skill mba --md
+npx zhanglu-net search "品牌判断" --type skill
+npx zhanglu-net about --json</code></pre>
+
+  <p style="margin: 0 0 16px;">CLI 是 JSON 端点的薄包装。<code style="background: #f0ebe0; padding: 2px 5px; border-radius: 3px; font: 13px 'SF Mono', monospace;">--json</code> 给 agent pipe,默认人类可读带 ANSI 颜色(agent 端非 TTY 自动关)。</p>
+
+  <!-- 几个明确不做的决策 -->
+  <h2 style="margin: 36px 0 16px; padding-bottom: 8px; border-bottom: 1px solid #e8e3d8; font: 600 22px/1.4 'Source Serif 4', 'Noto Serif SC', Georgia, serif; color: #1a1815;">几个明确不做的决策</h2>
+
+  <p style="margin: 0 0 16px;"><strong style="color: #b14b3a;">不做 MCP server。</strong> Claude Code 之外的 agent 还不一定支持 MCP。HTTP + JSON 是最大公约数。如果未来 MCP 用户多了,加一个 CF Worker 把现有端点包成 MCP server,成本可控。</p>
+
+  <p style="margin: 0 0 16px;"><strong style="color: #b14b3a;">不做服务端搜索。</strong> 语料就 30 条 skill + 3 个项目 + 几篇文章,全文 &lt; 100KB。CLI 拉一份 <code style="background: #f0ebe0; padding: 2px 5px; border-radius: 3px; font: 13px 'SF Mono', monospace;">/api/search.json</code>,本地 <code style="background: #f0ebe0; padding: 2px 5px; border-radius: 3px; font: 13px 'SF Mono', monospace;">text.toLowerCase().includes(needle)</code> 就够。简单评分:title 命中 +5、出现次数累加。语料涨到几百再换 MiniSearch。</p>
+
+  <p style="margin: 0 0 16px;"><strong style="color: #b14b3a;">CLI 零运行时依赖。</strong> Node 18+ 内置的 <code style="background: #f0ebe0; padding: 2px 5px; border-radius: 3px; font: 13px 'SF Mono', monospace;">fetch</code> 替代 <code style="background: #f0ebe0; padding: 2px 5px; border-radius: 3px; font: 13px 'SF Mono', monospace;">node-fetch</code>,<code style="background: #f0ebe0; padding: 2px 5px; border-radius: 3px; font: 13px 'SF Mono', monospace;">node:util</code> 的 <code style="background: #f0ebe0; padding: 2px 5px; border-radius: 3px; font: 13px 'SF Mono', monospace;">parseArgs</code> 替代 <code style="background: #f0ebe0; padding: 2px 5px; border-radius: 3px; font: 13px 'SF Mono', monospace;">commander</code>,ANSI escape codes 手拼替代 <code style="background: #f0ebe0; padding: 2px 5px; border-radius: 3px; font: 13px 'SF Mono', monospace;">chalk</code>。<code style="background: #f0ebe0; padding: 2px 5px; border-radius: 3px; font: 13px 'SF Mono', monospace;">npx zhanglu-net</code> 启动快,agent 调也不卡。</p>
+
+  <p style="margin: 0 0 16px;"><strong style="color: #b14b3a;">公众号正文不做端点。</strong> 公众号 URL 反爬,WebFetch 抓不到。站内只存入口(title / date / summary / url),正文跳外链。</p>
+
+  <!-- 自发现 -->
+  <h2 style="margin: 36px 0 16px; padding-bottom: 8px; border-bottom: 1px solid #e8e3d8; font: 600 22px/1.4 'Source Serif 4', 'Noto Serif SC', Georgia, serif; color: #1a1815;">自发现:<code style="background: #f0ebe0; padding: 2px 8px; border-radius: 3px; font: 600 20px 'SF Mono', monospace; color: #b14b3a;">/llms.txt</code></h2>
+
+  <p style="margin: 0 0 16px;">llmstxt.org 在推一份约定 —— 站点根放 <code style="background: #f0ebe0; padding: 2px 5px; border-radius: 3px; font: 13px 'SF Mono', monospace;">llms.txt</code>,告诉 AI agent "我这有啥、怎么读"。我跟了:</p>
+
+  <pre style="margin: 0 0 16px; padding: 16px; background: #2a2622; color: #e8e3d8; border-radius: 4px; overflow-x: auto; font: 13px/1.6 'SF Mono', 'Menlo', 'Consolas', monospace; white-space: pre;"><code style="background: none; color: inherit;"># zhanglu.net
+
+&gt; 张路的个人站。
+
+## For AI agents
+- /api/index.json — manifest
+- /api/skills.json — Claude Skills 索引
+- ...
+
+## CLI
+npx zhanglu-net --help</code></pre>
+
+  <p style="margin: 0 0 16px;">任何 agent 拿到 <code style="background: #f0ebe0; padding: 2px 5px; border-radius: 3px; font: 13px 'SF Mono', monospace;">https://zhanglu.net</code>,先 <code style="background: #f0ebe0; padding: 2px 5px; border-radius: 3px; font: 13px 'SF Mono', monospace;">GET /llms.txt</code>,自己就知道下一步去哪了。</p>
+
+  <!-- 怎么用 -->
+  <h2 style="margin: 36px 0 16px; padding-bottom: 8px; border-bottom: 1px solid #e8e3d8; font: 600 22px/1.4 'Source Serif 4', 'Noto Serif SC', Georgia, serif; color: #1a1815;">怎么用</h2>
+
+  <p style="margin: 0 0 16px;"><strong>Claude Code 里</strong>:我写了个 <code style="background: #f0ebe0; padding: 2px 5px; border-radius: 3px; font: 13px 'SF Mono', monospace;">/zhanglu</code> skill,触发词包括「查张路的 skill」「zhanglu 上的 X」。skill 会自动调 <code style="background: #f0ebe0; padding: 2px 5px; border-radius: 3px; font: 13px 'SF Mono', monospace;">npx zhanglu-net</code>。</p>
+
+  <p style="margin: 0 0 16px;"><strong>其他 agent</strong>:</p>
+
+  <pre style="margin: 0 0 16px; padding: 16px; background: #2a2622; color: #e8e3d8; border-radius: 4px; overflow-x: auto; font: 13px/1.6 'SF Mono', 'Menlo', 'Consolas', monospace; white-space: pre;"><code style="background: none; color: inherit;"># 列出我所有 featured 的 skill
+curl -s https://zhanglu.net/api/skills.json \
+  | jq '.items[] | select(.featured)'
+
+# 拿 mba skill 的全文
+curl -s https://zhanglu.net/api/skills/mba.json \
+  | jq -r .body_md
+
+# 全文搜
+curl -s https://zhanglu.net/api/search.json \
+  | jq '.items[] | select(.text | test("品牌"; "i"))'</code></pre>
+
+  <p style="margin: 0 0 16px;">或者直接:</p>
+
+  <pre style="margin: 0 0 16px; padding: 16px; background: #2a2622; color: #e8e3d8; border-radius: 4px; overflow-x: auto; font: 13px/1.6 'SF Mono', 'Menlo', 'Consolas', monospace; white-space: pre;"><code style="background: none; color: inherit;">npx zhanglu-net list skills --featured --json
+npx zhanglu-net get skill mba --md
+npx zhanglu-net search "品牌"</code></pre>
+
+  <!-- 实施时间 -->
+  <h2 style="margin: 36px 0 16px; padding-bottom: 8px; border-bottom: 1px solid #e8e3d8; font: 600 22px/1.4 'Source Serif 4', 'Noto Serif SC', Georgia, serif; color: #1a1815;">实施时间</h2>
+
+  <pre style="margin: 0 0 16px; padding: 16px; background: #2a2622; color: #e8e3d8; border-radius: 4px; overflow-x: auto; font: 13px/1.6 'SF Mono', 'Menlo', 'Consolas', monospace; white-space: pre;"><code style="background: none; color: inherit;">端点 (9 个文件):           25 分钟
+CLI (单文件 270 行):       30 分钟
+llms.txt / robots.txt:      5 分钟
+Skill (SKILL.md + sync):   10 分钟
+设计文档 + 本文 + 草稿:    20 分钟
+AGENTS.md / README 更新:   10 分钟
+build + test + commit:     15 分钟
+─────────────────────────────────
+合计:                      ~1.5 小时</code></pre>
+
+  <p style="margin: 0 0 16px;">包括写这篇文章的草稿。<strong style="color: #b14b3a;">给自己留够时间写文档,比代码本身重要。</strong></p>
+
+  <!-- 现在拿走 -->
+  <h2 style="margin: 36px 0 16px; padding-bottom: 8px; border-bottom: 1px solid #e8e3d8; font: 600 22px/1.4 'Source Serif 4', 'Noto Serif SC', Georgia, serif; color: #1a1815;">现在拿走</h2>
+
+  <ul style="margin: 0 0 16px; padding-left: 24px;">
+    <li style="margin-bottom: 6px;">站点接入指南:zhanglu.net/agents</li>
+    <li style="margin-bottom: 6px;">自发现入口:zhanglu.net/llms.txt</li>
+    <li style="margin-bottom: 6px;">Manifest:zhanglu.net/api/index.json</li>
+    <li style="margin-bottom: 6px;">CLI:<code style="background: #f0ebe0; padding: 2px 5px; border-radius: 3px; font: 13px 'SF Mono', monospace;">npx zhanglu-net --help</code></li>
+    <li style="margin-bottom: 6px;">源码:github.com/zhanglunet/zhanglu.net</li>
+    <li style="margin-bottom: 6px;">设计文档:仓库内 <code style="background: #f0ebe0; padding: 2px 5px; border-radius: 3px; font: 13px 'SF Mono', monospace;">docs/agent-cli/design.md</code></li>
+  </ul>
+
+  <p style="margin: 0 0 16px;">如果你也维护一个内容站,强烈建议加一层 JSON API + <code style="background: #f0ebe0; padding: 2px 5px; border-radius: 3px; font: 13px 'SF Mono', monospace;">/llms.txt</code>。不需要框架升级,不需要新服务。Astro / Next / Hugo 都能 build 时生成静态 JSON。Cloudflare Pages 自动 cache。零成本。</p>
+
+  <p style="margin: 0 0 16px;">下一个 agent 来抓你站时,不会再卡在 HTML parse 上了。</p>
+
+  <!-- 落款 -->
+  <hr style="margin: 40px 0 24px; border: none; border-top: 1px solid #e8e3d8;">
+
+  <p style="margin: 0 0 8px; color: #8a857a; font-size: 14px; line-height: 1.7;">
+    站点:zhanglu.net &nbsp;·&nbsp; GitHub:@zhanglunet
+  </p>
+  <p style="margin: 0; color: #8a857a; font-size: 14px; line-height: 1.7;">
+    点击文末「阅读原文」看站内长文版(排版更适合在电脑上读)。
+  </p>
+
+</div>
+
+</body>
+</html>

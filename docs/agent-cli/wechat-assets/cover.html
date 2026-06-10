@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  html, body { margin: 0; padding: 0; }
+  .cover {
+    width: 1200px;
+    height: 510px;
+    background: #faf7f1;
+    padding: 60px 80px;
+    box-sizing: border-box;
+    font-family: 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+    color: #1a1815;
+    position: relative;
+    overflow: hidden;
+  }
+  /* 朱砂左竖条 */
+  .accent-bar {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 12px;
+    background: #b14b3a;
+  }
+  /* 右下水印 */
+  .watermark {
+    position: absolute;
+    right: 80px;
+    bottom: 40px;
+    font-family: 'SF Mono', 'Menlo', monospace;
+    font-size: 13px;
+    color: #b8b09c;
+    letter-spacing: 0.06em;
+  }
+  .meta {
+    font-family: 'SF Mono', 'Menlo', monospace;
+    font-size: 13px;
+    color: #b14b3a;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+  .title {
+    font-family: 'Source Serif 4', 'Noto Serif SC', Georgia, serif;
+    font-size: 48px;
+    font-weight: 600;
+    line-height: 1.25;
+    color: #1a1815;
+    margin: 0 0 28px;
+    letter-spacing: -0.01em;
+  }
+  .title em {
+    font-style: normal;
+    color: #b14b3a;
+  }
+  .lede {
+    font-size: 20px;
+    line-height: 1.6;
+    color: #5a554c;
+    max-width: 880px;
+    margin: 0 0 36px;
+  }
+  .cmd {
+    display: inline-block;
+    background: #2a2622;
+    color: #f5f3ee;
+    font-family: 'SF Mono', 'Menlo', monospace;
+    font-size: 18px;
+    padding: 12px 20px;
+    border-radius: 4px;
+  }
+  .cmd .prompt { color: #b14b3a; user-select: none; }
+  .cmd .arg { color: #b8b09c; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="accent-bar"></div>
+
+  <div class="meta">zhanglu.net · 工程笔记 · 2026·06·09</div>
+
+  <h1 class="title">
+    给 <em>agent</em> 写了个 CLI<br>
+    用一行 <em>npx zhanglu-net</em> 替代 HTML 抓取
+  </h1>
+
+  <p class="lede">
+    不做 MCP,不做 SDK。9 个静态 JSON 端点 + 一个 270 行的 CLI。<br>
+    Agent 端 <code style="background:#ece7dc;padding:2px 6px;border-radius:3px;font:16px 'SF Mono',monospace;color:#2a2622;">curl /api/skills.json</code> 直接用,1.5 小时上线。
+  </p>
+
+  <div class="cmd">
+    <span class="prompt">$</span> npx zhanglu-net list skills <span class="arg">--featured</span>
+  </div>
+
+  <div class="watermark">张路的碎碎念 · zhanglu.net</div>
+</div>
+
+</body>
+</html>
