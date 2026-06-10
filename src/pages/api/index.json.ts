@@ -5,7 +5,7 @@ import about from '../../data/about.json';
 export const GET: APIRoute = async ({ site }) => {
   const [projects, articles, skills] = await Promise.all([
     getCollection('projects'),
-    getCollection('articles', ({ id }) => id !== 'README.md'),
+    getCollection('articles'),
     getCollection('skills'),
   ]);
 

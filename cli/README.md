@@ -1,6 +1,7 @@
-# zhanglu
+# zhanglu-net
 
 > Agent-friendly CLI for [zhanglu.net](https://zhanglu.net) — Claude Skills 索引、项目、文章、搜索，全走静态 JSON 端点，零依赖。
+> npm 包名 `zhanglu-net`（`zhanglu` 在 npm 已被占），bin 名也是 `zhanglu-net`。
 
 ```bash
 npx zhanglu-net --help
@@ -33,7 +34,7 @@ npx zhanglu-net <cmd>
 
 ```bash
 npm i -g zhanglu-net
-zhanglu <cmd>
+zhanglu-net <cmd>
 ```
 
 ## 命令

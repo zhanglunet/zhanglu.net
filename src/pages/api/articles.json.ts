@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
 
 export const GET: APIRoute = async () => {
-  const articles = await getCollection('articles', ({ id }) => id !== 'README.md');
+  const articles = await getCollection('articles');
 
   const items = articles
     .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())

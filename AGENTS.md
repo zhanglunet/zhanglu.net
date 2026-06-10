@@ -69,7 +69,7 @@ zhanglu/
 │   │   ├── config.ts              ← Zod schemas (改这里 = 改全站数据契约)
 │   │   ├── projects/              ← 一个项目 = 一个 .md
 │   │   ├── articles/              ← 公众号 / 博客文章入口 = 一个 .md
-│   │   └── skills/                ← 29 个 skill, 15 个 sync 自动生成 + 14 个手写中文
+│   │   └── skills/                ← 30 个 skill, 16 个 sync 自动生成 + 14 个手写中文
 │   │
 │   ├── data/                      ← 静态 JSON, 给所有页面读
 │   │   ├── about.json             ← 名字 / tagline / bio / tags (首页 hero 直接读)
@@ -181,7 +181,7 @@ pnpm run new:project -- <slug> "项目名" "一句话标语" https://url.com 202
 不要用公众号转载的 URL（公众号反爬，agent 抓不到正文；而且原始页通常排版更好）。
 也可以指向 `/posts/<slug>` —— 站内长文也是合法的"原始出处"。
 
-写 `src/content/articles/<slug>.md`:
+写 `src/content/articles/<slug>.md`(`articles/` 下每个 `.md` 都是真文章 —— 不放占位 / inline schema doc / README, 否则消费端 4 处都要 filter, 容易漏一处):
 
 ```yaml
 ---
@@ -223,8 +223,8 @@ pnpm run sync:skills
 3. 以后 `sync:skills` 不会覆盖它
 
 **首页精选**: `featured: true` 上首页 "Skills" 精选区。  
-**当前 29 个 skill 状态**:
-- 15 个自动同步（中文版 SKILL.md 直接拿过来）
+**当前 30 个 skill 状态**:
+- 16 个自动同步（中文版 SKILL.md 直接拿过来）
 - 14 个手动翻译成中文（`handwritten: true`）：
   - agent-browser, agents-sdk, cloudflare, cloudflare-email-service,
   - demo-day-dossier, durable-objects, frontend-design, musk-perspective,
@@ -448,12 +448,12 @@ YAML `|` block 在 frontmatter 里保留 `\n`，但 HTML 默认折叠空白。`S
 
 ### 14.2 CLI（`cli/` 子目录）
 
-独立 package，bin name `zhanglu`，零运行时依赖。
+独立 package，bin name `zhanglu-net`（npm 上 `zhanglu` 已被占），零运行时依赖。
 
 ```
 cli/
-├── package.json    # name: "zhanglu"
-├── bin/zhanglu.mjs # 单文件 ~270 行 ESM
+├── package.json        # name: "zhanglu-net", bin: { "zhanglu-net": "./bin/zhanglu-net.mjs" }
+├── bin/zhanglu-net.mjs # 单文件 ~270 行 ESM
 └── README.md
 ```
 

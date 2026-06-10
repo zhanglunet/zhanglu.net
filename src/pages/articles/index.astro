@@ -3,7 +3,7 @@ import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import ArticleCard from '../../components/ArticleCard.astro';
 
-const articles = (await getCollection('articles', ({ id }) => id !== 'README.md'))
+const articles = (await getCollection('articles'))
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 ---
 <Base title="文章" description="写作索引：站内长文 + 外部博客 / 公众号">

@@ -4,7 +4,7 @@ import type { APIContext } from 'astro';
 import about from '../data/about.json';
 
 export async function GET(context: APIContext) {
-  const articles = await getCollection('articles', ({ id }) => id !== 'README.md');
+  const articles = await getCollection('articles');
   const projects = await getCollection('projects');
 
   const items = [

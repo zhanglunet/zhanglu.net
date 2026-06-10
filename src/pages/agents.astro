@@ -4,7 +4,7 @@ import { getCollection } from 'astro:content';
 
 const [projects, articles, skills] = await Promise.all([
   getCollection('projects'),
-  getCollection('articles', ({ id }) => id !== 'README.md'),
+  getCollection('articles'),
   getCollection('skills'),
 ]);
 
@@ -90,7 +90,7 @@ npx zhanglu-net about --json</code></pre>
   <section class="mb-12">
     <h2 class="font-serif text-2xl font-semibold mb-2">CLI</h2>
     <p class="text-[var(--color-muted)] text-sm mb-5">
-      包名 <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">zhanglu</code>，零运行时依赖。
+      包名 <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">zhanglu-net</code>，零运行时依赖。
       Node 18+ 直接 <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">npx</code> 跑，或 <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">npm i -g zhanglu-net</code>。
     </p>
 

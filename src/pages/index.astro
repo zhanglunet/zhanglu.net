@@ -11,7 +11,7 @@ const featuredProjects = allProjects
   .filter((p) => p.data.featured)
   .sort((a, b) => a.data.order - b.data.order);
 
-const allArticles = await getCollection('articles', ({ id }) => id !== 'README.md');
+const allArticles = await getCollection('articles');
 const recentArticles = allArticles
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
   .slice(0, 5);
