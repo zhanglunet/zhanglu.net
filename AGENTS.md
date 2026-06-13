@@ -432,7 +432,7 @@ YAML `|` block 在 frontmatter 里保留 `\n`，但 HTML 默认折叠空白。`S
 |---|---|---|
 | projects | 3 | mbabrand, qiji-roadshow-2026, qcc-agent |
 | articles | 3 | agent-cli (站内 /posts/), qiji-56-projects-one-night, qcc-agent-origin |
-| presentations | 3 | mbabrand (slides), apex-handbook (slides), openagent (site) — 后两条 tagline 仍是占位 |
+| presentations | 3 | mbabrand (slides), apex-handbook (slides), openagent (site) |
 | skills | 30 | zhanglu（14 个 handwritten:true） |
 
 `src/data/about.json` 当前 hero / bio 是基于公开项目信息撰写的占位描述，可随时替换为本人定义版。
