@@ -1,0 +1,21 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import PresentationCard from '../../components/PresentationCard.astro';
+
+const presentations = (await getCollection('presentations'))
+  .sort((a, b) => (a.data.order || 999) - (b.data.order || 999));
+---
+<Base title="展示" description="网页版 PPT 与相关站点入口">
+  <h1 class="font-serif text-3xl font-semibold mb-2">展示</h1>
+  <p class="text-[var(--color-muted)] mb-8">
+    网页版 PPT 与相关站点入口, 共 {presentations.length} 个。点卡片直接打开外链。
+  </p>
+  {presentations.length === 0 ? (
+    <p class="text-[var(--color-muted)]">还没有展示内容。新增见 <code>AGENTS.md</code>。</p>
+  ) : (
+    <div class="grid sm:grid-cols-2 gap-4">
+      {presentations.map((p) => <PresentationCard entry={p} />)}
+    </div>
+  )}
+</Base>

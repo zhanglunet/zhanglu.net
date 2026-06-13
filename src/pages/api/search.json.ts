@@ -5,13 +5,14 @@ import about from '../../data/about.json';
 export const GET: APIRoute = async ({ site }) => {
   const base = site?.toString().replace(/\/$/, '') ?? 'https://zhanglu.net';
 
-  const [projects, articles, skills] = await Promise.all([
+  const [projects, articles, presentations, skills] = await Promise.all([
     getCollection('projects'),
     getCollection('articles'),
+    getCollection('presentations'),
     getCollection('skills'),
   ]);
 
-  type Item = { type: 'skill' | 'project' | 'article' | 'about'; slug: string; title: string; text: string; url: string };
+  type Item = { type: 'skill' | 'project' | 'article' | 'presentation' | 'about'; slug: string; title: string; text: string; url: string };
 
   const items: Item[] = [];
 
@@ -40,6 +41,16 @@ export const GET: APIRoute = async ({ site }) => {
       title: a.data.title,
       text: [a.data.title, a.data.summary, a.data.tags.join(' '), a.body].join('\n'),
       url: a.data.url,
+    });
+  }
+
+  for (const p of presentations) {
+    items.push({
+      type: 'presentation',
+      slug: p.slug,
+      title: p.data.title,
+      text: [p.data.title, p.data.tagline, p.data.kind, p.body].join('\n'),
+      url: p.data.url,
     });
   }
 

@@ -29,6 +29,20 @@ const articles = defineCollection({
   }),
 });
 
+const presentations = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    tagline: z.string(),
+    url: z.string().url(),
+    kind: z.enum(['slides', 'site']).default('slides'),
+    cover: z.string().optional(),
+    year: z.number(),
+    featured: z.boolean().default(false),
+    order: z.number().default(0),
+  }),
+});
+
 const skills = defineCollection({
   type: 'content',
   schema: z.object({
@@ -42,4 +56,4 @@ const skills = defineCollection({
   }),
 });
 
-export const collections = { projects, articles, skills };
+export const collections = { projects, articles, presentations, skills };

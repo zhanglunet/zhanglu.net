@@ -141,6 +141,25 @@ featured: boolean = false
 正文可有可无 (列表只用 summary + 跳外链, 没有内部详情页)
 ```
 
+### presentations
+
+```yaml
+---
+title: string               # 卡片标题
+tagline: string             # 一句话标语 (whitespace-pre-line, YAML | 多行 OK)
+url: string                 # 外链 (必填), 点卡片直接跳新 tab
+kind: 'slides' | 'site' = 'slides'  # 网页 PPT vs 普通站点, 卡片上有 badge
+cover?: string              # 封面 (可选, 暂未渲染)
+year: number                # 出现在卡片右上
+featured: boolean = false
+order: number = 0           # 数字越小越靠前
+---
+正文 markdown (可选, 列表页不渲染, 只用作端点 body_md 参考)
+```
+
+不开详情页, 卡片直接跳外链。列表页: `src/pages/presentations/index.astro`。
+端点: `/api/presentations.json` (含 cover/featured/order)。
+
 ### skills
 
 ```yaml
@@ -201,7 +220,29 @@ featured: false       # true 可选, 暂未启用首页过滤
 **slug 命名**: 不要用 URL 的 hash，用 `日期-关键词` 或纯关键词。  
 **特殊：公众号正文**: 公众号有反爬，WebFetch 抓不到。如果同一篇内容既在公众号也在原始博客发了，**优先用博客 URL**（agent 友好）。
 
-### 5.3 同步本机 skills
+### 5.3 加展示 (网页 PPT / 站点入口)
+
+写 `src/content/presentations/<slug>.md`:
+
+```yaml
+---
+title: 展示标题
+tagline: 一句话标语
+url: https://外链
+kind: slides         # slides=网页 PPT, site=普通站点
+year: 2026
+order: 1             # 数字小靠前
+featured: false
+---
+正文可选
+```
+
+- 不开详情页, 卡片直接跳外链 (新 tab)
+- 列表页 `/presentations`, 顶部导航有「展示」入口
+- 端点 `/api/presentations.json` build 时静态生成
+- 改完 schema (`src/content/config.ts`) 要同步改对应的 `*.json.ts` 端点
+
+### 5.4 同步本机 skills
 
 ```bash
 pnpm run sync:skills
@@ -231,7 +272,7 @@ pnpm run sync:skills
   - research, sandbox-sdk, turnstile-spin, web-perf,
   - workers-best-practices, wrangler
 
-### 5.4 改首页 / about / socials
+### 5.5 改首页 / about / socials
 
 | 想改什么 | 改哪里 |
 |---|---|
@@ -248,7 +289,7 @@ pnpm run sync:skills
 - 有 `url` 且不含 `TODO` → Footer 显示链接
 - `url` 空但有 `qrcode` → About 页可折叠显示二维码（Footer 不展示）
 
-### 5.5 加新区块（演讲 / 获奖 / Now）
+### 5.6 加新区块（演讲 / 获奖 / Now）
 
 改 `src/pages/index.astro`。照着 "精选项目" / "最近文章" / "Skills" 三个 section 复制结构。如果需要类型化数据，先：
 1. `src/content/config.ts` 加新 collection schema
@@ -385,12 +426,13 @@ YAML `|` block 在 frontmatter 里保留 `\n`，但 HTML 默认折叠空白。`S
 
 ---
 
-## 11. 当前内容快照（截至 2026-06-10）
+## 11. 当前内容快照（截至 2026-06-13）
 
 | collection | 数量 | featured |
 |---|---|---|
 | projects | 3 | mbabrand, qiji-roadshow-2026, qcc-agent |
-| articles | 2 | agent-cli (站内 /posts/), qiji-56-projects-one-night (qiji 项目站) |
+| articles | 3 | agent-cli (站内 /posts/), qiji-56-projects-one-night, qcc-agent-origin |
+| presentations | 3 | mbabrand (slides), apex-handbook (slides), openagent (site) — 后两条 tagline 仍是占位 |
 | skills | 30 | zhanglu（14 个 handwritten:true） |
 
 `src/data/about.json` 当前 hero / bio 是基于公开项目信息撰写的占位描述，可随时替换为本人定义版。
@@ -428,6 +470,7 @@ YAML `|` block 在 frontmatter 里保留 `\n`，但 HTML 默认折叠空白。`S
 | `/api/projects.json` | `src/pages/api/projects.json.ts` | 项目列表 |
 | `/api/projects/{slug}.json` | `src/pages/api/projects/[slug].json.ts` | 单项目（含 `body_md`）|
 | `/api/articles.json` | `src/pages/api/articles.json.ts` | 公众号 / blog 入口 |
+| `/api/presentations.json` | `src/pages/api/presentations.json.ts` | 网页 PPT / 站点入口 |
 | `/api/skills.json` | `src/pages/api/skills.json.ts` | Skill 索引 |
 | `/api/skills/{slug}.json` | `src/pages/api/skills/[slug].json.ts` | 单 skill（含 `body_md`）|
 | `/api/about.json` | `src/pages/api/about.json.ts` | 简介 |

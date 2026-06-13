@@ -17,6 +17,7 @@ JSON API (build-time generated, free to fetch, CORS open):
 - /api/projects.json — projects list
 - /api/projects/{slug}.json — single project with body_md
 - /api/articles.json — 公众号 / blog 文章入口列表
+- /api/presentations.json — 网页版 PPT 与相关站点入口
 - /api/skills.json — Claude Skills 索引
 - /api/skills/{slug}.json — single skill with body_md
 - /api/about.json — bio + tags

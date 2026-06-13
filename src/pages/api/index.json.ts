@@ -3,9 +3,10 @@ import { getCollection } from 'astro:content';
 import about from '../../data/about.json';
 
 export const GET: APIRoute = async ({ site }) => {
-  const [projects, articles, skills] = await Promise.all([
+  const [projects, articles, presentations, skills] = await Promise.all([
     getCollection('projects'),
     getCollection('articles'),
+    getCollection('presentations'),
     getCollection('skills'),
   ]);
 
@@ -21,12 +22,14 @@ export const GET: APIRoute = async ({ site }) => {
     counts: {
       projects: projects.length,
       articles: articles.length,
+      presentations: presentations.length,
       skills: skills.length,
     },
     endpoints: {
       projects: `${base}/api/projects.json`,
       project: `${base}/api/projects/{slug}.json`,
       articles: `${base}/api/articles.json`,
+      presentations: `${base}/api/presentations.json`,
       skills: `${base}/api/skills.json`,
       skill: `${base}/api/skills/{slug}.json`,
       about: `${base}/api/about.json`,
