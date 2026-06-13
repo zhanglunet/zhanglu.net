@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import ArticleCard from '../components/ArticleCard.astro';
+import PresentationCard from '../components/PresentationCard.astro';
 import SkillCard from '../components/SkillCard.astro';
 import about from '../data/about.json';
 
@@ -10,6 +11,9 @@ const allProjects = await getCollection('projects');
 const featuredProjects = allProjects
   .filter((p) => p.data.featured)
   .sort((a, b) => a.data.order - b.data.order);
+
+const presentations = (await getCollection('presentations'))
+  .sort((a, b) => (a.data.order || 999) - (b.data.order || 999));
 
 const allArticles = await getCollection('articles');
 const recentArticles = allArticles
@@ -50,6 +54,18 @@ const otherSkills = allSkills
       {featuredProjects.map((p) => <ProjectCard entry={p} />)}
     </div>
   </section>
+
+  {presentations.length > 0 && (
+    <section class="py-8 border-t border-[var(--color-rule)]">
+      <div class="flex items-baseline justify-between mb-6">
+        <h2 class="font-serif text-2xl font-semibold">展示</h2>
+        <a href="/presentations" class="text-sm text-[var(--color-muted)] hover:text-[var(--color-ink)]">全部 →</a>
+      </div>
+      <div class="grid sm:grid-cols-2 gap-4">
+        {presentations.map((p) => <PresentationCard entry={p} />)}
+      </div>
+    </section>
+  )}
 
   {recentArticles.length > 0 && (
     <section class="py-8 border-t border-[var(--color-rule)]">
