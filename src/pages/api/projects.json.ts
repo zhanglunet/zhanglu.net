@@ -19,6 +19,7 @@ export const GET: APIRoute = async ({ site }) => {
       status: p.data.status,
       order: p.data.order,
       loc: p.data.loc ?? null,
+      persona: p.data.persona ?? null,
       permalink: `${base}/projects/${p.slug}`,
       body_url: `${base}/api/projects/${p.slug}.json`,
     }));

@@ -2,7 +2,7 @@
 import type { CollectionEntry } from 'astro:content';
 interface Props { entry: CollectionEntry<'projects'> }
 const { entry } = Astro.props;
-const { title, tagline, url, tech, year, status, loc } = entry.data;
+const { title, tagline, url, tech, year, status, loc, persona } = entry.data;
 const detailHref = `/projects/${entry.slug}`;
 ---
 <article class="group border border-[var(--color-rule)] rounded-md p-5 hover:border-[var(--color-ink)] transition-colors bg-white/40">
@@ -12,6 +12,11 @@ const detailHref = `/projects/${entry.slug}`;
     </h3>
     <span class="text-xs text-[var(--color-muted)] shrink-0">{year}</span>
   </div>
+  {persona && (
+    <p class="mb-2">
+      <span class="inline-block px-2 py-0.5 text-xs rounded bg-[var(--color-paper-2)] text-[var(--color-accent)] font-medium">为 {persona} 设计</span>
+    </p>
+  )}
   <p class="text-[var(--color-muted)] text-sm leading-relaxed mb-3">{tagline}</p>
   <div class="flex flex-wrap items-center gap-2 text-xs">
     {tech.slice(0, 4).map((t) => (

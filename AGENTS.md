@@ -123,6 +123,7 @@ featured: boolean = false   # true 才上首页"精选项目"
 status: 'live' | 'beta' | 'wip' | 'archived' = 'live'
 order: number = 0           # 数字越小越靠前
 loc?: number                # 源码行数 (可选), cloc 统计, 排除文档/数据/生成物; 卡片和详情页显示 "≈ N 行代码"
+persona?: string            # 目标人群 (可选), 如 CEO / CMO / CFO; 卡片和详情页显示朱砂色徽章 "为 X 设计"
 ---
 正文 markdown (## 是什么 / ## 为什么做 / ## 你能怎么用)
 ```

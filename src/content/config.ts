@@ -14,6 +14,7 @@ const projects = defineCollection({
     status: z.enum(['live', 'beta', 'archived', 'wip']).default('live'),
     order: z.number().default(0),
     loc: z.number().optional(),
+    persona: z.string().optional(),
   }),
 });
 
