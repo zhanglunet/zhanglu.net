@@ -1,0 +1,126 @@
+---
+import Base from '../../layouts/Base.astro';
+
+const title = 'AI 原生组织的 C-suite，需要一套什么样的决策智能体';
+const desc = '我先后做了 Boss、MBA Brand、OAF 三个看起来不相关的产品，做到第三个才发现它们是同一套骨架。这篇讲讲这套骨架，以及为什么 AI 原生组织的 C-suite 需要它。';
+const date = '2026-07-18';
+---
+<Base title={title} description={desc} image="/og/c-suite.png">
+  <article class="max-w-2xl mx-auto">
+    <!-- meta -->
+    <div class="mb-6 flex items-center gap-3 text-xs font-mono text-[var(--color-muted)] tracking-wider">
+      <a href="/posts" class="hover:text-[var(--color-accent)]">POSTS</a>
+      <span>·</span>
+      <time datetime={date}>{date}</time>
+      <span>·</span>
+      <span>9 分钟阅读</span>
+    </div>
+
+    <h1 class="font-serif text-3xl sm:text-4xl font-semibold leading-tight mb-3">{title}</h1>
+    <p class="text-lg text-[var(--color-muted)] leading-relaxed mb-10 border-l-2 border-[var(--color-accent)] pl-4">
+      我先后做了 Boss、MBA Brand、OAF 三个看起来不相关的产品，做到第三个才发现它们是同一套骨架。这篇讲讲这套骨架，以及为什么 AI 原生组织的 C-suite 需要它。
+    </p>
+
+    <div class="prose-zh max-w-none">
+
+      <h2>三个产品，一个意外的发现</h2>
+
+      <p>去年到今年，我先后做了三个 AI 产品，面向的人完全不同：</p>
+
+      <ul>
+        <li><strong><a href="/projects/boss">Boss</a></strong>（bossagent.cc）—— 给 CEO 的决策智能体。抛一个战略议题，它开一场多评委合议，产出一份带归因校验的判断书。</li>
+        <li><strong><a href="/projects/mbabrand">MBA Brand</a></strong>（mbabrand.com）—— 给 CMO 的品牌影响力审计。给一个品牌名，它跑完多维度调研，再让一组评委独立打分。</li>
+        <li><strong><a href="/projects/oaf">OAF</a></strong>（oaf.world）—— 给 CFO 的投研工作台。覆盖美 / A / 港三市场，把数字交给确定性工具、把叙事交给大模型。</li>
+      </ul>
+
+      <p>领域不同、用户不同、数据源不同。但做到第三个的时候我停下来了——因为我意识到自己在<strong>第三次写同一套东西</strong>。</p>
+
+      <h2>共同的敌人：拍脑袋</h2>
+
+      <p>三个职能，每天都在做高风险判断：这个方向投不投、这个品牌到底强不强、这家公司值不值这个价。这些判断长期依赖同一个词——<strong>感觉</strong>。</p>
+
+      <p>「感觉」有两个致命的失败模式：</p>
+
+      <ol>
+        <li><strong>单一视角偏见</strong>。你只问一个人，哪怕是最资深的那个，他的盲区就是你的盲区。</li>
+        <li><strong>结论无法归因</strong>。拍脑袋说「挺好的」，半年后崩了，你分不清是判断错了、证据不全、还是世界变了。</li>
+      </ol>
+
+      <p>三个不同的职能，害的是同一种病。所以解药也应该是同一套。</p>
+
+      <h2>同一套骨架</h2>
+
+      <p>我在三个产品里反复搭的，是同一条流水线：</p>
+
+      <pre><code>{`  调研    →    合议    →    打分    →    归因
+  多路并行     多评委独立    多镜头可证伪   30/90/365
+  取证据      互不相见      给出分数      时间轴回看`}</code></pre>
+
+      <p>四步，逐个说为什么。</p>
+
+      <h3>多评委合议，而不是单个分析师</h3>
+
+      <p>单个模型（或单个人）给结论，本质还是「单一视角」。所以每一步判断都不是一个 agent 说了算，而是<strong>一组各持立场的评委独立打分、必答反方</strong>——有人盯战略、有人盯证据、有人专门唱反调。合议之前评委互不相见，避免相互带节奏。这样出来的不是一个观点，而是一张<strong>分歧地图</strong>：哪条结论是共识、哪条撕得最凶，一目了然。</p>
+
+      <h3>可打分、可证伪，而不是「我觉得挺好」</h3>
+
+      <p>「这个品牌很强」是没法复盘的。「这个品牌在范畴命名维度 8.8 分，在真实信号维度只有 5.2 分，因为线上声量集中在单一渠道」——才是。每条结论都被要求给出<strong>分数</strong>和<strong>可证伪点</strong>：满足什么条件它就算错。判断从此可以被反驳，而不是只能被相信。</p>
+
+      <h3>版本化 + 归因校验，而不是一次性</h3>
+
+      <p>判断打上时间戳，冻结成不可变快照，并预设 30 / 90 / 365 天的<strong>归因校验点</strong>。到期系统自己回来比对：当初的预判命中了没有？命中 / 证伪写进记分板。判断力于是第一次变成<strong>可积累的资产</strong>——你不只是做决定，你在给自己的判断建一条可回测的曲线。</p>
+
+      <h3>反捏造，是硬约束不是选项</h3>
+
+      <p>大模型最危险的地方，是它能一本正经地编一个数字。所以三个产品都把「反捏造」做成机器级约束：只用公开一手 / 真实数据，拿不到就标 N/A 留白，绝不替你圆。OAF 干脆把数字全部交给确定性工具、只让模型写叙事；MBA 把评委引用接进 CI 硬 gate，逐字校验是否真在语料里。<strong>宁可少说，不可乱说。</strong></p>
+
+      <h3>人机双读</h3>
+
+      <p>同一份判断，既要能给人看（HTML 报告 / 看板），也要能给 agent 调（MCP / API）。因为在一个 AI 原生的组织里，判断的下游既有人，也有别的 agent。</p>
+
+      <h2>换的，只是评委和数据源</h2>
+
+      <p>看懂了骨架，三个产品的差异其实很表层：</p>
+
+      <table>
+        <thead>
+          <tr><th></th><th>评委是谁</th><th>数据源</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Boss</td><td>维度 doctrine + 锚点心证</td><td>战略议题、内部文档</td></tr>
+          <tr><td>MBA</td><td>人物 mental model（傅盛 / 乔布斯…）</td><td>品牌信号、舆情</td></tr>
+          <tr><td>OAF</td><td>多空辩论 + 确定性工具</td><td>三市场行情财报</td></tr>
+        </tbody>
+      </table>
+
+      <p>骨架一行没变。这也是为什么它们能凑成<strong>一套</strong>，而不是三个孤立工具。</p>
+
+      <h2>为什么是「AI 原生组织」</h2>
+
+      <p>再往上想一层。</p>
+
+      <p>一个 AI 原生组织，是把越来越多的日常运转——写代码、跑调研、做客服、盯数据——交给 agent 的组织。当执行层已经跑在可追溯的 agent 上，<strong>唯独顶层判断还停留在会议室的直觉里</strong>，就成了最刺眼的断层。</p>
+
+      <p>C-suite 决策智能体想补的就是这一层：让 CEO / CMO / CFO 的核心判断，长在和组织其余部分同一套「可调研、可打分、可复盘」的底座上。不是取代人拍板——<strong>最终按下按钮的还是人</strong>——而是把拍板之前的调研、合议、打分、归因，变成一套人和 agent 都能读、都能回看的基础设施。</p>
+
+      <p>组织越 AI 原生，这层基础设施就越不可少。</p>
+
+      <h2>边界</h2>
+
+      <p>说点诚实的。这套东西不是神谕：</p>
+
+      <ul>
+        <li>评委是 AI 演绎的视角，不是真人董事会；它逼你想全，但不替你负责。</li>
+        <li>打分是相对的、给定语料下的，语料变了分数就该变——这正是要版本化的原因。</li>
+        <li>归因校验需要<strong>时间</strong>，30/90/365 天没到，记分板就还是空的。</li>
+      </ul>
+
+      <p>但即便如此，把判断从「拍脑袋」挪到「可追溯的流水线」，本身就已经是一次升级。剩下的，交给时间去回测。</p>
+
+      <hr />
+
+      <p>三个入口都在这：<a href="/projects/boss">Boss · CEO</a>、<a href="/projects/mbabrand">MBA Brand · CMO</a>、<a href="/projects/oaf">OAF · CFO</a>，或从 <a href="/c-suite">C-suite 专题页</a> 进。</p>
+
+    </div>
+  </article>
+</Base>

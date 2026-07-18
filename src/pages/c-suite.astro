@@ -44,22 +44,25 @@ const host = (url?: string) => {
   try { return new URL(url).host.replace(/^www\./, ''); } catch { return url; }
 };
 
-const desc = 'Boss（CEO）· MBA Brand（CMO）· OAF（CFO）—— 一套把决策层核心判断做成可调研、可打分、可复盘流水线的智能体。';
+const desc = '为 AI 原生组织而设计：Boss（CEO）· MBA Brand（CMO）· OAF（CFO）—— 一套把决策层核心判断做成可调研、可打分、可复盘流水线的智能体。';
 ---
-<Base title="C-suite 决策智能体" description={desc}>
+<Base title="C-suite 决策智能体" description={desc} image="/og/c-suite.png">
   <!-- Hero -->
   <section class="py-8 sm:py-12">
     <p class="font-mono text-xs tracking-wider text-[var(--color-accent)] mb-4">专题 · DECISION SUITE</p>
-    <h1 class="font-serif text-4xl sm:text-5xl font-semibold tracking-tight mb-5">
+    <h1 class="font-serif text-4xl sm:text-5xl font-semibold tracking-tight mb-4">
       C-suite 决策智能体
     </h1>
-    <p class="font-serif text-xl sm:text-2xl text-[var(--color-ink)] leading-snug mb-6 max-w-3xl">
+    <p class="font-serif text-xl sm:text-2xl text-[var(--color-ink)] mb-5">
+      为 <span class="text-[var(--color-accent)]">AI 原生组织</span> 而设计。
+    </p>
+    <p class="font-serif text-lg sm:text-xl text-[var(--color-muted)] leading-snug mb-6 max-w-3xl">
       把 CEO 的战略判断、CMO 的品牌判断、CFO 的投研判断，各做成一条可调研、可打分、可复盘的流水线。
     </p>
     <p class="text-[var(--color-muted)] leading-relaxed max-w-2xl">
-      决策层每天都在做高风险判断，但判断长期靠「感觉」——事后无法复盘，也说不清当初错在哪一步。
-      这里的三个产品用同一套方法论，把 CEO / CMO / CFO 各自最核心的那类判断，从「拍脑袋」变成可追溯的流水线。
-      三个席位，一套骨架。
+      当一个组织把日常运转越来越多地交给 agent，它的顶层判断也该长在同一套可追溯的底座上——而不是继续靠「感觉」。
+      决策层每天在做高风险判断：投不投、强不强、值不值。这里的三个产品用同一套方法论，
+      把 CEO / CMO / CFO 各自最核心的那类判断，从「拍脑袋」变成可追溯、可打分、可复盘的流水线。三个席位，一套骨架。
     </p>
     <div class="mt-7 flex flex-wrap gap-2 text-sm">
       {suite.map((p) => (

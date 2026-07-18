@@ -286,6 +286,7 @@ pnpm run sync:skills
 | GitHub / X / 邮箱 链接 | `src/data/social.json` |
 | 微信公众号名 | `social.json` 里 label "微信公众号" 那条的 `handle` |
 | 公众号二维码 | 放 `public/wechat-qr.jpg`（258×258 JPEG OK），`qrcode` 字段指过去 |
+| 某页 OG 分享图 | 做 1200×630 图放 `public/og/`，页面 `<Base image="/og/xxx.png">`（Base 自动输出绝对 og:image / twitter:image）；无 image 则不出 og:image |
 
 `social.json` 里：
 - 有 `url` 且不含 `TODO` → Footer 显示链接
