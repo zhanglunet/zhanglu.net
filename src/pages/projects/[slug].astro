@@ -10,7 +10,7 @@ export const getStaticPaths = (async () => {
 
 const { entry } = Astro.props;
 const { Content } = await entry.render();
-const { title, tagline, url, repo, tech, year, status } = entry.data;
+const { title, tagline, url, repo, tech, year, status, loc } = entry.data;
 ---
 <Base title={title} description={tagline}>
   <article>
@@ -21,6 +21,9 @@ const { title, tagline, url, repo, tech, year, status } = entry.data;
       <span class="text-[var(--color-muted)]">{year}</span>
       {status !== 'live' && (
         <span class="px-2 py-0.5 border border-[var(--color-rule)] rounded text-xs">{status}</span>
+      )}
+      {loc && (
+        <span class="font-mono text-[var(--color-muted)]" title="源码行数（cloc 统计，排除文档/数据/生成物）">≈ {loc.toLocaleString()} 行代码</span>
       )}
       {url && (
         <a href={url} target="_blank" rel="noopener" class="text-[var(--color-accent)] hover:underline">

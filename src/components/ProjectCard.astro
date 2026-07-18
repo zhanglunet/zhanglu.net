@@ -2,7 +2,7 @@
 import type { CollectionEntry } from 'astro:content';
 interface Props { entry: CollectionEntry<'projects'> }
 const { entry } = Astro.props;
-const { title, tagline, url, tech, year, status } = entry.data;
+const { title, tagline, url, tech, year, status, loc } = entry.data;
 const detailHref = `/projects/${entry.slug}`;
 ---
 <article class="group border border-[var(--color-rule)] rounded-md p-5 hover:border-[var(--color-ink)] transition-colors bg-white/40">
@@ -19,6 +19,9 @@ const detailHref = `/projects/${entry.slug}`;
     ))}
     {status !== 'live' && (
       <span class="px-2 py-0.5 border border-[var(--color-rule)] rounded text-[var(--color-muted)]">{status}</span>
+    )}
+    {loc && (
+      <span class="ml-auto font-mono text-[var(--color-muted)]" title="源码行数（cloc 统计，排除文档/数据/生成物）">≈ {loc.toLocaleString()} 行</span>
     )}
   </div>
   <div class="mt-4 flex gap-4 text-sm">

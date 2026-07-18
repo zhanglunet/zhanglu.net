@@ -18,6 +18,7 @@ export const GET: APIRoute = async ({ site }) => {
       featured: p.data.featured,
       status: p.data.status,
       order: p.data.order,
+      loc: p.data.loc ?? null,
       permalink: `${base}/projects/${p.slug}`,
       body_url: `${base}/api/projects/${p.slug}.json`,
     }));

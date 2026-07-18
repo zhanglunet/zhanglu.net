@@ -13,6 +13,7 @@ const projects = defineCollection({
     featured: z.boolean().default(false),
     status: z.enum(['live', 'beta', 'archived', 'wip']).default('live'),
     order: z.number().default(0),
+    loc: z.number().optional(),
   }),
 });
 

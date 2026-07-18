@@ -122,6 +122,7 @@ year: number                # 出现在卡片右上 + 排序辅助
 featured: boolean = false   # true 才上首页"精选项目"
 status: 'live' | 'beta' | 'wip' | 'archived' = 'live'
 order: number = 0           # 数字越小越靠前
+loc?: number                # 源码行数 (可选), cloc 统计, 排除文档/数据/生成物; 卡片和详情页显示 "≈ N 行代码"
 ---
 正文 markdown (## 是什么 / ## 为什么做 / ## 你能怎么用)
 ```
@@ -430,7 +431,7 @@ YAML `|` block 在 frontmatter 里保留 `\n`，但 HTML 默认折叠空白。`S
 
 | collection | 数量 | featured |
 |---|---|---|
-| projects | 5 | mbabrand, boss, oaf, qiji-roadshow-2026, qcc-agent（order 1→5） |
+| projects | 6 | mbabrand, boss, oaf, qiji-roadshow-2026, qcc-agent, shanghai（order 1→6, 均 featured） |
 | articles | 3 | agent-cli (站内 /posts/), qiji-56-projects-one-night, qcc-agent-origin |
 | presentations | 4 | mbabrand (slides), boss-handbook (slides), oaf (slides), openagent (site) |
 | skills | 30 | zhanglu（14 个 handwritten:true） |
