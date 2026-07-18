@@ -1,0 +1,151 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+
+const roleOrder = ['CEO', 'CMO', 'CFO'];
+
+const projects = await getCollection('projects');
+const suite = projects
+  .filter((p) => p.data.persona && roleOrder.includes(p.data.persona))
+  .sort((a, b) => roleOrder.indexOf(a.data.persona!) - roleOrder.indexOf(b.data.persona!));
+
+const roleMeta: Record<string, { role: string; scene: string; line: string; features: string[] }> = {
+  CEO: {
+    role: '首席执行官 · 战略决策',
+    scene: '战略议题、投资决策、组织与人事判断',
+    line: '把该拍板的大事，先交给一场多评委合议——1 个锚点心证 + N 位维度评委独立打分、必答反方。',
+    features: ['多评委独立合议，不单点拍板', '30 / 90 / 365 天归因校验', '判断书不可变版本快照'],
+  },
+  CMO: {
+    role: '首席营销官 · 品牌决策',
+    scene: '品牌方向、市场定位、竞品与增长判断',
+    line: '把「这个品牌到底强不强」拆成 7 维度调研 + 多评委打分，量化成可追溯、可复盘的分数。',
+    features: ['7 维度并行调研 × 43 评委打分', '版本化报告 + 舆情驱动重审', '每条结论可 attribute 回证据'],
+  },
+  CFO: {
+    role: '首席财务官 · 投研决策',
+    scene: '标的研究、估值判断、行业与组合配置',
+    line: '把投研的数字交给确定性工具、叙事交给大模型、缺数留白不编造。',
+    features: ['美 / A / 港三市场真实行情财报', '多空辩论 + 两阶段 DCF 估值', '数字来自工具，缺数留白不编造'],
+  },
+};
+
+const principles = [
+  { t: '多视角合议，不单点拍板', d: '一组各持立场的评委独立打分、必答反方，取代一个人的直觉与盲区。' },
+  { t: '可打分、可证伪', d: '每条结论都带分数和可证伪点，不是模糊的「我觉得挺好」。' },
+  { t: '版本化 + 归因校验', d: '判断打上时间戳与不可变快照，到期回来验证当初到底对不对。' },
+  { t: '反捏造 anti-fabrication', d: '只用公开一手 / 真实数据，拿不到就标 N/A 留白，绝不替你编造。' },
+  { t: '人机双读', d: '输出既是给人看的报告，也是给 agent 调的 MCP / API。' },
+  { t: '同一套骨架', d: '三个职能共用调研→合议→打分→归因的流水线，换的是评委和数据源。' },
+];
+
+const host = (url?: string) => {
+  if (!url) return '';
+  try { return new URL(url).host.replace(/^www\./, ''); } catch { return url; }
+};
+
+const desc = 'Boss（CEO）· MBA Brand（CMO）· OAF（CFO）—— 一套把决策层核心判断做成可调研、可打分、可复盘流水线的智能体。';
+---
+<Base title="C-suite 决策智能体" description={desc}>
+  <!-- Hero -->
+  <section class="py-8 sm:py-12">
+    <p class="font-mono text-xs tracking-wider text-[var(--color-accent)] mb-4">专题 · DECISION SUITE</p>
+    <h1 class="font-serif text-4xl sm:text-5xl font-semibold tracking-tight mb-5">
+      C-suite 决策智能体
+    </h1>
+    <p class="font-serif text-xl sm:text-2xl text-[var(--color-ink)] leading-snug mb-6 max-w-3xl">
+      把 CEO 的战略判断、CMO 的品牌判断、CFO 的投研判断，各做成一条可调研、可打分、可复盘的流水线。
+    </p>
+    <p class="text-[var(--color-muted)] leading-relaxed max-w-2xl">
+      决策层每天都在做高风险判断，但判断长期靠「感觉」——事后无法复盘，也说不清当初错在哪一步。
+      这里的三个产品用同一套方法论，把 CEO / CMO / CFO 各自最核心的那类判断，从「拍脑袋」变成可追溯的流水线。
+      三个席位，一套骨架。
+    </p>
+    <div class="mt-7 flex flex-wrap gap-2 text-sm">
+      {suite.map((p) => (
+        <a
+          href={`#${p.slug}`}
+          class="inline-flex items-center gap-1 px-3 py-1 rounded-full border border-[var(--color-rule)] bg-white/40 hover:border-[var(--color-accent)] transition-colors"
+        >
+          {p.data.title} <span class="text-[var(--color-accent)]">· {p.data.persona}</span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- 三个席位 -->
+  <section class="py-8 border-t border-[var(--color-rule)]">
+    <h2 class="font-serif text-2xl font-semibold mb-6">三个席位</h2>
+    <div class="space-y-5">
+      {suite.map((p) => {
+        const m = roleMeta[p.data.persona!];
+        return (
+          <article id={p.slug} class="border border-[var(--color-rule)] rounded-lg p-6 bg-white/40 scroll-mt-24">
+            <div class="flex flex-wrap items-center gap-3 mb-3">
+              <span class="px-2 py-0.5 text-xs rounded bg-[var(--color-paper-2)] text-[var(--color-accent)] font-medium">为 {p.data.persona} 设计</span>
+              <span class="text-xs text-[var(--color-muted)]">{m?.role}</span>
+              {p.data.loc && (
+                <span class="ml-auto font-mono text-xs text-[var(--color-muted)]">≈ {p.data.loc.toLocaleString()} 行代码</span>
+              )}
+            </div>
+            <h3 class="font-serif text-2xl font-semibold mb-1">
+              <a href={`/projects/${p.slug}`} class="hover:text-[var(--color-accent)]">{p.data.title}</a>
+            </h3>
+            <p class="text-[var(--color-muted)] text-sm leading-relaxed mb-4">{p.data.tagline}</p>
+            <p class="text-sm leading-relaxed mb-4 max-w-2xl">
+              <span class="text-[var(--color-muted)]">决策场景：</span>{m?.scene}。<br />
+              {m?.line}
+            </p>
+            <ul class="flex flex-wrap gap-2 mb-5">
+              {m?.features.map((f) => (
+                <li class="text-xs px-2 py-1 bg-[var(--color-paper-2)] rounded">{f}</li>
+              ))}
+            </ul>
+            <div class="flex flex-wrap gap-4 text-sm">
+              <a href={`/projects/${p.slug}`} class="text-[var(--color-accent)] hover:underline">项目详情 →</a>
+              {p.data.url && (
+                <a href={p.data.url} target="_blank" rel="noopener" class="text-[var(--color-accent)] hover:underline">访问 {host(p.data.url)} →</a>
+              )}
+            </div>
+          </article>
+        );
+      })}
+    </div>
+  </section>
+
+  <!-- 共同的方法论 -->
+  <section class="py-8 border-t border-[var(--color-rule)]">
+    <h2 class="font-serif text-2xl font-semibold mb-2">一套共同的方法论</h2>
+    <p class="text-[var(--color-muted)] text-sm mb-6 max-w-2xl">
+      三个产品面向不同职能，底层却是同一套「不拍脑袋」的骨架。这也是为什么它们能凑成一套，而不是三个孤立工具。
+    </p>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {principles.map((p) => (
+        <div class="border border-[var(--color-rule)] rounded-md p-4 bg-white/40">
+          <h3 class="font-serif text-base font-semibold mb-1">{p.t}</h3>
+          <p class="text-[var(--color-muted)] text-sm leading-relaxed">{p.d}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="py-8 border-t border-[var(--color-rule)]">
+    <h2 class="font-serif text-2xl font-semibold mb-2">从哪个席位开始</h2>
+    <p class="text-[var(--color-muted)] text-sm mb-6">挑离你最近的那类判断，直接打开对应的站点跑一遍。</p>
+    <div class="grid sm:grid-cols-3 gap-4">
+      {suite.map((p) => (
+        <a
+          href={p.data.url}
+          target="_blank"
+          rel="noopener"
+          class="group border border-[var(--color-rule)] rounded-lg p-5 bg-white/40 hover:border-[var(--color-accent)] transition-colors"
+        >
+          <div class="text-xs text-[var(--color-accent)] font-medium mb-1">为 {p.data.persona} 设计</div>
+          <div class="font-serif text-lg font-semibold group-hover:text-[var(--color-accent)]">{p.data.title}</div>
+          <div class="text-xs text-[var(--color-muted)] mt-1">{host(p.data.url)} →</div>
+        </a>
+      ))}
+    </div>
+  </section>
+</Base>

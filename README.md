@@ -10,6 +10,8 @@
 
 [![首页 — 精选项目 / 展示 / 最近文章 / Skills](docs/screenshots/home.png)](https://zhanglu.net)
 
+[![C-suite 专题 — Boss·CEO / MBA Brand·CMO / OAF·CFO 决策智能体套件](docs/screenshots/c-suite.png)](https://zhanglu.net/c-suite)
+
 | 项目（每个标注源码行数） | Skills 列表 | 关于页 |
 |---|---|---|
 | [![项目](docs/screenshots/projects.png)](https://zhanglu.net/projects/) | [![Skills](docs/screenshots/skills.png)](https://zhanglu.net/skills/) | [![关于](docs/screenshots/about.png)](https://zhanglu.net/about/) |
