@@ -383,7 +383,13 @@ Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
 ⚠️ **本会话类型（Claude Code on the web / 远程 agent 会话）建不了 Release、也推不了 tag**：GitHub API 返回 `Creating, editing, or deleting releases is not permitted for this session type`，git 代理对 tag ref push 返回 403。这是**会话类型的分类限制，放开仓库权限也没用**，别空转重试。第 ④ 步改走：
 
 1. **GitHub UI 一键发**：`https://github.com/zhanglunet/zhanglu.net/releases/new?tag=vX.Y.Z&target=main`，正文粘 CHANGELOG 段落，Publish（tag 由 GitHub 自动在 main 上创建）。
-2. **本地 gh**：`gh release create vX.Y.Z --target main --title "..." --notes-file CHANGELOG.md`。
+2. **本地 gh**：先把本地 main 更到最新（`git fetch && git merge --ff-only origin/main` —— 光 `git fetch` 只更新远端引用、不动工作区，新加的 `CHANGELOG.md` 在本地可能还不存在），再**只抽本版段落**发布（`--notes-file CHANGELOG.md` 会把整个 changelog 连历史版本一起塞进 release）：
+   ```bash
+   git fetch && git merge --ff-only origin/main
+   awk -v v="X.Y.Z" '$0 ~ "^## \\["v"\\]"{f=1;print;next} f&&/^## \[/{exit} f' CHANGELOG.md > /tmp/notes.md
+   gh release create vX.Y.Z --target main --title "vX.Y.Z — ..." --notes-file /tmp/notes.md
+   ```
+   （已发布的 release 想改说明：`gh release edit vX.Y.Z --notes-file /tmp/notes.md`。）
 
 agent 把能做的部分（①②③：bump + 写 CHANGELOG + 提交上 main）做完，第 ④ 步（tag / Release）留给人在 GitHub UI 或本地 gh 完成。
 
