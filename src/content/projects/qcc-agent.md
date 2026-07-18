@@ -7,7 +7,7 @@ tech: [MCP, Claude Skill, Python, TypeScript, Cloudflare Pages]
 year: 2026
 featured: true
 status: live
-order: 3
+order: 5
 ---
 
 ## 是什么

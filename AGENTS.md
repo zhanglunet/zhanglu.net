@@ -426,13 +426,13 @@ YAML `|` block 在 frontmatter 里保留 `\n`，但 HTML 默认折叠空白。`S
 
 ---
 
-## 11. 当前内容快照（截至 2026-06-13）
+## 11. 当前内容快照（截至 2026-07-18）
 
 | collection | 数量 | featured |
 |---|---|---|
-| projects | 3 | mbabrand, qiji-roadshow-2026, qcc-agent |
+| projects | 5 | mbabrand, boss, oaf, qiji-roadshow-2026, qcc-agent（order 1→5） |
 | articles | 3 | agent-cli (站内 /posts/), qiji-56-projects-one-night, qcc-agent-origin |
-| presentations | 3 | mbabrand (slides), boss-handbook (slides), openagent (site) |
+| presentations | 4 | mbabrand (slides), boss-handbook (slides), oaf (slides), openagent (site) |
 | skills | 30 | zhanglu（14 个 handwritten:true） |
 
 `src/data/about.json` 当前 hero / bio 是基于公开项目信息撰写的占位描述，可随时替换为本人定义版。

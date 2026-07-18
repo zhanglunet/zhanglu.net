@@ -2,8 +2,8 @@
   "name": "张路",
   "handle": "zhanglunet",
   "tagline": "用 Claude Skill 把复杂判断变成可追溯的流水线",
-  "bio": "在做 mbabrand（5 位评委合议给品牌做量化判断）和 qiji-roadshow-2026（一夜跑完 56 个路演项目的投资级 DD）两个项目。本机攒了 30 多个 Claude Skill，碎碎念发在公众号「张路的碎碎念」。",
-  "tags": ["Claude Skill", "多 Agent", "品牌判断", "路演 DD"],
+  "bio": "在做几个把复杂判断变成可追溯流水线的 AI 产品：mbabrand（评委合议给品牌打分）、bossagent（领导者决策智能体）、oaf.world（AI 投研工作台）。本机攒了 30 多个 Claude Skill，碎碎念发在公众号「张路的碎碎念」。",
+  "tags": ["Claude Skill", "多 Agent", "品牌判断", "决策智能体", "AI 投研"],
   "location": "",
   "avatar": "/avatar.png"
 }
