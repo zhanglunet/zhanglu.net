@@ -372,6 +372,21 @@ Commit message 用 HEREDOC 多行也行；末尾保留：
 Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
 ```
 
+### 8.1 发版 / release（版本 tag + GitHub Release）
+
+站点是 push main 自动部署，**发版只是可选的里程碑标记**，不影响上线。约定：
+
+- 版本号在 `package.json` 的 `version`（语义化版本，`0.x` 阶段小步 bump minor）。
+- 每次发版四步：① bump `package.json` → ② 在 `CHANGELOG.md` 顶部加 `## [x.y.z] - YYYY-MM-DD` 段落 → ③ 提交上 main → ④ 打 tag `vX.Y.Z` + 建 GitHub Release（正文照抄 CHANGELOG 对应段落）。
+- `CHANGELOG.md` 是发布说明的单一事实源，Release 正文直接粘对应段落。
+
+⚠️ **本会话类型（Claude Code on the web / 远程 agent 会话）建不了 Release、也推不了 tag**：GitHub API 返回 `Creating, editing, or deleting releases is not permitted for this session type`，git 代理对 tag ref push 返回 403。这是**会话类型的分类限制，放开仓库权限也没用**，别空转重试。第 ④ 步改走：
+
+1. **GitHub UI 一键发**：`https://github.com/zhanglunet/zhanglu.net/releases/new?tag=vX.Y.Z&target=main`，正文粘 CHANGELOG 段落，Publish（tag 由 GitHub 自动在 main 上创建）。
+2. **本地 gh**：`gh release create vX.Y.Z --target main --title "..." --notes-file CHANGELOG.md`。
+
+agent 把能做的部分（①②③：bump + 写 CHANGELOG + 提交上 main）做完，第 ④ 步（tag / Release）留给人在 GitHub UI 或本地 gh 完成。
+
 ---
 
 ## 9. 历史踩过的坑（不要重蹈）
