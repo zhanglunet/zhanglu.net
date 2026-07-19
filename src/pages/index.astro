@@ -37,22 +37,21 @@ const tui3Sites = [
 ---
 <Base image="/og/home.png">
   <section class="py-10 sm:py-16">
-    <div class="road-banner mb-8 sm:mb-10 rounded-lg border border-[var(--color-rule)] bg-[var(--color-paper-2)] px-5 sm:px-8 py-5 sm:py-6">
-      <svg viewBox="0 0 1200 118" class="w-full h-auto" role="img" aria-label="一条路，一个句点">
-        <title>一条路，一个句点</title>
-        <path class="road" d="M 40 84 L 320 30 L 600 84 L 880 30 L 1104 68"
-          fill="none" stroke="var(--color-ink)" stroke-width="13"
-          stroke-linecap="round" stroke-linejoin="round" pathLength="100" />
-        <circle class="wp" cx="320" cy="30" r="4.2" fill="var(--color-paper-2)" />
-        <circle class="wp" cx="600" cy="84" r="4.2" fill="var(--color-paper-2)" />
-        <circle class="wp" cx="880" cy="30" r="4.2" fill="var(--color-paper-2)" />
-        <circle class="period" cx="1150" cy="68" r="10" fill="var(--color-accent)" />
-      </svg>
+    <div class="road-flow flex items-center gap-2 mb-4 max-w-md sm:max-w-lg" role="img" aria-label="一条路流进「张路」，一个句点收尾">
+      <div class="flex-1 min-w-0">
+        <svg viewBox="0 0 340 110" preserveAspectRatio="xMaxYMid meet" class="block w-full h-auto">
+          <path class="road" d="M 0 55 L 88 18 L 176 90 L 264 22 L 340 55"
+            fill="none" stroke="var(--color-ink)" stroke-width="13"
+            stroke-linecap="round" stroke-linejoin="round" pathLength="100" />
+          <circle class="wp" cx="88" cy="18" r="4.4" fill="var(--color-paper)" />
+          <circle class="wp" cx="176" cy="90" r="4.4" fill="var(--color-paper)" />
+          <circle class="wp" cx="264" cy="22" r="4.4" fill="var(--color-paper)" />
+        </svg>
+      </div>
+      <h1 class="font-serif text-4xl sm:text-5xl font-semibold tracking-tight whitespace-nowrap shrink-0">
+        {about.name}<span class="hero-period text-[var(--color-accent)]">.</span>
+      </h1>
     </div>
-
-    <h1 class="font-serif text-4xl sm:text-5xl font-semibold tracking-tight mb-4">
-      {about.name}
-    </h1>
     <p class="font-serif text-xl sm:text-2xl text-[var(--color-ink)] mb-6 leading-snug">
       {about.tagline}
     </p>
@@ -172,26 +171,26 @@ const tui3Sites = [
   @keyframes road-fade { to { opacity: 1; } }
   @keyframes road-pop { from { opacity: 0; transform: scale(0.3); } to { opacity: 1; transform: scale(1); } }
 
-  .road-banner .road {
+  .road-flow .road {
     stroke-dasharray: 100;
     stroke-dashoffset: 100;
-    animation: road-draw 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation: road-draw 1.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
   }
-  .road-banner .wp {
+  .road-flow .wp {
     opacity: 0;
     animation: road-fade 0.5s ease forwards;
-    animation-delay: 1s;
+    animation-delay: 0.85s;
   }
-  .road-banner .period {
+  .hero-period {
+    display: inline-block;
     opacity: 0;
-    transform-box: fill-box;
     transform-origin: center;
-    animation: road-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-    animation-delay: 1.35s;
+    animation: road-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    animation-delay: 1.25s;
   }
   @media (prefers-reduced-motion: reduce) {
-    .road-banner .road { stroke-dashoffset: 0; animation: none; }
-    .road-banner .wp,
-    .road-banner .period { opacity: 1; animation: none; }
+    .road-flow .road { stroke-dashoffset: 0; animation: none; }
+    .road-flow .wp,
+    .hero-period { opacity: 1; animation: none; }
   }
 </style>
