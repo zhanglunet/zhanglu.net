@@ -62,7 +62,9 @@ zhanglu/
 │
 ├── public/                        ← 原样拷贝到站点根
 │   ├── favicon.svg                ← 含一个"路"字 + 朱砂圆点
-│   └── wechat-qr.jpg              ← 公众号「张路的碎碎念」二维码 (258×258)
+│   ├── wechat-qr.jpg              ← 公众号「张路的碎碎念」二维码 (258×258)
+│   ├── og/                        ← OG 分享图 (1200×630), <Base image="/og/xxx.png"> 挂载
+│   └── brand/                     ← C-suite logo SVG 四变体 (设计文档 docs/brand/c-suite-logo.md)
 │
 ├── src/
 │   ├── content/
@@ -90,6 +92,7 @@ zhanglu/
 │   │   ├── index.astro            ← 首页: hero + 精选项目 + 最近 5 篇文章 + Skills 概览
 │   │   ├── about.astro
 │   │   ├── projects/{index,[slug]}.astro
+│   │   ├── c-suite/{index,brand}.astro ← C-suite 专题页 + Logo 品牌页
 │   │   ├── articles/index.astro   ← 列表; 无 [slug] 详情页, 文章只跳外链
 │   │   ├── skills/{index,[slug]}.astro
 │   │   └── rss.xml.ts             ← 合并 articles + projects 输出 RSS

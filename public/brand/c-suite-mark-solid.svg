@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="C-suite 决策智能体标识（阴刻版）">
+  <title>C-suite 决策智能体 — 阴刻（反白）版</title>
+  <rect x="4" y="4" width="112" height="112" rx="26" fill="#b14b3a"/>
+  <g fill="none" stroke="#fafaf7" stroke-width="9" stroke-linecap="round">
+    <path d="M 82.98 40.72 A 30 30 0 0 0 42.65 35.52"/>
+    <path d="M 37.95 39.66 A 30 30 0 0 0 37.95 80.34"/>
+    <path d="M 42.65 84.48 A 30 30 0 0 0 82.98 79.28"/>
+  </g>
+  <circle cx="60" cy="60" r="6.5" fill="#fafaf7"/>
+</svg>

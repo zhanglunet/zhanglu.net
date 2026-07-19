@@ -1,0 +1,192 @@
+---
+import Base from '../../layouts/Base.astro';
+
+const desc = 'C-suite 决策智能体的标识：三弧一点，一枚印。印章 = 拍板与版本化冻结，三段弧 = 三个席位独立而合议，中心一点墨 = 锚点，人在回路。';
+
+const colors = [
+  { name: '朱砂', hex: '#b14b3a', note: '印泥 / 流水线 / 机器' },
+  { name: '墨', hex: '#1a1a1a', note: '锚点 / 人 / 正文' },
+  { name: '纸', hex: '#fafaf7', note: '底色' },
+  { name: '纸二', hex: '#f3f1ea', note: '浅色块' },
+  { name: '界线', hex: '#d9d6cd', note: '分隔' },
+];
+
+const assets = [
+  { file: 'c-suite-mark.svg', label: '主形 · 阳刻', note: '浅色背景用' },
+  { file: 'c-suite-mark-solid.svg', label: '阴刻 · 反白', note: '深色背景 / 重色块' },
+  { file: 'c-suite-mark-mono.svg', label: '单色 · 墨', note: '黑白印刷 / 灰度' },
+  { file: 'c-suite-lockup.svg', label: '横排组合', note: 'mark + 中文字标 + 副标语' },
+];
+
+const donts = [
+  '不改颜色——只允许朱砂 / 墨 / 反白三态',
+  '不拆开三段弧单独使用',
+  '不去掉中心的墨点',
+  '不加投影、渐变、描边效果',
+  '不斜置、不变形',
+  '深色背景一律用阴刻版',
+];
+---
+<Base title="C-suite · Logo 与品牌" description={desc} image="/og/c-suite.png">
+  <!-- Hero -->
+  <section class="py-8 sm:py-12">
+    <div class="mb-6 flex items-center gap-3 text-xs font-mono text-[var(--color-muted)] tracking-wider">
+      <a href="/c-suite" class="hover:text-[var(--color-accent)]">C-SUITE</a>
+      <span>·</span>
+      <span>BRAND</span>
+    </div>
+    <div class="flex flex-col sm:flex-row sm:items-center gap-8 sm:gap-12">
+      <img src="/brand/c-suite-mark.svg" alt="C-suite 标识" class="w-36 h-36 sm:w-44 sm:h-44 shrink-0" />
+      <div>
+        <h1 class="font-serif text-4xl sm:text-5xl font-semibold tracking-tight mb-4">三弧一点，一枚印</h1>
+        <p class="text-[var(--color-muted)] leading-relaxed max-w-xl">
+          C-suite 决策智能体的标识。一枚朱砂印，框住三段合成 C 的弧，围着中心一点墨。
+          它把这套产品的三个信条压进了一个图形：<strong class="text-[var(--color-ink)]">决策要能盖章存档，合议要独立而成一体，最终拍板的是人</strong>。
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 设计思路 -->
+  <section class="py-8 border-t border-[var(--color-rule)]">
+    <h2 class="font-serif text-2xl font-semibold mb-6">设计思路</h2>
+    <div class="space-y-5 max-w-3xl">
+      <div class="border border-[var(--color-rule)] rounded-lg p-6 bg-white/40">
+        <h3 class="font-serif text-lg font-semibold mb-2">① 一枚印章 —— 决策的终极动作</h3>
+        <p class="text-sm text-[var(--color-muted)] leading-relaxed">
+          站点的 accent 色 <code class="font-mono text-xs">#b14b3a</code> 本来就是<strong class="text-[var(--color-ink)]">朱砂</strong>——传统印泥的颜色。
+          而「盖章」正是中文语境里决策的终极动作：拍板、用印、生效。这套产品的核心主张之一是<strong class="text-[var(--color-ink)]">版本化冻结</strong>——每份判断书生成不可变快照，供事后验真。
+          印章天然携带这层意思：<strong class="text-[var(--color-ink)]">盖下去，就是一个不可篡改的版本</strong>。外框取印章的圆角方，阳刻（描边）为主形、阴刻（满铺反白）为反白形，正好对应篆刻的两种刻法。
+        </p>
+      </div>
+      <div class="border border-[var(--color-rule)] rounded-lg p-6 bg-white/40">
+        <h3 class="font-serif text-lg font-semibold mb-2">② 三段弧合成一个 C —— 三个席位，独立而合议</h3>
+        <p class="text-sm text-[var(--color-muted)] leading-relaxed">
+          C-suite 的 C 由<strong class="text-[var(--color-ink)]">三段断开的弧</strong>构成：三段弧对应三个席位——Boss（CEO）、MBA Brand（CMO）、OAF（CFO）；
+          弧与弧<strong class="text-[var(--color-ink)]">断开</strong>，是因为评委独立打分、互不相见（合议前不通气，是这套方法论的硬规则）；
+          三段合起来<strong class="text-[var(--color-ink)]">读作一个 C</strong>，是合议成一体、一套骨架。C 的开口朝右、张角 80°——开放的判断，不闭环自证。
+        </p>
+      </div>
+      <div class="border border-[var(--color-rule)] rounded-lg p-6 bg-white/40">
+        <h3 class="font-serif text-lg font-semibold mb-2">③ 中心一点墨 —— 锚点，人在回路</h3>
+        <p class="text-sm text-[var(--color-muted)] leading-relaxed">
+          圆心处一个<strong class="text-[var(--color-ink)]">墨色</strong>实点——全图唯一不是朱砂的元素。
+          它是锚点（anchor）：最终按下按钮的那个人。机器（朱砂的流水线）围绕着人（墨点）转，<strong class="text-[var(--color-ink)]">不是取代人拍板</strong>。
+          视觉上它也让 C 有了「视点」，整个 mark 隐约像一只眼——审视、复盘。
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 结构 -->
+  <section class="py-8 border-t border-[var(--color-rule)]">
+    <h2 class="font-serif text-2xl font-semibold mb-6">结构</h2>
+    <div class="flex flex-col sm:flex-row gap-8 items-start">
+      <svg viewBox="0 0 120 120" class="w-56 h-56 shrink-0" aria-label="标识结构图">
+        <!-- guides -->
+        <rect x="7.5" y="7.5" width="105" height="105" rx="24" fill="none" stroke="#d9d6cd" stroke-width="1" stroke-dasharray="3 3"/>
+        <circle cx="60" cy="60" r="30" fill="none" stroke="#d9d6cd" stroke-width="1" stroke-dasharray="3 3"/>
+        <line x1="60" y1="6" x2="60" y2="114" stroke="#d9d6cd" stroke-width="0.75" stroke-dasharray="3 3"/>
+        <line x1="6" y1="60" x2="114" y2="60" stroke="#d9d6cd" stroke-width="0.75" stroke-dasharray="3 3"/>
+        <!-- mark at reduced opacity -->
+        <g opacity="0.85">
+          <rect x="7.5" y="7.5" width="105" height="105" rx="24" fill="none" stroke="#b14b3a" stroke-width="7"/>
+          <g fill="none" stroke="#b14b3a" stroke-width="9" stroke-linecap="round">
+            <path d="M 82.98 40.72 A 30 30 0 0 0 42.65 35.52"/>
+            <path d="M 37.95 39.66 A 30 30 0 0 0 37.95 80.34"/>
+            <path d="M 42.65 84.48 A 30 30 0 0 0 82.98 79.28"/>
+          </g>
+          <circle cx="60" cy="60" r="6.5" fill="#1a1a1a"/>
+        </g>
+      </svg>
+      <ul class="text-sm text-[var(--color-muted)] leading-relaxed space-y-2 font-mono">
+        <li>印框：120 × 120，圆角 24，线宽 7</li>
+        <li>弧圆：圆心 (60, 60)，半径 30，线宽 9，圆头</li>
+        <li>三段弧：各 85.3°，段间隙 12°</li>
+        <li>C 口：朝右，张角 80°</li>
+        <li>心点：半径 6.5，墨色（全图唯一）</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 变体 -->
+  <section class="py-8 border-t border-[var(--color-rule)]">
+    <h2 class="font-serif text-2xl font-semibold mb-6">变体</h2>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="border border-[var(--color-rule)] rounded-lg p-6 bg-white/40 flex flex-col items-center gap-4">
+        <img src="/brand/c-suite-mark.svg" alt="主形阳刻" class="w-24 h-24" />
+        <div class="text-center"><div class="text-sm font-medium">主形 · 阳刻</div><div class="text-xs text-[var(--color-muted)]">浅色背景</div></div>
+      </div>
+      <div class="border border-[var(--color-rule)] rounded-lg p-6 bg-white/40 flex flex-col items-center gap-4">
+        <img src="/brand/c-suite-mark-solid.svg" alt="阴刻反白" class="w-24 h-24" />
+        <div class="text-center"><div class="text-sm font-medium">阴刻 · 反白</div><div class="text-xs text-[var(--color-muted)]">重色块</div></div>
+      </div>
+      <div class="border border-[var(--color-rule)] rounded-lg p-6 bg-[#1a1a1a] flex flex-col items-center gap-4">
+        <img src="/brand/c-suite-mark-solid.svg" alt="深色背景上的阴刻" class="w-24 h-24" />
+        <div class="text-center"><div class="text-sm font-medium text-[#fafaf7]">深色背景</div><div class="text-xs text-[#9a9a9a]">一律用阴刻</div></div>
+      </div>
+      <div class="border border-[var(--color-rule)] rounded-lg p-6 bg-white/40 flex flex-col items-center gap-4">
+        <img src="/brand/c-suite-mark-mono.svg" alt="单色墨版" class="w-24 h-24" />
+        <div class="text-center"><div class="text-sm font-medium">单色 · 墨</div><div class="text-xs text-[var(--color-muted)]">黑白 / 灰度</div></div>
+      </div>
+    </div>
+    <div class="mt-4 border border-[var(--color-rule)] rounded-lg p-6 bg-white/40">
+      <img src="/brand/c-suite-lockup.svg" alt="横排组合标识" class="w-full max-w-md" />
+      <div class="mt-3 text-xs text-[var(--color-muted)]">横排组合 · mark + 字标 + 「为 AI 原生组织而设计」</div>
+    </div>
+  </section>
+
+  <!-- 色彩 -->
+  <section class="py-8 border-t border-[var(--color-rule)]">
+    <h2 class="font-serif text-2xl font-semibold mb-2">色彩</h2>
+    <p class="text-sm text-[var(--color-muted)] mb-6">与 zhanglu.net 全站共用一套色板，logo 不引入新颜色。</p>
+    <div class="grid grid-cols-2 sm:grid-cols-5 gap-4">
+      {colors.map((c) => (
+        <div class="border border-[var(--color-rule)] rounded-lg overflow-hidden bg-white/40">
+          <div class="h-16" style={`background:${c.hex}`}></div>
+          <div class="p-3">
+            <div class="text-sm font-medium">{c.name}</div>
+            <div class="font-mono text-xs text-[var(--color-muted)]">{c.hex}</div>
+            <div class="text-xs text-[var(--color-muted)] mt-1">{c.note}</div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- 使用规范 + 下载 -->
+  <section class="py-8 border-t border-[var(--color-rule)]">
+    <div class="grid sm:grid-cols-2 gap-8">
+      <div>
+        <h2 class="font-serif text-2xl font-semibold mb-4">使用规范</h2>
+        <ul class="text-sm text-[var(--color-muted)] leading-relaxed space-y-2">
+          <li>最小尺寸：mark 短边 ≥ 20px（心点仍可辨）；组合宽 ≥ 180px</li>
+          <li>留白：四周至少留 mark 宽度的 1/6（约一个心点直径）</li>
+          {donts.map((d) => <li>❌ {d}</li>)}
+        </ul>
+      </div>
+      <div>
+        <h2 class="font-serif text-2xl font-semibold mb-4">下载</h2>
+        <ul class="text-sm space-y-2">
+          {assets.map((a) => (
+            <li>
+              <a href={`/brand/${a.file}`} download class="text-[var(--color-accent)] hover:underline font-mono">{a.file}</a>
+              <span class="text-[var(--color-muted)]"> — {a.label}（{a.note}）</span>
+            </li>
+          ))}
+        </ul>
+        <p class="text-xs text-[var(--color-muted)] mt-4">
+          全部为手写 SVG，无光栅依赖。设计文档见仓库 <code class="font-mono">docs/brand/c-suite-logo.md</code>。
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- back -->
+  <section class="py-8 border-t border-[var(--color-rule)]">
+    <p class="text-sm text-[var(--color-muted)]">
+      <a href="/c-suite" class="text-[var(--color-accent)] hover:underline">← 回 C-suite 专题</a>
+      　·　<a href="/posts/c-suite-design" class="text-[var(--color-accent)] hover:underline">设计思想长文 →</a>
+    </p>
+  </section>
+</Base>

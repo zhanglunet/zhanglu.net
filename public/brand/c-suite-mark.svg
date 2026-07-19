@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="C-suite 决策智能体标识：三弧一点，一枚印">
+  <title>C-suite 决策智能体 — 三弧一点，一枚印</title>
+  <!-- 印框：拍板 / 版本化冻结 -->
+  <rect x="7.5" y="7.5" width="105" height="105" rx="24" fill="none" stroke="#b14b3a" stroke-width="7"/>
+  <!-- 三弧合 C：三个席位独立而合议 -->
+  <g fill="none" stroke="#b14b3a" stroke-width="9" stroke-linecap="round">
+    <path d="M 82.98 40.72 A 30 30 0 0 0 42.65 35.52"/>
+    <path d="M 37.95 39.66 A 30 30 0 0 0 37.95 80.34"/>
+    <path d="M 42.65 84.48 A 30 30 0 0 0 82.98 79.28"/>
+  </g>
+  <!-- 心点：锚点，最终拍板的人 -->
+  <circle cx="60" cy="60" r="6.5" fill="#1a1a1a"/>
+</svg>

@@ -1,6 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
-import Base from '../layouts/Base.astro';
+import Base from '../../layouts/Base.astro';
 
 const roleOrder = ['CEO', 'CMO', 'CFO'];
 
@@ -49,6 +49,9 @@ const desc = '为 AI 原生组织而设计：Boss（CEO）· MBA Brand（CMO）�
 <Base title="C-suite 决策智能体" description={desc} image="/og/c-suite.png">
   <!-- Hero -->
   <section class="py-8 sm:py-12">
+    <a href="/c-suite/brand" title="Logo 与品牌 →" class="inline-block mb-6">
+      <img src="/brand/c-suite-mark.svg" alt="C-suite 标识：三弧一点，一枚印" class="w-16 h-16" />
+    </a>
     <p class="font-mono text-xs tracking-wider text-[var(--color-accent)] mb-4">专题 · DECISION SUITE</p>
     <h1 class="font-serif text-4xl sm:text-5xl font-semibold tracking-tight mb-4">
       C-suite 决策智能体
@@ -150,5 +153,9 @@ const desc = '为 AI 原生组织而设计：Boss（CEO）· MBA Brand（CMO）�
         </a>
       ))}
     </div>
+    <p class="mt-8 text-sm text-[var(--color-muted)]">
+      这套标识的来历：<a href="/c-suite/brand" class="text-[var(--color-accent)] hover:underline">Logo 与品牌 →</a>
+      　·　设计思想长文：<a href="/posts/c-suite-design" class="text-[var(--color-accent)] hover:underline">AI 原生组织的 C-suite →</a>
+    </p>
   </section>
 </Base>
