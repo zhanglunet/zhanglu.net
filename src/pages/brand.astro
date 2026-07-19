@@ -1,0 +1,195 @@
+---
+import Base from '../layouts/Base.astro';
+
+const desc = 'zhanglu.net 的标识：一条路，一个句点。Z 形盘山路是姓也是名，拐点是可追溯的记录，朱砂句点是「张路.」落下的那个点。';
+
+const colors = [
+  { name: '墨', hex: '#1a1a1a', note: '路 / 正文 / 人走的每一步' },
+  { name: '朱砂', hex: '#b14b3a', note: '句点 / 强调 / 全站 accent' },
+  { name: '纸', hex: '#fafaf7', note: '底色 / 拐点孔' },
+  { name: '纸二', hex: '#f3f1ea', note: '浅色块' },
+  { name: '界线', hex: '#d9d6cd', note: '分隔' },
+];
+
+const assets = [
+  { file: 'zhanglu-mark.svg', label: '主形', note: '浅色背景用' },
+  { file: 'zhanglu-mark-inverse.svg', label: '深底反白', note: '深色背景用' },
+  { file: 'zhanglu-mark-mono.svg', label: '单色 · 墨', note: '黑白印刷 / 灰度' },
+  { file: 'zhanglu-lockup.svg', label: '横排组合', note: 'mark + 张路 + zhanglu.net' },
+];
+
+const donts = [
+  '不改颜色——句点只能是朱砂（单色版除外）',
+  '不把句点挪走或去掉',
+  '不填充 Z 的内部、不改线宽比例',
+  '不加投影、渐变、描边效果',
+  '不斜置、不变形',
+  '深色背景一律用反白版',
+];
+---
+<Base title="Logo 与品牌" description={desc}>
+  <!-- Hero -->
+  <section class="py-8 sm:py-12">
+    <div class="mb-6 flex items-center gap-3 text-xs font-mono text-[var(--color-muted)] tracking-wider">
+      <span>ZHANGLU.NET</span>
+      <span>·</span>
+      <span>BRAND</span>
+    </div>
+    <div class="flex flex-col sm:flex-row sm:items-center gap-8 sm:gap-12">
+      <img src="/brand/zhanglu-mark.svg" alt="zhanglu.net 标识" class="w-36 h-36 sm:w-44 sm:h-44 shrink-0" />
+      <div>
+        <h1 class="font-serif text-4xl sm:text-5xl font-semibold tracking-tight mb-4">一条路，一个句点</h1>
+        <p class="text-[var(--color-muted)] leading-relaxed max-w-xl">
+          zhanglu.net 的标识。一条 Z 形的盘山路，两个拐点，尽头落一枚朱砂句点。
+          它把这个站的三件事压进了一个图形：<strong class="text-[var(--color-ink)]">名字里有路，走过的每步可追溯，走到哪句点落到哪</strong>。
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 设计思路 -->
+  <section class="py-8 border-t border-[var(--color-rule)]">
+    <h2 class="font-serif text-2xl font-semibold mb-6">设计思路</h2>
+    <div class="space-y-5 max-w-3xl">
+      <div class="border border-[var(--color-rule)] rounded-lg p-6 bg-white/40">
+        <h3 class="font-serif text-lg font-semibold mb-2">① 名字里的路 —— Z 形盘山道</h3>
+        <p class="text-sm text-[var(--color-muted)] leading-relaxed">
+          「张路」的路，就是道路的路。地图上的盘山路画出来，正好是一个 <strong class="text-[var(--color-ink)]">Z 字折线</strong>——而 Z 又是「张 Zhang」的首字母。
+          一笔下去，<strong class="text-[var(--color-ink)]">既是姓，也是名</strong>。斜段精确 45°，像等高线间的之字爬升。
+        </p>
+      </div>
+      <div class="border border-[var(--color-rule)] rounded-lg p-6 bg-white/40">
+        <h3 class="font-serif text-lg font-semibold mb-2">② 拐点即记录 —— 可追溯</h3>
+        <p class="text-sm text-[var(--color-muted)] leading-relaxed">
+          这个站在做的事是「把复杂判断变成<strong class="text-[var(--color-ink)]">可追溯</strong>的流水线」。
+          折线的两个拐点各打了一个孔——像路书上的<strong class="text-[var(--color-ink)]">途经点</strong>。
+          直线是走，拐点是判断；打了孔，走过的每一步都能回看。缩小之后孔自然消失，mark 退化成干净的「Z.」。
+        </p>
+      </div>
+      <div class="border border-[var(--color-rule)] rounded-lg p-6 bg-white/40">
+        <h3 class="font-serif text-lg font-semibold mb-2">③ 朱砂句点 —— 「张路.」的那个点</h3>
+        <p class="text-sm text-[var(--color-muted)] leading-relaxed">
+          全站的字标本来就是「张路」加一枚朱砂句点。mark 的终点就是这枚句点——
+          <strong class="text-[var(--color-ink)]">路走到哪里，句点就落在哪里</strong>。它是全图唯一的朱砂，也是唯一的圆。
+        </p>
+      </div>
+      <div class="border border-[var(--color-rule)] rounded-lg p-6 bg-white/40">
+        <h3 class="font-serif text-lg font-semibold mb-2">④ 与 C-suite 印章：一方一线，一印一路</h3>
+        <p class="text-sm text-[var(--color-muted)] leading-relaxed">
+          本站的产品套件 <a href="/c-suite/brand" class="text-[var(--color-accent)] hover:underline">C-suite 有自己的印章标识</a>（朱砂方框围一点墨——机器围着人转）。
+          个人标识反过来：<strong class="text-[var(--color-ink)]">墨线引一点朱砂——人走出来的路</strong>。
+          同一套色板，互为表里：<strong class="text-[var(--color-ink)]">产品是盖下去的印，个人是走出来的路</strong>。
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 结构 -->
+  <section class="py-8 border-t border-[var(--color-rule)]">
+    <h2 class="font-serif text-2xl font-semibold mb-6">结构</h2>
+    <div class="flex flex-col sm:flex-row gap-8 items-start">
+      <svg viewBox="0 0 120 120" class="w-56 h-56 shrink-0" aria-label="标识结构图">
+        <rect x="10" y="10" width="100" height="100" fill="none" stroke="#d9d6cd" stroke-width="1" stroke-dasharray="3 3"/>
+        <line x1="60" y1="6" x2="60" y2="114" stroke="#d9d6cd" stroke-width="0.75" stroke-dasharray="3 3"/>
+        <line x1="6" y1="60" x2="114" y2="60" stroke="#d9d6cd" stroke-width="0.75" stroke-dasharray="3 3"/>
+        <line x1="26" y1="36" x2="96" y2="36" stroke="#d9d6cd" stroke-width="0.75" stroke-dasharray="3 3"/>
+        <line x1="26" y1="84" x2="96" y2="84" stroke="#d9d6cd" stroke-width="0.75" stroke-dasharray="3 3"/>
+        <g opacity="0.9">
+          <path d="M 26 36 H 80 L 32 84 H 70" fill="none" stroke="#1a1a1a" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="80" cy="36" r="3" fill="#fafaf7"/>
+          <circle cx="32" cy="84" r="3" fill="#fafaf7"/>
+          <circle cx="88.5" cy="84" r="7.5" fill="#b14b3a"/>
+        </g>
+      </svg>
+      <ul class="text-sm text-[var(--color-muted)] leading-relaxed space-y-2 font-mono">
+        <li>画布：120 × 120</li>
+        <li>折线三段：线宽 10，圆头圆角</li>
+        <li>斜段：精确 45°（下降 48 × 48）</li>
+        <li>拐点孔：r 3 × 2（纸色，缩小自然消失）</li>
+        <li>句点：r 7.5，朱砂（全图唯一朱砂、唯一圆）</li>
+        <li>句点与末段基线对齐（y = 84）</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 变体 -->
+  <section class="py-8 border-t border-[var(--color-rule)]">
+    <h2 class="font-serif text-2xl font-semibold mb-6">变体</h2>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="border border-[var(--color-rule)] rounded-lg p-6 bg-white/40 flex flex-col items-center gap-4">
+        <img src="/brand/zhanglu-mark.svg" alt="主形" class="w-24 h-24" />
+        <div class="text-center"><div class="text-sm font-medium">主形</div><div class="text-xs text-[var(--color-muted)]">浅色背景</div></div>
+      </div>
+      <div class="border border-[var(--color-rule)] rounded-lg p-6 bg-[#1a1a1a] flex flex-col items-center gap-4">
+        <img src="/brand/zhanglu-mark-inverse.svg" alt="深底反白" class="w-24 h-24" />
+        <div class="text-center"><div class="text-sm font-medium text-[#fafaf7]">深底反白</div><div class="text-xs text-[#9a9a9a]">深色背景</div></div>
+      </div>
+      <div class="border border-[var(--color-rule)] rounded-lg p-6 bg-white/40 flex flex-col items-center gap-4">
+        <img src="/brand/zhanglu-mark-mono.svg" alt="单色墨" class="w-24 h-24" />
+        <div class="text-center"><div class="text-sm font-medium">单色 · 墨</div><div class="text-xs text-[var(--color-muted)]">黑白 / 灰度</div></div>
+      </div>
+      <div class="border border-[var(--color-rule)] rounded-lg p-6 bg-white/40 flex flex-col items-center gap-4">
+        <img src="/favicon.svg" alt="favicon" class="w-24 h-24 rounded-xl" />
+        <div class="text-center"><div class="text-sm font-medium">Favicon</div><div class="text-xs text-[var(--color-muted)]">浏览器标签</div></div>
+      </div>
+    </div>
+    <div class="mt-4 border border-[var(--color-rule)] rounded-lg p-6 bg-white/40">
+      <img src="/brand/zhanglu-lockup.svg" alt="横排组合标识" class="w-full max-w-sm" />
+      <div class="mt-3 text-xs text-[var(--color-muted)]">横排组合 · mark 的句点即字标的句点，不再重复</div>
+    </div>
+  </section>
+
+  <!-- 色彩 -->
+  <section class="py-8 border-t border-[var(--color-rule)]">
+    <h2 class="font-serif text-2xl font-semibold mb-2">色彩</h2>
+    <p class="text-sm text-[var(--color-muted)] mb-6">即全站色板（global.css 的 @theme），标识不引入新颜色。</p>
+    <div class="grid grid-cols-2 sm:grid-cols-5 gap-4">
+      {colors.map((c) => (
+        <div class="border border-[var(--color-rule)] rounded-lg overflow-hidden bg-white/40">
+          <div class="h-16" style={`background:${c.hex}`}></div>
+          <div class="p-3">
+            <div class="text-sm font-medium">{c.name}</div>
+            <div class="font-mono text-xs text-[var(--color-muted)]">{c.hex}</div>
+            <div class="text-xs text-[var(--color-muted)] mt-1">{c.note}</div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- 使用规范 + 下载 -->
+  <section class="py-8 border-t border-[var(--color-rule)]">
+    <div class="grid sm:grid-cols-2 gap-8">
+      <div>
+        <h2 class="font-serif text-2xl font-semibold mb-4">使用规范</h2>
+        <ul class="text-sm text-[var(--color-muted)] leading-relaxed space-y-2">
+          <li>最小尺寸：mark 短边 ≥ 16px（拐点孔会自然消失，属预期）</li>
+          <li>留白：四周至少留一个句点直径（约 mark 宽度 1/8）</li>
+          {donts.map((d) => <li>❌ {d}</li>)}
+        </ul>
+      </div>
+      <div>
+        <h2 class="font-serif text-2xl font-semibold mb-4">下载</h2>
+        <ul class="text-sm space-y-2">
+          {assets.map((a) => (
+            <li>
+              <a href={`/brand/${a.file}`} download class="text-[var(--color-accent)] hover:underline font-mono">{a.file}</a>
+              <span class="text-[var(--color-muted)]"> — {a.label}（{a.note}）</span>
+            </li>
+          ))}
+        </ul>
+        <p class="text-xs text-[var(--color-muted)] mt-4">
+          全部为手写 SVG。设计文档见仓库 <code class="font-mono">docs/brand/zhanglu-logo.md</code>。
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- back -->
+  <section class="py-8 border-t border-[var(--color-rule)]">
+    <p class="text-sm text-[var(--color-muted)]">
+      <a href="/" class="text-[var(--color-accent)] hover:underline">← 回首页</a>
+      　·　<a href="/c-suite/brand" class="text-[var(--color-accent)] hover:underline">C-suite 印章标识 →</a>
+    </p>
+  </section>
+</Base>

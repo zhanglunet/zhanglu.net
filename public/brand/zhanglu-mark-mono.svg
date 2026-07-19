@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="zhanglu.net 标识（单色版）">
+  <title>张路 — 一条路，一个句点（单色·墨）</title>
+  <path d="M 26 36 H 80 L 32 84 H 70" fill="none" stroke="#1a1a1a" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="80" cy="36" r="3" fill="#fafaf7"/>
+  <circle cx="32" cy="84" r="3" fill="#fafaf7"/>
+  <circle cx="88.5" cy="84" r="7.5" fill="#1a1a1a"/>
+</svg>

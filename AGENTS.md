@@ -61,10 +61,10 @@ zhanglu/
 ├── .gitignore
 │
 ├── public/                        ← 原样拷贝到站点根
-│   ├── favicon.svg                ← 含一个"路"字 + 朱砂圆点
+│   ├── favicon.svg                ← 深底方形 + 反白 Z 路 + 朱砂句点 (zhanglu logo 简化版)
 │   ├── wechat-qr.jpg              ← 公众号「张路的碎碎念」二维码 (258×258)
 │   ├── og/                        ← OG 分享图 (1200×630), <Base image="/og/xxx.png"> 挂载
-│   ├── brand/                     ← C-suite logo SVG 四变体 (设计文档 docs/brand/c-suite-logo.md)
+│   ├── brand/                     ← logo SVG: C-suite 印章四变体 + zhanglu 个人标识四变体 (设计文档 docs/brand/*.md)
 │   ├── covers/                    ← 项目网站截图 (webp), projects frontmatter cover 字段引用
 │   └── tui3/                      ← tui3 往期作品 5 个子站截图 (webp), 首页「往期作品」画廊用
 │
@@ -93,6 +93,7 @@ zhanglu/
 │   ├── pages/                     ← Astro 文件系统路由
 │   │   ├── index.astro            ← 首页: hero + 精选项目 + 最近 5 篇文章 + Skills 概览
 │   │   ├── about.astro
+│   │   ├── brand.astro            ← 本站 logo 品牌页「一条路，一个句点」(Footer 有入口)
 │   │   ├── projects/{index,[slug]}.astro
 │   │   ├── c-suite/{index,brand}.astro ← C-suite 专题页 + Logo 品牌页
 │   │   ├── articles/index.astro   ← 列表; 无 [slug] 详情页, 文章只跳外链

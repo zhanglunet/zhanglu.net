@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 120" role="img" aria-label="张路 — 横排组合标识">
+  <title>张路 — 横排组合</title>
+  <g>
+    <path d="M 26 36 H 80 L 32 84 H 70" fill="none" stroke="#1a1a1a" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="80" cy="36" r="3" fill="#fafaf7"/>
+    <circle cx="32" cy="84" r="3" fill="#fafaf7"/>
+    <circle cx="88.5" cy="84" r="7.5" fill="#b14b3a"/>
+  </g>
+  <text x="138" y="66" font-family="Georgia, 'Source Serif Pro', 'Noto Serif SC', 'Songti SC', serif" font-size="46" font-weight="600" fill="#1a1a1a">张路</text>
+  <text x="141" y="96" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="16" letter-spacing="2" fill="#6b6b6b">zhanglu.net</text>
+</svg>

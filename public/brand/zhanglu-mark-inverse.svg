@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="zhanglu.net 标识（深底反白版）">
+  <title>张路 — 一条路，一个句点（反白）</title>
+  <rect x="4" y="4" width="112" height="112" rx="56" fill="#1a1a1a"/>
+  <path d="M 26 36 H 80 L 32 84 H 70" fill="none" stroke="#fafaf7" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="80" cy="36" r="3" fill="#1a1a1a"/>
+  <circle cx="32" cy="84" r="3" fill="#1a1a1a"/>
+  <circle cx="88.5" cy="84" r="7.5" fill="#b14b3a"/>
+</svg>
