@@ -468,7 +468,7 @@ YAML `|` block 在 frontmatter 里保留 `\n`，但 HTML 默认折叠空白。`S
 
 | collection | 数量 | featured |
 |---|---|---|
-| projects | 6 | mbabrand, boss, oaf, qiji-roadshow-2026, qcc-agent, shanghai（order 1→6, 均 featured） |
+| projects | 7 | mbabrand, boss, oaf, qiji-roadshow-2026, qcc-agent, shanghai（order 1→6, featured）+ tui3（网站存档, order 9, archived, 非 featured, 只上 /projects） |
 | articles | 3 | agent-cli (站内 /posts/), qiji-56-projects-one-night, qcc-agent-origin |
 | presentations | 4 | mbabrand (slides), boss-handbook (slides), oaf (slides), openagent (site) |
 | skills | 30 | zhanglu（14 个 handwritten:true） |
