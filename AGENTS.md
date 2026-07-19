@@ -439,6 +439,17 @@ YAML `|` block 在 frontmatter 里保留 `\n`，但 HTML 默认折叠空白。`S
 
 `x.com/<handle>` 给无 cookies 请求返回 403，不代表 handle 错。不要用 curl 状态码判定 handle 有效性。
 
+### 9.8 手机端横向溢出的三个惯犯
+
+390px 视口下把页面撑破的三类元素（已修，新增内容别再犯）：
+
+1. **grid 隐式轨道 + pre**：`grid md:grid-cols-2` 在手机端落到隐式单列，轨道会被 `<pre>` 的 max-content 撑破容器。写成显式 `grid grid-cols-1 md:grid-cols-2`（`grid-cols-1` = `minmax(0,1fr)`）。
+2. **长英文 token 不断行**：URL / 路径 / `ZHANGLU_BASE_URL` 这类词在窄列（尤其 `grid-cols-[auto_1fr]`）里撑宽 min-content。容器加 `wrap-anywhere`（overflow-wrap 可继承）。skill description 的 `whitespace-pre-line` 已配套 `wrap-anywhere`，别删。
+3. **导航换行**：Header 导航是单行横滑（`overflow-x-auto` + item `shrink-0` + 隐藏滚动条），新增导航项不需要处理换行，但**别删掉 nav 上那串 overflow/scrollbar class**。
+
+排查工具：`global.css` 里 `html,body { overflow-x: clip }` 只是兜底；真出问题用 playwright evaluate 遍历 `getBoundingClientRect().right > 390` 找元凶（本仓库修复时的做法），不要靠猜。
+另外 `.prose-zh` 表格在 ≤640px 整表横滑（th/td nowrap），长文里放表格不用管宽度。
+
 ---
 
 ## 10. 不要做的事

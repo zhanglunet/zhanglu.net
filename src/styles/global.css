@@ -105,3 +105,49 @@ body {
   font-style: italic;
   margin: 1.25rem 0;
 }
+
+/* ---------- 手机阅读优化 ---------- */
+
+/* 兜底：任何残余横向溢出不再撑破页面（真正的成因仍应逐个修） */
+html,
+body {
+  overflow-x: clip;
+}
+
+/* 长 token（URL / 路径 / 英文长词）允许任意处断行，不撑宽容器 */
+.prose-zh {
+  overflow-wrap: break-word;
+}
+.prose-zh code {
+  overflow-wrap: anywhere;
+}
+
+/* 表格：窄屏整表横向滚动，不逐字挤压 */
+@media (max-width: 640px) {
+  .prose-zh table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .prose-zh th,
+  .prose-zh td {
+    white-space: nowrap;
+  }
+}
+
+/* 表格基础样式（桌面同用） */
+.prose-zh table {
+  margin: 1.25rem 0;
+  font-size: 0.95em;
+  border-collapse: collapse;
+}
+.prose-zh th,
+.prose-zh td {
+  padding: 0.4rem 0.9rem 0.4rem 0;
+  text-align: left;
+  border-bottom: 1px solid var(--color-rule);
+}
+.prose-zh th {
+  font-weight: 600;
+}

@@ -20,12 +20,12 @@ const isActive = (href: string) =>
     <a href="/" class="font-serif text-xl font-semibold tracking-tight">
       {about.name}<span class="text-[var(--color-accent)]">.</span>
     </a>
-    <nav class="flex items-center gap-5 text-sm">
+    <nav class="flex items-center gap-4 sm:gap-5 text-sm max-w-full overflow-x-auto whitespace-nowrap [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
       {nav.map((item) => (
         <a
           href={item.href}
           class:list={[
-            'transition-colors',
+            'transition-colors shrink-0',
             isActive(item.href)
               ? 'text-[var(--color-ink)] font-medium'
               : 'text-[var(--color-muted)] hover:text-[var(--color-ink)]',

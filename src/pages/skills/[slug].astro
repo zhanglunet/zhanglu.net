@@ -16,7 +16,7 @@ const { name, description, source, featured, handwritten } = entry.data;
   <article>
     <a href="/skills" class="text-sm text-[var(--color-muted)] hover:text-[var(--color-ink)]">← Skills</a>
     <h1 class="font-mono text-2xl sm:text-3xl font-semibold mt-4 mb-3">/{name}</h1>
-    <p class="text-[var(--color-muted)] mb-6 leading-relaxed whitespace-pre-line">{description}</p>
+    <p class="text-[var(--color-muted)] mb-6 leading-relaxed whitespace-pre-line wrap-anywhere">{description}</p>
     <div class="flex gap-3 text-xs mb-8 pb-5 border-b border-[var(--color-rule)] text-[var(--color-muted)]">
       <span>source: {source}</span>
       {featured && <span class="text-[var(--color-accent)]">★ featured</span>}

@@ -43,7 +43,7 @@ const desc = '给 AI agent (Claude Code / Codex / Hermes / OpenClaw) 一个统�
   <!-- Quick start -->
   <section class="mb-12">
     <h2 class="font-serif text-2xl font-semibold mb-5">30 秒上手</h2>
-    <div class="grid md:grid-cols-2 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
         <p class="text-xs font-mono text-[var(--color-muted)] mb-2 tracking-wider">CURL</p>
         <pre class="bg-[#1a1a1a] text-[#f3f1ea] p-4 rounded text-xs leading-relaxed overflow-x-auto"><code>curl -s https://zhanglu.net/api/index.json | jq
@@ -96,7 +96,7 @@ npx zhanglu-net about --json</code></pre>
 
     <h3 class="font-serif text-lg font-semibold mt-6 mb-3">命令</h3>
     <div class="text-sm">
-      <div class="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 font-mono">
+      <div class="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 font-mono wrap-anywhere">
         <code class="text-[var(--color-accent)]">list &lt;kind&gt;</code>
         <span class="text-[var(--color-muted)]">列出 skills / projects / articles</span>
         <code class="text-[var(--color-accent)]">get &lt;kind&gt; &lt;slug&gt;</code>
@@ -113,7 +113,7 @@ npx zhanglu-net about --json</code></pre>
     </div>
 
     <h3 class="font-serif text-lg font-semibold mt-6 mb-3">通用 flags</h3>
-    <div class="text-sm grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 font-mono">
+    <div class="text-sm grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 font-mono wrap-anywhere">
       <code class="text-[var(--color-accent)]">--json</code>
       <span class="text-[var(--color-muted)]">输出原始 JSON（agent 默认要的）</span>
       <code class="text-[var(--color-accent)]">--md</code>
@@ -135,7 +135,7 @@ npx zhanglu-net about --json</code></pre>
     </div>
 
     <h3 class="font-serif text-lg font-semibold mt-6 mb-3">环境变量</h3>
-    <div class="text-sm grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 font-mono">
+    <div class="text-sm grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 font-mono wrap-anywhere">
       <code class="text-[var(--color-accent)]">ZHANGLU_BASE_URL</code>
       <span class="text-[var(--color-muted)]">切换 base，本地 dev 用 http://localhost:4321</span>
       <code class="text-[var(--color-accent)]">NO_COLOR=1</code>
