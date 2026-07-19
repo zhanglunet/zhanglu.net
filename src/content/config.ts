@@ -58,4 +58,15 @@ const skills = defineCollection({
   }),
 });
 
-export const collections = { projects, articles, presentations, skills };
+const weekly = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    week: z.string(),
+    dateRange: z.string(),
+    date: z.coerce.date(),
+    summary: z.string(),
+  }),
+});
+
+export const collections = { projects, articles, presentations, skills, weekly };

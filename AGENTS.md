@@ -481,8 +481,9 @@ YAML `|` block 在 frontmatter 里保留 `\n`，但 HTML 默认折叠空白。`S
 | collection | 数量 | featured |
 |---|---|---|
 | projects | 7 | mbabrand, boss, oaf, qiji-roadshow-2026, qcc-agent, shanghai（order 1→6, featured）+ tui3（网站存档, order 9, archived, 非 featured, 只上 /projects） |
-| articles | 3 | agent-cli (站内 /posts/), qiji-56-projects-one-night, qcc-agent-origin |
+| articles | 5 | agent-cli, qiji-56-projects-one-night, qcc-agent-origin, c-suite-design (站内 /posts/), weekly-2026-w29 (站内 /weekly/) |
 | presentations | 4 | mbabrand (slides), boss-handbook (slides), oaf (slides), openagent (site) |
+| weekly | 1 | 2026-w29 (脱敏公开周报, 集合 src/content/weekly + /weekly 索引 + [slug] 页) |
 | skills | 30 | zhanglu（14 个 handwritten:true） |
 
 `src/data/about.json` 当前 hero / bio 是基于公开项目信息撰写的占位描述，可随时替换为本人定义版。
