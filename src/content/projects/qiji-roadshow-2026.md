@@ -2,6 +2,7 @@
 title: 奇绩 2026 路演全景
 tagline: 56 个路演项目，从现场照片到可发布的 DD 全景页，一条流水线打穿
 url: https://qiji-roadshow-2026.pages.dev
+cover: /covers/qiji-roadshow-2026.webp
 tech: [Claude Skill, Multi-Agent, Cloudflare Pages]
 year: 2026
 featured: true

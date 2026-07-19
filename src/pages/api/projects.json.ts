@@ -13,6 +13,7 @@ export const GET: APIRoute = async ({ site }) => {
       tagline: p.data.tagline,
       url: p.data.url ?? null,
       repo: p.data.repo ?? null,
+      cover: p.data.cover ? new URL(p.data.cover, base).toString() : null,
       tech: p.data.tech,
       year: p.data.year,
       featured: p.data.featured,

@@ -3,6 +3,7 @@ title: AI 愿景论坛 · 上海回顾
 tagline: 把 2026 AI 愿景论坛（上海站）30 场分享做成纪要、知识库与知识图谱的非官方回顾站
 url: https://agentic-ai-shanghai-2026.pages.dev
 repo: https://github.com/zhanglunet/shanghai
+cover: /covers/shanghai.webp
 tech: [HTML, JavaScript, 知识图谱, Cloudflare Pages]
 year: 2026
 featured: true

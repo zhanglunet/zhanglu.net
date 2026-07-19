@@ -26,6 +26,14 @@ const featuredSkills = allSkills
   .slice(0, 6);
 const otherSkills = allSkills
   .filter((s) => !s.data.featured && !s.data.handwritten);
+
+const tui3Sites = [
+  { name: '黑板报文艺', years: '1999–2007', img: '/tui3/heibanbao.webp', url: 'https://heibanbao.tui3.com/' },
+  { name: '畅游网', years: '1999–2007', img: '/tui3/changyou.webp', url: 'https://changyou.tui3.com/' },
+  { name: '在路上', years: '2007', img: '/tui3/zhanglu.webp', url: 'https://zhanglu.tui3.com/' },
+  { name: '说3 · 科技TV', years: '2007', img: '/tui3/shuo3.webp', url: 'https://shuo3.tui3.com/' },
+  { name: '沙发网', years: '2007', img: '/tui3/sofaee.webp', url: 'https://sofaee.tui3.com/' },
+];
 ---
 <Base>
   <section class="py-10 sm:py-16">
@@ -120,5 +128,28 @@ const otherSkills = allSkills
         {otherSkills.length > 20 && <span> …</span>}
       </p>
     )}
+  </section>
+
+  <section class="py-8 border-t border-[var(--color-rule)]">
+    <div class="flex items-baseline justify-between mb-2">
+      <h2 class="font-serif text-2xl font-semibold">往期作品</h2>
+      <a href="/projects/tui3" class="text-sm text-[var(--color-muted)] hover:text-[var(--color-ink)]">详情 →</a>
+    </div>
+    <p class="text-[var(--color-muted)] text-sm mb-6 max-w-2xl">
+      在做这些 AI 产品之前——<a href="https://tui3.com" target="_blank" rel="noopener" class="text-[var(--color-accent)] hover:underline">tui3.com</a> 把我 1999–2007 年间参与的几个中文个人网站，从服务器存档整体重建成静态站，永久保存。
+    </p>
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+      {tui3Sites.map((s) => (
+        <a href={s.url} target="_blank" rel="noopener" class="group block border border-[var(--color-rule)] rounded-md overflow-hidden hover:border-[var(--color-accent)] transition-colors bg-white/40">
+          <div class="aspect-[4/3] overflow-hidden bg-[var(--color-paper-2)]">
+            <img src={s.img} alt={`${s.name} 存档截图`} loading="lazy" class="w-full h-full object-cover object-top group-hover:scale-[1.02] transition-transform duration-300" />
+          </div>
+          <div class="p-2.5">
+            <div class="text-xs font-medium leading-tight">{s.name}</div>
+            <div class="text-[10px] text-[var(--color-muted)] font-mono mt-0.5">{s.years}</div>
+          </div>
+        </a>
+      ))}
+    </div>
   </section>
 </Base>

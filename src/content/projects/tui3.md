@@ -2,6 +2,7 @@
 title: 网站存档 · tui3.com
 tagline: 把 1999–2007 年间参与的几个中文个人网站，从服务器存档整体重建成静态站，永久保存
 url: https://tui3.com
+cover: /covers/tui3.webp
 tech: [静态站, 存档重建, Wayback]
 year: 2007
 featured: false

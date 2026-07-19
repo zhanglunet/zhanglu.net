@@ -64,7 +64,9 @@ zhanglu/
 │   ├── favicon.svg                ← 含一个"路"字 + 朱砂圆点
 │   ├── wechat-qr.jpg              ← 公众号「张路的碎碎念」二维码 (258×258)
 │   ├── og/                        ← OG 分享图 (1200×630), <Base image="/og/xxx.png"> 挂载
-│   └── brand/                     ← C-suite logo SVG 四变体 (设计文档 docs/brand/c-suite-logo.md)
+│   ├── brand/                     ← C-suite logo SVG 四变体 (设计文档 docs/brand/c-suite-logo.md)
+│   ├── covers/                    ← 项目网站截图 (webp), projects frontmatter cover 字段引用
+│   └── tui3/                      ← tui3 往期作品 5 个子站截图 (webp), 首页「往期作品」画廊用
 │
 ├── src/
 │   ├── content/
@@ -438,6 +440,16 @@ YAML `|` block 在 frontmatter 里保留 `\n`，但 HTML 默认折叠空白。`S
 ### 9.7 X 链接 403 是正常的
 
 `x.com/<handle>` 给无 cookies 请求返回 403，不代表 handle 错。不要用 curl 状态码判定 handle 有效性。
+
+### 9.9 抓外部网站截图：Chromium 走不了代理，用 wget 镜像
+
+想给项目卡片配"网站截图"时，**headless Chromium 直连外部站会被 agent 代理 `ERR_CONNECTION_RESET`**（连 example.com 都挂；本地 localhost 不走代理所以没事）。curl / wget 走代理是通的。可行套路：
+
+1. `wget -e robots=off -p -k -H -nd -P <dir> --no-check-certificate <url>` 把页面连 CSS/JS/图片镜像到本地（这几个站都是静态托管，能镜像；纯 JS-SPA 只能拿到壳）。
+2. Playwright 截 `file://<dir>/index.html`（本地渲染正常），截图时 `page.route` 把非 file:// / data: 的请求 abort 掉，避免它再去够外部资源。
+3. `sharp`（`node_modules/.pnpm/sharp@*/node_modules/sharp`，根目录 require 不到要用全路径）resize 到宽 1200 + 转 webp q78，12 张 3.1MB → 633KB。放 `public/covers/`（项目）或 `public/tui3/`（往期子站）。
+
+项目 `cover` 字段现在**会渲染**（ProjectCard 顶部 banner + 详情页），不再是"暂未渲染"。presentations 的 cover 仍未渲染。
 
 ### 9.8 手机端横向溢出的三个惯犯
 

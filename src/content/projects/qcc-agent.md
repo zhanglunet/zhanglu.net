@@ -3,6 +3,7 @@ title: QCC Agent
 tagline: 把企查查塞进任何一个 AI Agent
 url: https://qcc-agent.pages.dev
 repo: https://github.com/zhanglunet/qcc
+cover: /covers/qcc-agent.webp
 tech: [MCP, Claude Skill, Python, TypeScript, Cloudflare Pages]
 year: 2026
 featured: true

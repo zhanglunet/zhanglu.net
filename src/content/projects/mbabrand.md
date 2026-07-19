@@ -3,6 +3,7 @@ title: MBA Brand
 tagline: 把品牌影响力做成可监控 / 可打分 / 可复盘的智能资产——43 位评委合议，舆情驱动版本化重审
 url: https://mbabrand.com
 repo: https://github.com/zhanglunet/mba
+cover: /covers/mbabrand.webp
 tech: [Claude Skill, Multi-Agent, MCP Server, TypeScript, Python, Cloudflare Pages]
 year: 2026
 featured: true

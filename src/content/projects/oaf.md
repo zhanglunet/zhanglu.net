@@ -2,6 +2,7 @@
 title: OAF
 tagline: 卫星互联网决策 Agent + 美/A/港三市场 AI 投研工作台——数字来自工具、叙事由大模型、缺数留白不编造
 url: https://oaf.world
+cover: /covers/oaf.webp
 tech: [FastAPI, Multi-Agent, MCP, Claude Opus, Claude Haiku, Cloudflare Pages]
 year: 2026
 featured: true

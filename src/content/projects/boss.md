@@ -2,6 +2,7 @@
 title: Boss
 tagline: CEO 的战略 OS——把重要判断交给一场多评委合议，可引用、可打分、可证伪，带 30/90/365 天归因校验
 url: https://bossagent.cc
+cover: /covers/boss.webp
 tech: [Claude Skill, Multi-Agent, MCP, HTTP Service, Python, 飞书 Bot]
 year: 2026
 featured: true
