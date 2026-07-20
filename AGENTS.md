@@ -481,7 +481,7 @@ YAML `|` block 在 frontmatter 里保留 `\n`，但 HTML 默认折叠空白。`S
 
 | collection | 数量 | featured |
 |---|---|---|
-| projects | 7 | mbabrand, boss, oaf, qiji-roadshow-2026, qcc-agent, shanghai（order 1→6, featured）+ tui3（网站存档, order 9, archived, 非 featured, 只上 /projects） |
+| projects | 8 | mbabrand, boss, oaf, aip（第二大脑）, qiji-roadshow-2026, qcc-agent, shanghai（order 1→7, featured）+ tui3（网站存档, order 9, archived, 非 featured） |
 | articles | 5 | agent-cli, qiji-56-projects-one-night, qcc-agent-origin, c-suite-design (站内 /posts/), weekly-2026-w29 (站内 /weekly/) |
 | presentations | 4 | mbabrand (slides), boss-handbook (slides), oaf (slides), openagent (site) |
 | weekly | 1 | 2026-w29 (脱敏公开周报, 集合 src/content/weekly + /weekly 索引 + [slug] 页) |

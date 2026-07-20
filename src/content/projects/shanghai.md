@@ -8,7 +8,7 @@ tech: [HTML, JavaScript, 知识图谱, Cloudflare Pages]
 year: 2026
 featured: true
 status: live
-order: 6
+order: 7
 loc: 6376
 ---
 
