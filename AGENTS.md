@@ -380,6 +380,8 @@ Commit message 用 HEREDOC 多行也行；末尾保留：
 Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
 ```
 
+> 每次开发都走 **§15 的回路**（计划 → 改 → **验证** → 过程记录）；commit 前必须 `pnpm run build` 过，且在 `docs/dev-log/` 留一条过程记录。别跳这两步。
+
 ### 8.1 发版 / release（版本 tag + GitHub Release）
 
 站点是 push main 自动部署，**发版只是可选的里程碑标记**，不影响上线。约定：
@@ -474,6 +476,7 @@ YAML `|` block 在 frontmatter 里保留 `\n`，但 HTML 默认折叠空白。`S
 - ❌ `git push --force` 到 main
 - ❌ 推送前不本地 `pnpm run build` 验证（CF Pages 失败构建对外不可见但会延迟生效）
 - ❌ 跳过 `Co-Authored-By` 行（约定）
+- ❌ 开发完不写 `docs/dev-log/` 过程记录、或没 build 就宣布"完成"（见 §15）
 
 ---
 
@@ -507,6 +510,8 @@ YAML `|` block 在 frontmatter 里保留 `\n`，但 HTML 默认折叠空白。`S
 ## 13. 文档同步
 
 改完代码 / 内容如果发现本指南某条过时了：**直接改本文件**，不要单开 changelog。本文是给未来你和其它 agent 看的快照，保持准确比保持历史重要。
+
+分工：本指南（AGENTS.md）记"**以后该怎么做**"；`docs/dev-log/` 记"**这次是怎么做的**"（过程记录，见 §15）；新踩的坑同时补进 §9。三者别混。
 
 ---
 
@@ -628,3 +633,50 @@ CLI 与站点端点松耦合 —— 改端点 schema 时若不破坏向下兼容
 `ArticleCard` 自动识别站内 URL，用同 tab 而非新 tab 打开。
 
 如果未来 posts 多了，把 `src/pages/posts/*.astro` 改成 `src/content/posts/*.md` 集合 + `[slug].astro` 渲染，schema 加进 `config.ts`。
+
+---
+
+## 15. 开发纪律与过程记录（Superpowers 式，原生落地）
+
+> 本站**不装** Superpowers 插件（obra / Jesse Vincent 的 Claude Code 插件）：它是本地插件，装不进临时的远程 web 会话；且它完整的 `brainstorm → git worktree → 写计划 → 子 agent 执行 → TDD → 完成前验证` 流程是给"重代码、有测试"的项目设计的，对以内容为主的本站偏重。
+> 但**采纳它的内核**——先想清楚、留下书面产物、完成前必须验证。纪律固化在本节，过程记录落在 `docs/dev-log/`（随 git 走，本地和远程会话都看得到）。
+
+### 15.1 每次开发的固定回路
+
+```
+① 计划  →  ② 改  →  ③ 验证  →  ④ 过程记录
+```
+
+1. **计划** —— 动手前先想清楚"改哪些文件、为什么、怎么验证"。改动大就写进 dev-log 的「目标」段；小改一句话带过。碰 schema / 组件 / 构建，先读懂 §4 §9 再动手，别顺手扩大范围。
+2. **改** —— 按计划改。
+3. **验证（完成前必做，不可跳）**：
+   - 任何改动 → `pnpm run build` 必须过（**别用 `| tail` 吞错误**，见 §9.1）。
+   - 视觉 / 组件 / 布局 → 再 `pnpm preview` 或截图看一眼，手机端按 §9.8 查横向溢出。
+   - 端点 / 数据 → build 后 `curl` 对应 `/api/*.json`（见 §14.4）。
+   - **没验证 = 没完成。** 别把"应该没问题"当成"验证过了"。
+4. **过程记录** —— 在 `docs/dev-log/` 留一条（格式见 §15.2 与 `docs/dev-log/README.md`）。
+
+### 15.2 过程记录（dev-log）写什么
+
+- **位置**：`docs/dev-log/YYYY-MM-DD-<关键词>.md`，一次开发一个文件。
+- **五段式**：目标 / 改动（文件清单）/ 验证（build 结果 + 预览或截图）/ 踩坑（可选）/ 结论与交付物。
+- **目的**：让未来的你和别的 agent 顺着记录复盘，而不是只能看 commit diff 猜意图。**踩到新坑 → 顺手也补进 §9。**
+- 模板和更细的说明在 `docs/dev-log/README.md`。
+
+### 15.3 按改动大小裁剪（别搞流程表演）
+
+| 改动类型 | 计划 | 验证 | dev-log |
+|---|---|---|---|
+| 内容微调（改一句文案 / 加一篇 article） | 一句话 | `pnpm build` | 一小段（当天可合并）|
+| 新增 项目 / presentation / skill | 列文件 | build + 列表页 / 首页扫一眼 | 一条 |
+| 组件 / CSS / 布局 | 列文件 + 意图 | build + 截图（桌面 + 手机）| 一条，附截图 |
+| schema / 端点 / 脚手架 / 构建配置 | 写清楚 + 影响面 | build + curl 端点 + 回归受影响页 | 一条，写明为什么这么改 |
+| 纯仓库文档（`docs/`、本指南）| 一句话 | `pnpm build`（确认没误伤 `src/`）| 可选，重要决策才记 |
+
+### 15.4 和既有约定的关系
+
+- 「验证」那步就是 §9.1「build 单独跑、看到 Complete 再继续」的硬化，外加视觉 / 端点回归。
+- 「过程记录」是 commit 之外的"过程"层，**不替代** commit message（§8）、也**不替代**本指南（§13）：dev-log 记"这次怎么做的"，本指南记"以后该怎么做"，新坑进 §9。
+- 发版仍按 §8.1。
+
+> 想上真插件走完整流程 → 本地 Claude Code 的 `/plugin` 里搜 **superpowers**（作者 obra / Jesse Vincent）安装；远程 web 会话装不住，仍以本节的原生纪律为准。
