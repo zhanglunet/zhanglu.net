@@ -58,5 +58,18 @@ docs/dev-log/YYYY-MM-DD-<关键词>.md
 
 ## 已有记录
 
-- `2026-07-21-wechat-typeset.md` — C-suite 长文的公众号排版版 + 标题迭代
+新的在上。这段是导航，别当唯一事实源 —— 目录里的 `YYYY-MM-DD-*.md` 才是。
+
 - `2026-07-21-devlog-discipline.md` — 本套开发纪律与 dev-log 约定的落地
+- `2026-07-21-wechat-typeset.md` — C-suite 长文的公众号排版版 + 标题迭代
+- `2026-07-20-aip-project.md` — 第二大脑 (aip.cab) 项目
+- `2026-07-19-site-logo-hero-og.md` — 站点 logo + 首页 OG + hero 头图迭代 + tagline
+- `2026-07-19-weekly.md` — 本周周报脱敏公开版 + 站内 weekly 集合
+- `2026-07-19-tui3-covers-gallery.md` — tui3 存档 + 全项目截图封面 + 往期作品画廊
+- `2026-07-19-mobile-reading.md` — 手机阅读优化（导航横滑 + 修横向溢出）
+- `2026-07-19-csuite-logo-brand.md` — C-suite logo「三弧一点，一枚印」+ 品牌页
+- `2026-07-18-csuite-suite.md` — C-suite 三件套（persona → 专题页 → 长文 → 定位升维）
+- `2026-07-18-release-v0.2.0.md` — 发版 v0.2.0 + 发版流程文档化 + README/截图刷新
+- `2026-07-18-projects-loc-shanghai.md` — 加 boss/oaf + shanghai + 全项目 loc 标注
+
+> 07-18 之前的工作（展示集合、CLI 改名、qcc-agent 缘起等）未回溯补记 —— dev-log 约定从本轮起启用。更早的决策仍散见于 commit 历史与 `docs/agent-cli/dev-log.md`。
