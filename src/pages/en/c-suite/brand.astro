@@ -1,0 +1,192 @@
+---
+import Base from '../../../layouts/Base.astro';
+
+const desc = 'The mark for the C-suite decision agents: three arcs, one dot, one seal. The seal = the final call and versioned freeze; the three arc segments = three seats, independent yet deliberating as one; the ink dot at the center = the anchor, the human in the loop.';
+
+const colors = [
+  { name: 'Cinnabar', hex: '#b14b3a', note: 'Seal ink / pipeline / machine' },
+  { name: 'Ink', hex: '#1a1a1a', note: 'Anchor / human / body text' },
+  { name: 'Paper', hex: '#fafaf7', note: 'Background' },
+  { name: 'Paper II', hex: '#f3f1ea', note: 'Light blocks' },
+  { name: 'Rule', hex: '#d9d6cd', note: 'Dividers' },
+];
+
+const assets = [
+  { file: 'c-suite-mark.svg', label: 'Primary · relief cut', note: 'For light backgrounds' },
+  { file: 'c-suite-mark-solid.svg', label: 'Intaglio · reversed', note: 'Dark backgrounds / heavy blocks' },
+  { file: 'c-suite-mark-mono.svg', label: 'Monochrome · ink', note: 'Black-and-white print / grayscale' },
+  { file: 'c-suite-lockup.svg', label: 'Horizontal lockup', note: 'mark + wordmark + tagline' },
+];
+
+const donts = [
+  'Do not change the colors — only cinnabar / ink / reversed are allowed',
+  'Do not split the three arc segments and use them separately',
+  'Do not remove the central ink dot',
+  'Do not add shadows, gradients, or outline effects',
+  'Do not tilt or distort it',
+  'Always use the intaglio version on dark backgrounds',
+];
+---
+<Base title="C-suite · Logo & Brand" description={desc} image="/og/c-suite.png">
+  <!-- Hero -->
+  <section class="py-8 sm:py-12">
+    <div class="mb-6 flex items-center gap-3 text-xs font-mono text-[var(--color-muted)] tracking-wider">
+      <a href="/en/c-suite" class="hover:text-[var(--color-accent)]">C-SUITE</a>
+      <span>·</span>
+      <span>BRAND</span>
+    </div>
+    <div class="flex flex-col sm:flex-row sm:items-center gap-8 sm:gap-12">
+      <img src="/brand/c-suite-mark.svg" alt="C-suite mark" class="w-36 h-36 sm:w-44 sm:h-44 shrink-0" />
+      <div>
+        <h1 class="font-serif text-4xl sm:text-5xl font-semibold tracking-tight mb-4">Three arcs, one dot, one seal</h1>
+        <p class="text-[var(--color-muted)] leading-relaxed max-w-xl">
+          The mark for the C-suite decision agents. A cinnabar seal frames three arcs that compose a C, encircling a single ink dot at the center.
+          It compresses the product's three tenets into one figure: <strong class="text-[var(--color-ink)]">decisions must be sealed and archived, deliberation must be independent yet form one body, and the final call is made by a human</strong>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Design rationale -->
+  <section class="py-8 border-t border-[var(--color-rule)]">
+    <h2 class="font-serif text-2xl font-semibold mb-6">Design rationale</h2>
+    <div class="space-y-5 max-w-3xl">
+      <div class="border border-[var(--color-rule)] rounded-lg p-6 bg-white/40">
+        <h3 class="font-serif text-lg font-semibold mb-2">① One seal — the ultimate act of deciding</h3>
+        <p class="text-sm text-[var(--color-muted)] leading-relaxed">
+          The site's accent color <code class="font-mono text-xs">#b14b3a</code> is <strong class="text-[var(--color-ink)]">cinnabar</strong> to begin with — the color of traditional seal ink.
+          And "stamping a seal" is precisely the ultimate act of deciding in the Chinese idiom: to make the call, apply the seal, take effect. One of this product's core claims is <strong class="text-[var(--color-ink)]">versioned freezing</strong> — each verdict generates an immutable snapshot for later verification.
+          A seal naturally carries this meaning: <strong class="text-[var(--color-ink)]">once stamped, it is an unalterable version</strong>. The outer frame takes the rounded square of a seal; relief cut (outlined) as the primary form, intaglio (fully filled, reversed) as the reversed form — corresponding exactly to the two carving methods of seal engraving.
+        </p>
+      </div>
+      <div class="border border-[var(--color-rule)] rounded-lg p-6 bg-white/40">
+        <h3 class="font-serif text-lg font-semibold mb-2">② Three arcs composing a C — three seats, independent yet deliberating</h3>
+        <p class="text-sm text-[var(--color-muted)] leading-relaxed">
+          The C of C-suite is formed by <strong class="text-[var(--color-ink)]">three broken arc segments</strong>: the three arcs correspond to three seats — Boss (CEO), MBA Brand (CMO), OAF (CFO);
+          the arcs are <strong class="text-[var(--color-ink)]">broken</strong> because the judges score independently and never see one another (no comparing notes before deliberation is a hard rule of this methodology);
+          together they <strong class="text-[var(--color-ink)]">read as one C</strong> — deliberating into one body, one skeleton. The C opens to the right at an 80° gap — an open judgment, not a closed loop of self-justification.
+        </p>
+      </div>
+      <div class="border border-[var(--color-rule)] rounded-lg p-6 bg-white/40">
+        <h3 class="font-serif text-lg font-semibold mb-2">③ One ink dot at the center — the anchor, the human in the loop</h3>
+        <p class="text-sm text-[var(--color-muted)] leading-relaxed">
+          At the center sits a single <strong class="text-[var(--color-ink)]">ink-colored</strong> dot — the only element in the whole figure that is not cinnabar.
+          It is the anchor: the person who ultimately presses the button. The machine (the cinnabar pipeline) revolves around the human (the ink dot), <strong class="text-[var(--color-ink)]">not replacing the human's final call</strong>.
+          Visually it also gives the C a "point of view," making the whole mark faintly resemble an eye — scrutinizing, reviewing.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Structure -->
+  <section class="py-8 border-t border-[var(--color-rule)]">
+    <h2 class="font-serif text-2xl font-semibold mb-6">Structure</h2>
+    <div class="flex flex-col sm:flex-row gap-8 items-start">
+      <svg viewBox="0 0 120 120" class="w-56 h-56 shrink-0" aria-label="Mark construction diagram">
+        <!-- guides -->
+        <rect x="7.5" y="7.5" width="105" height="105" rx="24" fill="none" stroke="#d9d6cd" stroke-width="1" stroke-dasharray="3 3"/>
+        <circle cx="60" cy="60" r="30" fill="none" stroke="#d9d6cd" stroke-width="1" stroke-dasharray="3 3"/>
+        <line x1="60" y1="6" x2="60" y2="114" stroke="#d9d6cd" stroke-width="0.75" stroke-dasharray="3 3"/>
+        <line x1="6" y1="60" x2="114" y2="60" stroke="#d9d6cd" stroke-width="0.75" stroke-dasharray="3 3"/>
+        <!-- mark at reduced opacity -->
+        <g opacity="0.85">
+          <rect x="7.5" y="7.5" width="105" height="105" rx="24" fill="none" stroke="#b14b3a" stroke-width="7"/>
+          <g fill="none" stroke="#b14b3a" stroke-width="9" stroke-linecap="round">
+            <path d="M 82.98 40.72 A 30 30 0 0 0 42.65 35.52"/>
+            <path d="M 37.95 39.66 A 30 30 0 0 0 37.95 80.34"/>
+            <path d="M 42.65 84.48 A 30 30 0 0 0 82.98 79.28"/>
+          </g>
+          <circle cx="60" cy="60" r="6.5" fill="#1a1a1a"/>
+        </g>
+      </svg>
+      <ul class="text-sm text-[var(--color-muted)] leading-relaxed space-y-2 font-mono">
+        <li>Seal frame: 120 × 120, corner radius 24, stroke 7</li>
+        <li>Arc circle: center (60, 60), radius 30, stroke 9, round caps</li>
+        <li>Three arcs: 85.3° each, 12° gap between segments</li>
+        <li>C opening: to the right, 80° gap</li>
+        <li>Center dot: radius 6.5, ink color (the only one in the figure)</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Variants -->
+  <section class="py-8 border-t border-[var(--color-rule)]">
+    <h2 class="font-serif text-2xl font-semibold mb-6">Variants</h2>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="border border-[var(--color-rule)] rounded-lg p-6 bg-white/40 flex flex-col items-center gap-4">
+        <img src="/brand/c-suite-mark.svg" alt="Primary relief cut" class="w-24 h-24" />
+        <div class="text-center"><div class="text-sm font-medium">Primary · relief cut</div><div class="text-xs text-[var(--color-muted)]">Light backgrounds</div></div>
+      </div>
+      <div class="border border-[var(--color-rule)] rounded-lg p-6 bg-white/40 flex flex-col items-center gap-4">
+        <img src="/brand/c-suite-mark-solid.svg" alt="Intaglio reversed" class="w-24 h-24" />
+        <div class="text-center"><div class="text-sm font-medium">Intaglio · reversed</div><div class="text-xs text-[var(--color-muted)]">Heavy color blocks</div></div>
+      </div>
+      <div class="border border-[var(--color-rule)] rounded-lg p-6 bg-[#1a1a1a] flex flex-col items-center gap-4">
+        <img src="/brand/c-suite-mark-solid.svg" alt="Intaglio on a dark background" class="w-24 h-24" />
+        <div class="text-center"><div class="text-sm font-medium text-[#fafaf7]">Dark background</div><div class="text-xs text-[#9a9a9a]">Always use intaglio</div></div>
+      </div>
+      <div class="border border-[var(--color-rule)] rounded-lg p-6 bg-white/40 flex flex-col items-center gap-4">
+        <img src="/brand/c-suite-mark-mono.svg" alt="Monochrome ink version" class="w-24 h-24" />
+        <div class="text-center"><div class="text-sm font-medium">Monochrome · ink</div><div class="text-xs text-[var(--color-muted)]">Black-and-white / grayscale</div></div>
+      </div>
+    </div>
+    <div class="mt-4 border border-[var(--color-rule)] rounded-lg p-6 bg-white/40">
+      <img src="/brand/c-suite-lockup.svg" alt="Horizontal lockup" class="w-full max-w-md" />
+      <div class="mt-3 text-xs text-[var(--color-muted)]">Horizontal lockup · mark + wordmark + "Designed for AI-native organizations"</div>
+    </div>
+  </section>
+
+  <!-- Color -->
+  <section class="py-8 border-t border-[var(--color-rule)]">
+    <h2 class="font-serif text-2xl font-semibold mb-2">Color</h2>
+    <p class="text-sm text-[var(--color-muted)] mb-6">Shares one palette with the whole of zhanglu.net; the logo introduces no new colors.</p>
+    <div class="grid grid-cols-2 sm:grid-cols-5 gap-4">
+      {colors.map((c) => (
+        <div class="border border-[var(--color-rule)] rounded-lg overflow-hidden bg-white/40">
+          <div class="h-16" style={`background:${c.hex}`}></div>
+          <div class="p-3">
+            <div class="text-sm font-medium">{c.name}</div>
+            <div class="font-mono text-xs text-[var(--color-muted)]">{c.hex}</div>
+            <div class="text-xs text-[var(--color-muted)] mt-1">{c.note}</div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Usage guidelines + downloads -->
+  <section class="py-8 border-t border-[var(--color-rule)]">
+    <div class="grid sm:grid-cols-2 gap-8">
+      <div>
+        <h2 class="font-serif text-2xl font-semibold mb-4">Usage guidelines</h2>
+        <ul class="text-sm text-[var(--color-muted)] leading-relaxed space-y-2">
+          <li>Minimum size: mark short edge ≥ 20px (the center dot still legible); lockup width ≥ 180px</li>
+          <li>Clear space: at least 1/6 of the mark's width on all sides (about one center-dot diameter)</li>
+          {donts.map((d) => <li>❌ {d}</li>)}
+        </ul>
+      </div>
+      <div>
+        <h2 class="font-serif text-2xl font-semibold mb-4">Downloads</h2>
+        <ul class="text-sm space-y-2">
+          {assets.map((a) => (
+            <li>
+              <a href={`/brand/${a.file}`} download class="text-[var(--color-accent)] hover:underline font-mono">{a.file}</a>
+              <span class="text-[var(--color-muted)]"> — {a.label} ({a.note})</span>
+            </li>
+          ))}
+        </ul>
+        <p class="text-xs text-[var(--color-muted)] mt-4">
+          All hand-written SVG, no raster dependencies. Design doc in the repo at <code class="font-mono">docs/brand/c-suite-logo.md</code>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- back -->
+  <section class="py-8 border-t border-[var(--color-rule)]">
+    <p class="text-sm text-[var(--color-muted)]">
+      <a href="/en/c-suite" class="text-[var(--color-accent)] hover:underline">← Back to C-suite</a>
+      　·　<a href="/en/posts/c-suite-design" class="text-[var(--color-accent)] hover:underline">Design essay →</a>
+    </p>
+  </section>
+</Base>

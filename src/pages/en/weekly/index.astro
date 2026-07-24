@@ -1,0 +1,32 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+
+const weeklies = (await getCollection('weeklyEn'))
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+---
+<Base title="Weekly" description="Public weekly notes on what I shipped (redacted)">
+  <h1 class="font-serif text-3xl font-semibold mb-2">Weekly</h1>
+  <p class="text-[var(--color-muted)] mb-8">
+    A public log of what I shipped each week (redacted) — {weeklies.length} in total.
+  </p>
+
+  {weeklies.length === 0 ? (
+    <p class="text-[var(--color-muted)]">Nothing here yet.</p>
+  ) : (
+    <div class="space-y-6">
+      {weeklies.map((w) => (
+        <a href={`/en/weekly/${w.slug}`} class="block group p-5 border border-[var(--color-rule)] rounded hover:border-[var(--color-accent)] transition-colors">
+          <div class="flex items-baseline justify-between gap-4 mb-2">
+            <h2 class="font-serif text-xl font-semibold group-hover:text-[var(--color-accent)] transition-colors">
+              {w.data.title}
+            </h2>
+            <span class="text-xs font-mono text-[var(--color-muted)] shrink-0">{w.data.week}</span>
+          </div>
+          <p class="text-xs font-mono text-[var(--color-muted)] mb-2">{w.data.dateRange}</p>
+          <p class="text-sm text-[var(--color-muted)] leading-relaxed">{w.data.summary}</p>
+        </a>
+      ))}
+    </div>
+  )}
+</Base>

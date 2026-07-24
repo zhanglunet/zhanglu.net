@@ -1,0 +1,15 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+import ProjectCard from '../../../components/ProjectCard.astro';
+
+const projects = (await getCollection('projectsEn'))
+  .sort((a, b) => (a.data.order || 999) - (b.data.order || 999));
+---
+<Base title="Projects" description="Things I've built">
+  <h1 class="font-serif text-3xl font-semibold mb-2">Projects</h1>
+  <p class="text-[var(--color-muted)] mb-8">{projects.length} in total.</p>
+  <div class="grid sm:grid-cols-2 gap-4">
+    {projects.map((p) => <ProjectCard entry={p} />)}
+  </div>
+</Base>

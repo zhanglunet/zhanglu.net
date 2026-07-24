@@ -1,0 +1,56 @@
+---
+import { getCollection } from 'astro:content';
+import type { GetStaticPaths } from 'astro';
+import Base from '../../../layouts/Base.astro';
+
+export const getStaticPaths = (async () => {
+  const projects = await getCollection('projectsEn');
+  return projects.map((p) => ({ params: { slug: p.slug }, props: { entry: p } }));
+}) satisfies GetStaticPaths;
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+const { title, tagline, url, repo, tech, year, status, loc, persona, cover } = entry.data;
+---
+<Base title={title} description={tagline}>
+  <article>
+    <a href="/en/projects" class="text-sm text-[var(--color-muted)] hover:text-[var(--color-ink)]">← Projects</a>
+    <h1 class="font-serif text-3xl sm:text-4xl font-semibold mt-4 mb-2">{title}</h1>
+    <p class="font-serif text-lg text-[var(--color-muted)] mb-5">{tagline}</p>
+    <div class="flex flex-wrap items-center gap-3 text-sm mb-8 pb-5 border-b border-[var(--color-rule)]">
+      <span class="text-[var(--color-muted)]">{year}</span>
+      {persona && (
+        <span class="px-2 py-0.5 rounded bg-[var(--color-paper-2)] text-[var(--color-accent)] font-medium text-xs">Built for {persona}</span>
+      )}
+      {status !== 'live' && (
+        <span class="px-2 py-0.5 border border-[var(--color-rule)] rounded text-xs">{status}</span>
+      )}
+      {loc && (
+        <span class="font-mono text-[var(--color-muted)]" title="Lines of code (cloc; excludes docs/data/generated files)">≈ {loc.toLocaleString()} LOC</span>
+      )}
+      {url && (
+        <a href={url} target="_blank" rel="noopener" class="text-[var(--color-accent)] hover:underline">
+          Visit site →
+        </a>
+      )}
+      {repo && (
+        <a href={repo} target="_blank" rel="noopener" class="text-[var(--color-accent)] hover:underline">
+          Source →
+        </a>
+      )}
+      <div class="flex flex-wrap gap-1.5 ml-auto">
+        {tech.map((t) => (
+          <span class="text-xs px-2 py-0.5 bg-[var(--color-paper-2)] rounded font-mono">{t}</span>
+        ))}
+      </div>
+    </div>
+    {cover && (
+      <a href={url ?? cover} target="_blank" rel="noopener" class="block mb-8 rounded-lg overflow-hidden border border-[var(--color-rule)]">
+        <img src={cover} alt={`${title} screenshot`} loading="lazy" class="w-full" />
+      </a>
+    )}
+    <div class="prose-zh max-w-none">
+      <Content />
+    </div>
+  </article>
+</Base>

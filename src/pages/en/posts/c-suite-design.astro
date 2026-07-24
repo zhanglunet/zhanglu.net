@@ -1,0 +1,145 @@
+---
+import Base from '../../../layouts/Base.astro';
+
+const title = 'What kind of decision agents does an AI-native org\'s C-suite need';
+const desc = 'I built three seemingly unrelated products in a row — Boss, MBA Brand, OAF — and only by the third did I realize they share the same skeleton. This is about that skeleton, and why an AI-native org\'s C-suite needs it.';
+const date = '2026-07-18';
+---
+<Base title={title} description={desc} image="/og/c-suite.png">
+  <article class="max-w-2xl mx-auto">
+    <!-- meta -->
+    <div class="mb-6 flex items-center gap-3 text-xs font-mono text-[var(--color-muted)] tracking-wider">
+      <a href="/en/posts" class="hover:text-[var(--color-accent)]">POSTS</a>
+      <span>·</span>
+      <time datetime={date}>{date}</time>
+      <span>·</span>
+      <span>10 min read</span>
+    </div>
+
+    <h1 class="font-serif text-3xl sm:text-4xl font-semibold leading-tight mb-3">{title}</h1>
+    <p class="text-lg text-[var(--color-muted)] leading-relaxed mb-10 border-l-2 border-[var(--color-accent)] pl-4">
+      I built three seemingly unrelated products in a row — Boss, MBA Brand, OAF — and only by the third did I realize they share the same skeleton. This is about that skeleton, and why an AI-native org's C-suite needs it.
+    </p>
+
+    <div class="prose-zh max-w-none">
+
+      <h2>Three products, one accidental discovery</h2>
+
+      <p>In just the past month, I built three AI products in a row, each for a completely different audience:</p>
+
+      <ul>
+        <li><strong><a href="/en/projects/boss">Boss</a></strong> (bossagent.cc) — a <strong>strategy OS</strong> for the CEO. Throw it a strategic question and it convenes a multi-juror deliberation, producing a verdict with attribution checks.</li>
+        <li><strong><a href="/en/projects/mbabrand">MBA Brand</a></strong> (mbabrand.com) — a brand-influence audit for the CMO. Give it a brand name and it runs multi-dimensional research, then has a panel of jurors score it independently.</li>
+        <li><strong><a href="/en/projects/oaf">OAF</a></strong> (oaf.world) — an investment-research workbench for the CFO. Covering the US / A-share / HK markets, it hands the numbers to deterministic tools and the narrative to the large model.</li>
+      </ul>
+
+      <p>Different domains, different users, different data sources. But by the third one I stopped — because I realized I was <strong>writing the same thing for the third time</strong>.</p>
+
+      <h2>A common enemy: gut calls</h2>
+
+      <p>All three roles make high-stakes judgments every day: do we invest in this direction, is this brand actually strong, is this company worth the price. These judgments have long leaned on the same word — <strong>gut feel</strong>.</p>
+
+      <p>"Gut feel" has two fatal failure modes:</p>
+
+      <ol>
+        <li><strong>Single-perspective bias</strong>. You ask only one person, even the most senior one, and his blind spot becomes your blind spot.</li>
+        <li><strong>Conclusions can't be attributed</strong>. A gut call of "looks good," and half a year later it collapses — you can't tell whether the judgment was wrong, the evidence was incomplete, or the world changed.</li>
+      </ol>
+
+      <p>Three different roles, all afflicted by the same disease. So the cure should be the same set too.</p>
+
+      <h2>The same skeleton</h2>
+
+      <p>What I kept rebuilding across all three products was the same pipeline:</p>
+
+      <pre><code>{`  Research  →  Deliberate  →  Score      →  Attribute
+  parallel     jurors alone    multi-lens      30/90/365
+  gather ev.   unseen to ea.   falsifiable     timeline review`}</code></pre>
+
+      <p>Four steps; let me explain why for each.</p>
+
+      <h3>A panel of jurors, not a single analyst</h3>
+
+      <p>A single model (or a single person) delivering a conclusion is still "single perspective" at heart. So every judgment step is decided not by one agent but by <strong>a panel of jurors, each holding a stance, scoring independently and required to argue the opposing side</strong> — one watches strategy, one watches evidence, one plays devil's advocate on purpose. Before deliberation the jurors can't see each other, avoiding herd effects. What comes out isn't one opinion but a <strong>map of disagreement</strong>: which conclusions are consensus and which are hotly contested, at a glance.</p>
+
+      <h3>Scorable and falsifiable, not "I think it's fine"</h3>
+
+      <p>"This brand is very strong" can't be reviewed later. "This brand scores 8.8 on category naming but only 5.2 on genuine signal, because its online reach concentrates in a single channel" — that can. Every conclusion is required to give a <strong>score</strong> and a <strong>falsification point</strong>: under what conditions it would be counted wrong. Judgments can now be rebutted rather than merely believed.</p>
+
+      <h3>Versioned + attribution-checked, not one-and-done</h3>
+
+      <p>A judgment is timestamped, frozen into an immutable snapshot, and pre-set with <strong>attribution checkpoints</strong> at 30 / 90 / 365 days. When they come due, the system returns to compare: did the original prediction hit? Hits / falsifications are written into the scoreboard. Judgment thus becomes, for the first time, an <strong>accumulable asset</strong> — you're not just making decisions, you're building a backtestable curve of your own judgment.</p>
+
+      <h3>Anti-fabrication is a hard constraint, not an option</h3>
+
+      <p>The most dangerous thing about a large model is that it can invent a number with a straight face. So all three products make "anti-fabrication" a machine-level constraint: use only public first-hand / real data; if it can't be obtained, mark it N/A and leave it blank, never patch it up for you. OAF simply hands all numbers to deterministic tools and lets the model write only the narrative; MBA wires juror citations into a CI hard gate, verifying word-for-word whether they're actually in the corpus. <strong>Better to say less than to say wrong.</strong></p>
+
+      <h3>Dual readable, by humans and machines</h3>
+
+      <p>The same judgment must be readable by humans (HTML report / dashboard) and callable by agents (MCP / API). Because in an AI-native org, the downstream of a judgment includes both people and other agents.</p>
+
+      <h2>What changes is only the jurors and the data sources</h2>
+
+      <p>Once you see the skeleton, the differences between the three products are actually quite superficial:</p>
+
+      <table>
+        <thead>
+          <tr><th></th><th>Who the jurors are</th><th>Data sources</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Boss</td><td>dimensional doctrine + anchor conviction</td><td>strategic questions, internal docs</td></tr>
+          <tr><td>MBA</td><td>persona mental models (Fu Sheng / Jobs…)</td><td>brand signals, public sentiment</td></tr>
+          <tr><td>OAF</td><td>long-short debate + deterministic tools</td><td>three-market quotes and filings</td></tr>
+        </tbody>
+      </table>
+
+      <p>The skeleton didn't change by a line. That's also why they can add up to <strong>one set</strong>, rather than three isolated tools.</p>
+
+      <h2>Why "AI-native org"</h2>
+
+      <p>Take it one level higher.</p>
+
+      <p>An AI-native org is one that hands more and more of its daily operations — writing code, running research, doing customer support, watching data — to agents. When the execution layer already runs on traceable agents, <strong>the fact that only top-level judgment still lives in the boardroom's intuition</strong> becomes the most glaring gap.</p>
+
+      <p>What the C-suite decision agents aim to fill is exactly this layer: to let the CEO / CMO / CFO's core judgments grow on the same "researchable, scorable, reviewable" foundation as the rest of the org. Not to replace the human who calls the shot — <strong>the person still presses the button in the end</strong> — but to turn the research, deliberation, scoring, and attribution that precede the call into infrastructure that both humans and agents can read and revisit.</p>
+
+      <p>The more AI-native an org is, the more indispensable this layer of infrastructure becomes.</p>
+
+      <h2>Compressing the skeleton into a single mark</h2>
+
+      <p>Finally, I made a mark for all of this — <strong>three arcs, one dot, one seal</strong>:</p>
+
+      <figure class="my-8 flex flex-col items-center gap-4">
+        <img src="/brand/c-suite-mark.svg" alt="C-suite mark: three arcs, one dot, one seal" class="w-32 h-32" />
+        <figcaption class="text-sm text-[var(--color-muted)]">C-suite decision agents mark</figcaption>
+      </figure>
+
+      <p>Three graphic elements, each carrying a creed:</p>
+
+      <ul>
+        <li><strong>A seal</strong>. The site's cinnabar red (<code>#b14b3a</code>) is the color of seal paste to begin with, and "stamping a seal" is the ultimate act of decision. This suite is about versioned freezing — each verdict generates an immutable snapshot — and a seal naturally carries that meaning: <strong>once stamped, it is an immutable version</strong>.</li>
+        <li><strong>Three broken arcs forming a C</strong>. The three arcs are three seats (CEO / CMO / CFO); broken, because the jurors score independently, unseen to each other; read together as a C, they are deliberated into one, one skeleton. The opening faces right — an open judgment, not a closed loop of self-justification.</li>
+        <li><strong>A single dot of ink at the center</strong>. The only element in the whole image that isn't cinnabar. It is the anchor: the person who presses the button in the end. The machine orbits the human rather than replacing the human's call — exactly what the previous section said, drawn into the mark.</li>
+      </ul>
+
+      <p>The full design derivation, geometric parameters, variants, and usage guidelines are on the <a href="/en/c-suite/brand">Logo and brand page</a>.</p>
+
+      <h2>Boundaries</h2>
+
+      <p>Let me be honest. This thing is no oracle:</p>
+
+      <ul>
+        <li>The jurors are AI-deduced perspectives, not a real board; they force you to think it through, but they don't take responsibility for you.</li>
+        <li>Scores are relative and corpus-dependent; when the corpus changes the score should change — which is precisely why it must be versioned.</li>
+        <li>Attribution checks need <strong>time</strong>; before the 30/90/365 days are up, the scoreboard is still empty.</li>
+      </ul>
+
+      <p>Even so, moving judgment from "gut calls" to "a traceable pipeline" is itself already an upgrade. The rest, leave to time to backtest.</p>
+
+      <hr />
+
+      <p>All three entry points are here: <a href="/en/projects/boss">Boss · CEO</a>, <a href="/en/projects/mbabrand">MBA Brand · CMO</a>, <a href="/en/projects/oaf">OAF · CFO</a>, or enter from the <a href="/en/c-suite">C-suite feature page</a>.</p>
+
+    </div>
+  </article>
+</Base>

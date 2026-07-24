@@ -31,7 +31,7 @@ const htmlLang = lang === 'en' ? 'en' : 'zh-CN';
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="sitemap" href="/sitemap-index.xml" />
-    <link rel="alternate" type="application/rss+xml" title={about.name} href="/rss.xml" />
+    <link rel="alternate" type="application/rss+xml" title={about.name} href={lang === 'en' ? '/en/rss.xml' : '/rss.xml'} />
     <link rel="canonical" href={canonical} />
     <link rel="alternate" hreflang="zh-CN" href={zhHref} />
     <link rel="alternate" hreflang="en" href={enHref} />
@@ -47,7 +47,7 @@ const htmlLang = lang === 'en' ? 'en' : 'zh-CN';
     <meta name="twitter:card" content="summary_large_image" />
     {ogImage && <meta name="twitter:image" content={ogImage} />}
     <script is:inline>
-      // 首访按浏览器语言自适应；手动切换后记住选择，之后以选择为准，不再自动跳。
+      // First visit: adapt to the browser language. After a manual switch, remember the choice and stop auto-redirecting.
       (function () {
         try {
           var p = location.pathname;

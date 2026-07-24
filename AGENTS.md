@@ -680,3 +680,37 @@ CLI 与站点端点松耦合 —— 改端点 schema 时若不破坏向下兼容
 - 发版仍按 §8.1。
 
 > 想上真插件走完整流程 → 本地 Claude Code 的 `/plugin` 里搜 **superpowers**（作者 obra / Jesse Vincent）安装；远程 web 会话装不住，仍以本节的原生纪律为准。
+
+---
+
+## 16. 双语（中文 / English）i18n
+
+> 全站中英双语：中文默认在根路径 `/`，英文在 `/en/` 子路径。浏览器首访按语言自适应跳转，页头可手动切换。
+
+### 16.1 架构一览
+
+| 维度 | 做法 |
+|---|---|
+| URL | zh 在 `/`，en 在 `/en/`（`astro.config.mjs` 的 `i18n`，`prefixDefaultLocale: false`）|
+| 语言检测 | 组件里 `getLangFromUrl(Astro.url)`（`/en` 前缀 → `'en'`，否则 `'zh'`）——**自检，不靠 props 层层传** |
+| UI 文案 | `src/i18n/ui.ts` 字典（zh/en 两套）+ `useTranslations(lang)`；**页面独有的长散文不进字典，直接写在各自 en 页里** |
+| helpers | `src/i18n/utils.ts`：`getLangFromUrl` / `localizePath(path,lang)` / `stripLang` / `altPath(pathname,target)` |
+| 内容集合 | 每个集合有平行的 `*En` 版（`projectsEn` / `articlesEn` / `presentationsEn` / `skillsEn` / `weeklyEn`），同 schema，内容在 `src/content/<coll>En/`。**zh 集合完全不动，无需过滤** |
+| 数据 | `about.en.json` / `social.en.json` 对应 `about.json` / `social.json` |
+| 页面 | 每个 zh 页在 `src/pages/en/` 有一份镜像；**en 页比 zh 页深一层，相对 import 多一个 `../`**，且 `getCollection('x')` → `getCollection('xEn')` |
+| SEO | `Base.astro` 输出 `<html lang>`、`hreflang`（zh-CN / en / x-default）、`og:locale`、分语言 RSS（`/rss.xml` 与 `/en/rss.xml`）；`sitemap()` 开了 i18n |
+| 自适应 | `Base.astro` head 里的内联脚本：首访无偏好时按 `navigator.language` 跳；页头切换按钮把选择写进 `localStorage['site-lang']`，之后以选择为准、不再自动跳 |
+
+### 16.2 常见双语更新
+
+- **加一条 UI 文案**：`src/i18n/ui.ts` 的 `zh` 和 `en` **两处都加**同一个 key。
+- **加一个项目 / skill / 文章**：先写 zh（`src/content/<coll>/x.md`），再写英文版到 `src/content/<coll>En/x.md`（同 slug，frontmatter 结构一致，只翻可译值）。
+- **加一个新页面**：写 `src/pages/x.astro`，再在 `src/pages/en/x.astro` 建镜像（记得 import 多加一个 `../`、`getCollection` 换成 `*En`、站内导航链接前缀 `/en`、资源/外链/`/api`/锚点不加前缀）。
+- **加导航项**：`Header.astro` 的 `nav` 数组用 `{ base:'/x', key:'nav.x' }`，再在 `ui.ts` 两语都加 `nav.x`。
+
+### 16.3 不要做的事（双语专属，补充 §10）
+
+- ❌ **别只写 zh 页不写 en 镜像就 ff 到 main**：自适应脚本假设每个路径两语都在，英文访客会被跳到不存在的 `/en/...` → 404。en 站没补全前，只推 branch，别 ff main。
+- ❌ **别在组件里硬编码中文再指望双语**：UI 词进 `ui.ts`，页面散文写进对应语言的页面文件。
+- ❌ **别改 `zh` 集合去塞英文**：英文一律进 `*En` 平行集合，zh 消费端保持零改动。
+- ❌ **en 页里别把资源路径也加 `/en` 前缀**：`/brand/*.svg`、`/og/*.png`、`/favicon.svg`、`/covers/*`、`/api/*`、外链、`#锚点` 都原样。只有"页面路由"链接才加 `/en`。

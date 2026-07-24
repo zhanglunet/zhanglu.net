@@ -1,0 +1,21 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+import PresentationCard from '../../../components/PresentationCard.astro';
+
+const presentations = (await getCollection('presentationsEn'))
+  .sort((a, b) => (a.data.order || 999) - (b.data.order || 999));
+---
+<Base title="Decks" description="Web decks and related site entries">
+  <h1 class="font-serif text-3xl font-semibold mb-2">Decks</h1>
+  <p class="text-[var(--color-muted)] mb-8">
+    Web decks and related site entries — {presentations.length} in total. Click a card to open the link.
+  </p>
+  {presentations.length === 0 ? (
+    <p class="text-[var(--color-muted)]">Nothing here yet.</p>
+  ) : (
+    <div class="grid sm:grid-cols-2 gap-4">
+      {presentations.map((p) => <PresentationCard entry={p} />)}
+    </div>
+  )}
+</Base>

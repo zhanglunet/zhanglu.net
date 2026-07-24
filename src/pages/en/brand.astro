@@ -1,0 +1,195 @@
+---
+import Base from '../../layouts/Base.astro';
+
+const desc = 'The zhanglu.net mark: one road, one full stop. The Z-shaped mountain road is both the surname and the given name, the turning points are traceable records, and the vermilion full stop is the dot that lands after "Zhang Lu."';
+
+const colors = [
+  { name: 'Ink', hex: '#1a1a1a', note: 'Road / body text / every step a person walks' },
+  { name: 'Vermilion', hex: '#b14b3a', note: 'Full stop / emphasis / site-wide accent' },
+  { name: 'Paper', hex: '#fafaf7', note: 'Base color / turning-point holes' },
+  { name: 'Paper II', hex: '#f3f1ea', note: 'Light blocks' },
+  { name: 'Rule', hex: '#d9d6cd', note: 'Dividers' },
+];
+
+const assets = [
+  { file: 'zhanglu-mark.svg', label: 'Primary', note: 'For light backgrounds' },
+  { file: 'zhanglu-mark-inverse.svg', label: 'Reversed on dark', note: 'For dark backgrounds' },
+  { file: 'zhanglu-mark-mono.svg', label: 'Mono · Ink', note: 'Black-and-white print / grayscale' },
+  { file: 'zhanglu-lockup.svg', label: 'Horizontal lockup', note: 'mark + 张路 + zhanglu.net' },
+];
+
+const donts = [
+  'Do not change the color — the full stop can only be vermilion (mono version excepted)',
+  'Do not move or remove the full stop',
+  'Do not fill the inside of the Z, do not alter the stroke-width ratio',
+  'Do not add drop shadows, gradients, or outline effects',
+  'Do not skew or distort',
+  'Always use the reversed version on dark backgrounds',
+];
+---
+<Base title="Logo & Brand" description={desc}>
+  <!-- Hero -->
+  <section class="py-8 sm:py-12">
+    <div class="mb-6 flex items-center gap-3 text-xs font-mono text-[var(--color-muted)] tracking-wider">
+      <span>ZHANGLU.NET</span>
+      <span>·</span>
+      <span>BRAND</span>
+    </div>
+    <div class="flex flex-col sm:flex-row sm:items-center gap-8 sm:gap-12">
+      <img src="/brand/zhanglu-mark.svg" alt="zhanglu.net mark" class="w-36 h-36 sm:w-44 sm:h-44 shrink-0" />
+      <div>
+        <h1 class="font-serif text-4xl sm:text-5xl font-semibold tracking-tight mb-4">One road, one full stop</h1>
+        <p class="text-[var(--color-muted)] leading-relaxed max-w-xl">
+          The zhanglu.net mark. A Z-shaped mountain road with two turning points, and a vermilion full stop dropped at its end.
+          It compresses this site's three things into a single figure: <strong class="text-[var(--color-ink)]">the name contains a road, every step walked is traceable, and wherever it goes the full stop lands there</strong>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Design rationale -->
+  <section class="py-8 border-t border-[var(--color-rule)]">
+    <h2 class="font-serif text-2xl font-semibold mb-6">Design rationale</h2>
+    <div class="space-y-5 max-w-3xl">
+      <div class="border border-[var(--color-rule)] rounded-lg p-6 bg-white/40">
+        <h3 class="font-serif text-lg font-semibold mb-2">① The road in the name — a Z-shaped mountain path</h3>
+        <p class="text-sm text-[var(--color-muted)] leading-relaxed">
+          The 路 in "张路" means road, the very word for a road. Drawn out on a map, a switchback mountain road forms exactly a <strong class="text-[var(--color-ink)]">Z-shaped zigzag</strong> — and Z is also the initial of "Zhang."
+          One stroke down is <strong class="text-[var(--color-ink)]">both the surname and the given name</strong>. The diagonal is a precise 45°, like a zigzag climb between contour lines.
+        </p>
+      </div>
+      <div class="border border-[var(--color-rule)] rounded-lg p-6 bg-white/40">
+        <h3 class="font-serif text-lg font-semibold mb-2">② Turning points as records — traceable</h3>
+        <p class="text-sm text-[var(--color-muted)] leading-relaxed">
+          What this site does is "turn complex judgment into a <strong class="text-[var(--color-ink)]">traceable</strong> pipeline."
+          Each of the two turning points on the zigzag is pierced with a hole — like <strong class="text-[var(--color-ink)]">waypoints</strong> on a roadbook.
+          The straight lines are the walking, the turning points are the judgments; pierced with holes, every step walked can be reviewed. Once scaled down the holes naturally disappear, and the mark reduces to a clean "Z."
+        </p>
+      </div>
+      <div class="border border-[var(--color-rule)] rounded-lg p-6 bg-white/40">
+        <h3 class="font-serif text-lg font-semibold mb-2">③ The vermilion full stop — the dot after "张路."</h3>
+        <p class="text-sm text-[var(--color-muted)] leading-relaxed">
+          The site's wordmark is already "张路" plus a vermilion full stop. The mark's endpoint is that very full stop —
+          <strong class="text-[var(--color-ink)]">wherever the road goes, the full stop lands there</strong>. It is the only vermilion in the whole figure, and the only circle.
+        </p>
+      </div>
+      <div class="border border-[var(--color-rule)] rounded-lg p-6 bg-white/40">
+        <h3 class="font-serif text-lg font-semibold mb-2">④ And the C-suite seal: a square and a line, a seal and a road</h3>
+        <p class="text-sm text-[var(--color-muted)] leading-relaxed">
+          This site's product suite, <a href="/en/c-suite/brand" class="text-[var(--color-accent)] hover:underline">C-suite, has its own seal mark</a> (a vermilion square framing a dot of ink — the machine orbiting the human).
+          The personal mark is the reverse: <strong class="text-[var(--color-ink)]">an ink line leading a dot of vermilion — the road a person walks out</strong>.
+          The same palette, two sides of one thing: <strong class="text-[var(--color-ink)]">the product is a seal pressed down, the person is a road walked out</strong>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Structure -->
+  <section class="py-8 border-t border-[var(--color-rule)]">
+    <h2 class="font-serif text-2xl font-semibold mb-6">Structure</h2>
+    <div class="flex flex-col sm:flex-row gap-8 items-start">
+      <svg viewBox="0 0 120 120" class="w-56 h-56 shrink-0" aria-label="Mark structure diagram">
+        <rect x="10" y="10" width="100" height="100" fill="none" stroke="#d9d6cd" stroke-width="1" stroke-dasharray="3 3"/>
+        <line x1="60" y1="6" x2="60" y2="114" stroke="#d9d6cd" stroke-width="0.75" stroke-dasharray="3 3"/>
+        <line x1="6" y1="60" x2="114" y2="60" stroke="#d9d6cd" stroke-width="0.75" stroke-dasharray="3 3"/>
+        <line x1="26" y1="36" x2="96" y2="36" stroke="#d9d6cd" stroke-width="0.75" stroke-dasharray="3 3"/>
+        <line x1="26" y1="84" x2="96" y2="84" stroke="#d9d6cd" stroke-width="0.75" stroke-dasharray="3 3"/>
+        <g opacity="0.9">
+          <path d="M 26 36 H 80 L 32 84 H 70" fill="none" stroke="#1a1a1a" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="80" cy="36" r="3" fill="#fafaf7"/>
+          <circle cx="32" cy="84" r="3" fill="#fafaf7"/>
+          <circle cx="88.5" cy="84" r="7.5" fill="#b14b3a"/>
+        </g>
+      </svg>
+      <ul class="text-sm text-[var(--color-muted)] leading-relaxed space-y-2 font-mono">
+        <li>Canvas: 120 × 120</li>
+        <li>Three-segment zigzag: stroke-width 10, round caps and joins</li>
+        <li>Diagonal: precise 45° (descends 48 × 48)</li>
+        <li>Turning-point holes: r 3 × 2 (paper color, disappear when scaled down)</li>
+        <li>Full stop: r 7.5, vermilion (the only vermilion, the only circle)</li>
+        <li>Full stop aligns to the last segment's baseline (y = 84)</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Variants -->
+  <section class="py-8 border-t border-[var(--color-rule)]">
+    <h2 class="font-serif text-2xl font-semibold mb-6">Variants</h2>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="border border-[var(--color-rule)] rounded-lg p-6 bg-white/40 flex flex-col items-center gap-4">
+        <img src="/brand/zhanglu-mark.svg" alt="Primary" class="w-24 h-24" />
+        <div class="text-center"><div class="text-sm font-medium">Primary</div><div class="text-xs text-[var(--color-muted)]">Light background</div></div>
+      </div>
+      <div class="border border-[var(--color-rule)] rounded-lg p-6 bg-[#1a1a1a] flex flex-col items-center gap-4">
+        <img src="/brand/zhanglu-mark-inverse.svg" alt="Reversed on dark" class="w-24 h-24" />
+        <div class="text-center"><div class="text-sm font-medium text-[#fafaf7]">Reversed on dark</div><div class="text-xs text-[#9a9a9a]">Dark background</div></div>
+      </div>
+      <div class="border border-[var(--color-rule)] rounded-lg p-6 bg-white/40 flex flex-col items-center gap-4">
+        <img src="/brand/zhanglu-mark-mono.svg" alt="Mono ink" class="w-24 h-24" />
+        <div class="text-center"><div class="text-sm font-medium">Mono · Ink</div><div class="text-xs text-[var(--color-muted)]">Black-and-white / grayscale</div></div>
+      </div>
+      <div class="border border-[var(--color-rule)] rounded-lg p-6 bg-white/40 flex flex-col items-center gap-4">
+        <img src="/favicon.svg" alt="favicon" class="w-24 h-24 rounded-xl" />
+        <div class="text-center"><div class="text-sm font-medium">Favicon</div><div class="text-xs text-[var(--color-muted)]">Browser tab</div></div>
+      </div>
+    </div>
+    <div class="mt-4 border border-[var(--color-rule)] rounded-lg p-6 bg-white/40">
+      <img src="/brand/zhanglu-lockup.svg" alt="Horizontal lockup mark" class="w-full max-w-sm" />
+      <div class="mt-3 text-xs text-[var(--color-muted)]">Horizontal lockup · the mark's full stop is the wordmark's full stop, never repeated</div>
+    </div>
+  </section>
+
+  <!-- Color -->
+  <section class="py-8 border-t border-[var(--color-rule)]">
+    <h2 class="font-serif text-2xl font-semibold mb-2">Color</h2>
+    <p class="text-sm text-[var(--color-muted)] mb-6">This is the site-wide palette (global.css's @theme); the mark introduces no new colors.</p>
+    <div class="grid grid-cols-2 sm:grid-cols-5 gap-4">
+      {colors.map((c) => (
+        <div class="border border-[var(--color-rule)] rounded-lg overflow-hidden bg-white/40">
+          <div class="h-16" style={`background:${c.hex}`}></div>
+          <div class="p-3">
+            <div class="text-sm font-medium">{c.name}</div>
+            <div class="font-mono text-xs text-[var(--color-muted)]">{c.hex}</div>
+            <div class="text-xs text-[var(--color-muted)] mt-1">{c.note}</div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Usage guidelines + downloads -->
+  <section class="py-8 border-t border-[var(--color-rule)]">
+    <div class="grid sm:grid-cols-2 gap-8">
+      <div>
+        <h2 class="font-serif text-2xl font-semibold mb-4">Usage guidelines</h2>
+        <ul class="text-sm text-[var(--color-muted)] leading-relaxed space-y-2">
+          <li>Minimum size: mark short edge ≥ 16px (the turning-point holes will naturally disappear, as intended)</li>
+          <li>Clear space: leave at least one full-stop diameter on all sides (about 1/8 of the mark's width)</li>
+          {donts.map((d) => <li>❌ {d}</li>)}
+        </ul>
+      </div>
+      <div>
+        <h2 class="font-serif text-2xl font-semibold mb-4">Downloads</h2>
+        <ul class="text-sm space-y-2">
+          {assets.map((a) => (
+            <li>
+              <a href={`/brand/${a.file}`} download class="text-[var(--color-accent)] hover:underline font-mono">{a.file}</a>
+              <span class="text-[var(--color-muted)]"> — {a.label} ({a.note})</span>
+            </li>
+          ))}
+        </ul>
+        <p class="text-xs text-[var(--color-muted)] mt-4">
+          All are hand-written SVG. See the design doc in the repo at <code class="font-mono">docs/brand/zhanglu-logo.md</code>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- back -->
+  <section class="py-8 border-t border-[var(--color-rule)]">
+    <p class="text-sm text-[var(--color-muted)]">
+      <a href="/en/" class="text-[var(--color-accent)] hover:underline">← Back to home</a>
+      　·　<a href="/en/c-suite/brand" class="text-[var(--color-accent)] hover:underline">C-suite seal mark →</a>
+    </p>
+  </section>
+</Base>

@@ -1,0 +1,161 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+
+const roleOrder = ['CEO', 'CMO', 'CFO'];
+
+const projects = await getCollection('projectsEn');
+const suite = projects
+  .filter((p) => p.data.persona && roleOrder.includes(p.data.persona))
+  .sort((a, b) => roleOrder.indexOf(a.data.persona!) - roleOrder.indexOf(b.data.persona!));
+
+const roleMeta: Record<string, { role: string; scene: string; line: string; features: string[] }> = {
+  CEO: {
+    role: 'Chief Executive Officer · Strategy OS',
+    scene: 'Strategic questions, investment decisions, organizational and personnel judgment',
+    line: 'Hand the calls worth making over to a panel first—1 anchoring opinion + N dimension-specific judges scoring independently, each required to argue the counter-case.',
+    features: ['A panel deliberates independently, no single-point call', '30 / 90 / 365-day attribution checks', 'Immutable versioned snapshots of each verdict'],
+  },
+  CMO: {
+    role: 'Chief Marketing Officer · Brand Decisions',
+    scene: 'Brand direction, market positioning, competitive and growth judgment',
+    line: 'Break "is this brand actually strong" into 7-dimension research + multi-judge scoring, quantified into traceable, reviewable scores.',
+    features: ['7-dimension parallel research × 43 judges scoring', 'Versioned reports + sentiment-driven re-review', 'Every conclusion attributable back to evidence'],
+  },
+  CFO: {
+    role: 'Chief Financial Officer · Investment Research',
+    scene: 'Target research, valuation judgment, sector and portfolio allocation',
+    line: 'Give the numbers of investment research to deterministic tools, the narrative to the LLM, and leave gaps blank rather than fabricate.',
+    features: ['Real quotes and filings across US / A-share / HK markets', 'Long-short debate + two-stage DCF valuation', 'Numbers come from tools; missing data left blank, never fabricated'],
+  },
+};
+
+const principles = [
+  { t: 'Multi-perspective deliberation, no single-point call', d: 'A group of judges, each holding a stance, scores independently and must argue the counter-case—replacing one person\'s intuition and blind spots.' },
+  { t: 'Scorable, falsifiable', d: 'Every conclusion carries a score and a falsifiable point, not a vague "I think it\'s pretty good".' },
+  { t: 'Versioned + attribution checks', d: 'Each judgment is timestamped and snapshotted immutably, so you can come back at maturity and verify whether it was right.' },
+  { t: 'Anti-fabrication', d: 'Only public first-hand / real data; if it can\'t be obtained it\'s marked N/A and left blank—never fabricated for you.' },
+  { t: 'Read by humans and machines', d: 'The output is both a report for people and an MCP / API for agents to call.' },
+  { t: 'One shared skeleton', d: 'All three functions share the research → deliberation → scoring → attribution pipeline; only the judges and data sources change.' },
+];
+
+const host = (url?: string) => {
+  if (!url) return '';
+  try { return new URL(url).host.replace(/^www\./, ''); } catch { return url; }
+};
+
+const desc = 'Designed for the AI-native organization: Boss (CEO) · MBA Brand (CMO) · OAF (CFO)—a set of agents that turn the core judgments of the leadership layer into researchable, scorable, reviewable pipelines.';
+---
+<Base title="C-suite Decision Agents" description={desc} image="/og/c-suite.png">
+  <!-- Hero -->
+  <section class="py-8 sm:py-12">
+    <a href="/en/c-suite/brand" title="Logo & Brand →" class="inline-block mb-6">
+      <img src="/brand/c-suite-mark.svg" alt="C-suite mark: three arcs and a dot, one seal" class="w-16 h-16" />
+    </a>
+    <p class="font-mono text-xs tracking-wider text-[var(--color-accent)] mb-4">FEATURE · DECISION SUITE</p>
+    <h1 class="font-serif text-4xl sm:text-5xl font-semibold tracking-tight mb-4">
+      C-suite Decision Agents
+    </h1>
+    <p class="font-serif text-xl sm:text-2xl text-[var(--color-ink)] mb-5">
+      Designed for the <span class="text-[var(--color-accent)]">AI-native organization</span>.
+    </p>
+    <p class="font-serif text-lg sm:text-xl text-[var(--color-muted)] leading-snug mb-6 max-w-3xl">
+      Turn the CEO's strategic judgment, the CMO's brand judgment, and the CFO's investment-research judgment each into a researchable, scorable, reviewable pipeline.
+    </p>
+    <p class="text-[var(--color-muted)] leading-relaxed max-w-2xl">
+      As an organization hands more and more of its day-to-day operation over to agents, its top-level judgment should grow on the same traceable foundation—rather than keep running on "gut feeling".
+      The leadership layer makes high-stakes judgments every day: invest or not, strong or not, worth it or not. The three products here use one shared methodology to
+      turn the most core class of judgment for CEO / CMO / CFO from "guesswork" into a traceable, scorable, reviewable pipeline. Three seats, one skeleton.
+    </p>
+    <div class="mt-7 flex flex-wrap gap-2 text-sm">
+      {suite.map((p) => (
+        <a
+          href={`#${p.slug}`}
+          class="inline-flex items-center gap-1 px-3 py-1 rounded-full border border-[var(--color-rule)] bg-white/40 hover:border-[var(--color-accent)] transition-colors"
+        >
+          {p.data.title} <span class="text-[var(--color-accent)]">· {p.data.persona}</span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- Three seats -->
+  <section class="py-8 border-t border-[var(--color-rule)]">
+    <h2 class="font-serif text-2xl font-semibold mb-6">Three seats</h2>
+    <div class="space-y-5">
+      {suite.map((p) => {
+        const m = roleMeta[p.data.persona!];
+        return (
+          <article id={p.slug} class="border border-[var(--color-rule)] rounded-lg p-6 bg-white/40 scroll-mt-24">
+            <div class="flex flex-wrap items-center gap-3 mb-3">
+              <span class="px-2 py-0.5 text-xs rounded bg-[var(--color-paper-2)] text-[var(--color-accent)] font-medium">Designed for {p.data.persona}</span>
+              <span class="text-xs text-[var(--color-muted)]">{m?.role}</span>
+              {p.data.loc && (
+                <span class="ml-auto font-mono text-xs text-[var(--color-muted)]">≈ {p.data.loc.toLocaleString()} lines of code</span>
+              )}
+            </div>
+            <h3 class="font-serif text-2xl font-semibold mb-1">
+              <a href={`/en/projects/${p.slug}`} class="hover:text-[var(--color-accent)]">{p.data.title}</a>
+            </h3>
+            <p class="text-[var(--color-muted)] text-sm leading-relaxed mb-4">{p.data.tagline}</p>
+            <p class="text-sm leading-relaxed mb-4 max-w-2xl">
+              <span class="text-[var(--color-muted)]">Decision scenario: </span>{m?.scene}.<br />
+              {m?.line}
+            </p>
+            <ul class="flex flex-wrap gap-2 mb-5">
+              {m?.features.map((f) => (
+                <li class="text-xs px-2 py-1 bg-[var(--color-paper-2)] rounded">{f}</li>
+              ))}
+            </ul>
+            <div class="flex flex-wrap gap-4 text-sm">
+              <a href={`/en/projects/${p.slug}`} class="text-[var(--color-accent)] hover:underline">Project details →</a>
+              {p.data.url && (
+                <a href={p.data.url} target="_blank" rel="noopener" class="text-[var(--color-accent)] hover:underline">Visit {host(p.data.url)} →</a>
+              )}
+            </div>
+          </article>
+        );
+      })}
+    </div>
+  </section>
+
+  <!-- A shared methodology -->
+  <section class="py-8 border-t border-[var(--color-rule)]">
+    <h2 class="font-serif text-2xl font-semibold mb-2">One shared methodology</h2>
+    <p class="text-[var(--color-muted)] text-sm mb-6 max-w-2xl">
+      The three products face different functions, but underneath they share one "no guesswork" skeleton. That's why they form a suite rather than three isolated tools.
+    </p>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {principles.map((p) => (
+        <div class="border border-[var(--color-rule)] rounded-md p-4 bg-white/40">
+          <h3 class="font-serif text-base font-semibold mb-1">{p.t}</h3>
+          <p class="text-[var(--color-muted)] text-sm leading-relaxed">{p.d}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="py-8 border-t border-[var(--color-rule)]">
+    <h2 class="font-serif text-2xl font-semibold mb-2">Which seat to start with</h2>
+    <p class="text-[var(--color-muted)] text-sm mb-6">Pick the class of judgment closest to you and run it end to end on the matching site.</p>
+    <div class="grid sm:grid-cols-3 gap-4">
+      {suite.map((p) => (
+        <a
+          href={p.data.url}
+          target="_blank"
+          rel="noopener"
+          class="group border border-[var(--color-rule)] rounded-lg p-5 bg-white/40 hover:border-[var(--color-accent)] transition-colors"
+        >
+          <div class="text-xs text-[var(--color-accent)] font-medium mb-1">Designed for {p.data.persona}</div>
+          <div class="font-serif text-lg font-semibold group-hover:text-[var(--color-accent)]">{p.data.title}</div>
+          <div class="text-xs text-[var(--color-muted)] mt-1">{host(p.data.url)} →</div>
+        </a>
+      ))}
+    </div>
+    <p class="mt-8 text-sm text-[var(--color-muted)]">
+      The story behind this mark: <a href="/en/c-suite/brand" class="text-[var(--color-accent)] hover:underline">Logo & Brand →</a>
+      　·　Design essay: <a href="/en/posts/c-suite-design" class="text-[var(--color-accent)] hover:underline">The C-suite of the AI-native organization →</a>
+    </p>
+  </section>
+</Base>

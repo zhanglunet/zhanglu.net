@@ -1,0 +1,174 @@
+---
+import Base from '../../../layouts/Base.astro';
+
+const title = 'I built a CLI for agents: replace HTML scraping with one line of npx zhanglu-net';
+const desc = 'Added 9 JSON endpoints + a zero-dependency CLI to zhanglu.net; agents just run npx zhanglu-net list skills. Shipped in 1.5 hours.';
+const date = '2026-06-09';
+---
+<Base title={title} description={desc}>
+  <article class="max-w-2xl mx-auto">
+    <!-- meta -->
+    <div class="mb-6 flex items-center gap-3 text-xs font-mono text-[var(--color-muted)] tracking-wider">
+      <a href="/en/posts" class="hover:text-[var(--color-accent)]">POSTS</a>
+      <span>·</span>
+      <time datetime={date}>{date}</time>
+      <span>·</span>
+      <span>6 min read</span>
+    </div>
+
+    <h1 class="font-serif text-3xl sm:text-4xl font-semibold leading-tight mb-3">{title}</h1>
+    <p class="text-lg text-[var(--color-muted)] leading-relaxed mb-10 border-l-2 border-[var(--color-accent)] pl-4">
+      No MCP, no SDK. Just 9 static JSON endpoints and a 270-line CLI. Shipped in 1.5 hours.
+    </p>
+
+    <div class="prose-zh max-w-none">
+
+      <h2>The trigger</h2>
+
+      <p>zhanglu.net went live yesterday. The very first version shipped with an index of 30 Claude Skills, 3 projects, and 1 WeChat article entry. Then the question came:</p>
+
+      <blockquote>An AI agent wants to reference content on my site — how?</blockquote>
+
+      <p>The options on the table are bad:</p>
+
+      <ol>
+        <li><strong>Scrape HTML</strong> — what the agent gets is a layout meant for humans, which it has to parse. Wasted tokens, unstable fields.</li>
+        <li><strong>MCP server</strong> — Claude Code supports it, but Codex / Hermes / OpenClaw / the little agents I write myself may not.</li>
+        <li><strong>Don't bother</strong> — then why did I build this site.</li>
+      </ol>
+
+      <p>I picked a fourth option: <strong>add a JSON API layer + a CLI to the site</strong>.</p>
+
+      <h2>The two layers of the design</h2>
+
+      <pre><code>{`           zhanglu.net (Cloudflare Pages, fully static)
+                  │
+   ┌──────────────┼──────────────┐
+   │              │              │
+HTML pages    /api/*.json     /llms.txt
+(for humans)  (for agents)    (self-discovery)
+                  │
+       ┌──────────┴──────────┐
+       │                     │
+   curl / fetch         npx zhanglu-net (CLI)
+   (any agent)          (Node 18+, zero runtime deps)`}</code></pre>
+
+      <h3>Layer one: 9 static JSON endpoints</h3>
+
+      <pre><code>{`/api/index.json       manifest (counts + all endpoints)
+/api/projects.json    project list
+/api/projects/{slug}.json  single project (with body_md)
+/api/articles.json    WeChat article entries
+/api/skills.json      Claude Skill index
+/api/skills/{slug}.json    single skill (with body_md)
+/api/about.json       bio
+/api/social.json      public socials (email redacted)
+/api/search.json      flat corpus, searched by the CLI client`}</code></pre>
+
+      <p>Generated once as static files at build time, edge-cache friendly on CF Pages, <code>Access-Control-Allow-Origin: *</code>, so browser-side agents can use them directly too.</p>
+
+      <h3>Layer two: the CLI</h3>
+
+      <pre><code>{`npx zhanglu-net list skills --featured
+npx zhanglu-net get skill mba --md
+npx zhanglu-net search "brand judgment" --type skill
+npx zhanglu-net about --json`}</code></pre>
+
+      <p>The CLI is a thin wrapper over the JSON endpoints. <code>--json</code> for agents to pipe; human-readable by default, with ANSI colors (auto-disabled when the agent side isn't a TTY).</p>
+
+      <h2>A few deliberate decisions not to do things</h2>
+
+      <p><strong>No MCP server.</strong> Agents beyond Claude Code may not support MCP yet. HTTP + JSON is the greatest common denominator. If MCP users grow in the future, add a CF Worker to wrap the existing endpoints into an MCP server — a manageable cost.</p>
+
+      <p><strong>No server-side search.</strong> The corpus is just 30 skills + 3 projects + a few articles, under 100KB of full text. The CLI pulls one <code>/api/search.json</code> and does <code>text.toLowerCase().includes(needle)</code> locally — that's enough. Simple scoring: title hit +5, occurrences accumulate. Switch to MiniSearch when the corpus grows to a few hundred.</p>
+
+      <p><strong>Zero runtime deps in the CLI.</strong> Node 18+'s built-in <code>fetch</code> replaces <code>node-fetch</code>, <code>node:util</code>'s <code>parseArgs</code> replaces <code>commander</code>, hand-rolled ANSI escape codes replace <code>chalk</code>. <code>npx zhanglu-net</code> starts fast and doesn't stall when an agent calls it.</p>
+
+      <p><strong>No endpoint for WeChat article bodies.</strong> WeChat URLs block scrapers; WebFetch can't reach them. The site only stores the entry (title / date / summary / url), and the body links out.</p>
+
+      <h2>Self-discovery: <code>/llms.txt</code></h2>
+
+      <p><a href="https://llmstxt.org">llmstxt.org</a> is pushing a convention — put an <code>llms.txt</code> at the site root that tells AI agents "here's what I have and how to read it." I followed it:</p>
+
+      <pre><code>{`# zhanglu.net
+
+> Zhang Lu's personal site.
+
+## For AI agents
+- /api/index.json — manifest
+- /api/skills.json — Claude Skills index
+- ...
+
+## CLI
+npx zhanglu-net --help`}</code></pre>
+
+      <p>Any agent handed <code>https://zhanglu.net</code> just does <code>GET /llms.txt</code> first, and it knows where to go next.</p>
+
+      <h2>How to use it</h2>
+
+      <p><strong>In Claude Code</strong>: I wrote a <code>/zhanglu</code> skill, with trigger phrases like "look up Zhang Lu's skill" and "X on zhanglu." The skill automatically calls <code>npx zhanglu-net</code>.</p>
+
+      <p><strong>Other agents</strong>:</p>
+
+      <pre><code>{`# List all my featured skills
+curl -s https://zhanglu.net/api/skills.json \\
+  | jq '.items[] | select(.featured)'
+
+# Get the full text of the mba skill
+curl -s https://zhanglu.net/api/skills/mba.json \\
+  | jq -r .body_md
+
+# Full-text search
+curl -s https://zhanglu.net/api/search.json \\
+  | jq '.items[] | select(.text | test("brand"; "i"))'`}</code></pre>
+
+      <p>Or just:</p>
+
+      <pre><code>{`npx zhanglu-net list skills --featured --json
+npx zhanglu-net get skill mba --md
+npx zhanglu-net search "brand"`}</code></pre>
+
+      <h2>Time to build</h2>
+
+      <pre><code>{`Endpoints (9 files):          25 min
+CLI (single file, 270 lines): 30 min
+llms.txt / robots.txt:        5 min
+Skill (SKILL.md + sync):      10 min
+Design doc + this post + draft: 20 min
+AGENTS.md / README updates:   10 min
+build + test + commit:        15 min
+─────────────────────────────────
+Total:                        ~1.5 hours`}</code></pre>
+
+      <p>Including drafting this very article. <strong>Leaving yourself enough time to write the docs matters more than the code itself.</strong></p>
+
+      <h2>Take it now</h2>
+
+      <ul>
+        <li>Site integration guide: <a href="/en/agents">/agents</a></li>
+        <li>Self-discovery entry: <a href="/llms.txt">/llms.txt</a></li>
+        <li>Manifest: <a href="/api/index.json">/api/index.json</a></li>
+        <li>CLI: <code>npx zhanglu-net --help</code></li>
+        <li>Source: <a href="https://github.com/zhanglunet/zhanglu.net">github.com/zhanglunet/zhanglu.net</a></li>
+        <li>Design doc: <a href="https://github.com/zhanglunet/zhanglu.net/blob/main/docs/agent-cli/design.md">docs/agent-cli/design.md</a></li>
+      </ul>
+
+      <p>If you also maintain a content site, I strongly recommend adding a JSON API layer + <code>/llms.txt</code>. No framework upgrade, no new service required. Astro / Next / Hugo can all generate static JSON at build time. Cloudflare Pages caches it automatically. Zero cost.</p>
+
+      <p>The next agent that comes to scrape your site won't get stuck on HTML parsing anymore.</p>
+
+    </div>
+
+    <!-- footer -->
+    <div class="mt-16 pt-8 border-t border-[var(--color-rule)] flex items-center justify-between text-sm">
+      <a href="/en/agents" class="text-[var(--color-muted)] hover:text-[var(--color-accent)] transition-colors">
+        ← Integration guide
+      </a>
+      <span class="font-mono text-xs text-[var(--color-muted)] tracking-wider">/posts/agent-cli</span>
+    </div>
+
+    <div class="mt-6 text-sm text-[var(--color-muted)]">
+      Also posted on my <a href="https://mp.weixin.qq.com/s/SnZLBGA6LX6dLcMhwf0Jow" target="_blank" rel="noopener" class="underline hover:text-[var(--color-accent)]">WeChat public account "Zhang Lu's Ramblings"</a>.
+    </div>
+  </article>
+</Base>

@@ -1,0 +1,218 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import PresentationCard from '../../components/PresentationCard.astro';
+import SkillCard from '../../components/SkillCard.astro';
+import about from '../../data/about.en.json';
+
+const allProjects = await getCollection('projectsEn');
+const featuredProjects = allProjects
+  .filter((p) => p.data.featured)
+  .sort((a, b) => a.data.order - b.data.order);
+
+const presentations = (await getCollection('presentationsEn'))
+  .sort((a, b) => (a.data.order || 999) - (b.data.order || 999));
+
+const allArticles = await getCollection('articlesEn');
+const recentArticles = allArticles
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0, 5);
+
+const allSkills = await getCollection('skillsEn');
+const featuredSkills = allSkills
+  .filter((s) => s.data.featured || s.data.handwritten)
+  .slice(0, 6);
+const otherSkills = allSkills
+  .filter((s) => !s.data.featured && !s.data.handwritten);
+
+const tui3Sites = [
+  { name: 'Blackboard Arts', years: '1999–2007', img: '/tui3/heibanbao.webp', url: 'https://heibanbao.tui3.com/' },
+  { name: 'Changyou', years: '1999–2007', img: '/tui3/changyou.webp', url: 'https://changyou.tui3.com/' },
+  { name: 'On the Road', years: '2007', img: '/tui3/zhanglu.webp', url: 'https://zhanglu.tui3.com/' },
+  { name: 'Shuo3 · Tech TV', years: '2007', img: '/tui3/shuo3.webp', url: 'https://shuo3.tui3.com/' },
+  { name: 'Sofaee', years: '2007', img: '/tui3/sofaee.webp', url: 'https://sofaee.tui3.com/' },
+];
+
+// highlight "traceable" in the tagline
+const _hl = 'traceable';
+const _i = about.tagline.indexOf(_hl);
+const taglinePre = _i >= 0 ? about.tagline.slice(0, _i) : about.tagline;
+const taglinePost = _i >= 0 ? about.tagline.slice(_i + _hl.length) : '';
+const taglineHasHl = _i >= 0;
+
+const heroSites = [
+  { host: 'mbabrand.com', url: 'https://mbabrand.com' },
+  { host: 'bossagent.cc', url: 'https://bossagent.cc' },
+  { host: 'oaf.world', url: 'https://oaf.world' },
+];
+---
+<Base image="/og/home.png">
+  <section class="py-10 sm:py-16">
+    <div class="hero-card mb-8 rounded-lg overflow-hidden border border-[var(--color-rule)] bg-[var(--color-paper)]">
+      <div class="h-1.5 bg-[var(--color-accent)]"></div>
+      <div class="px-6 sm:px-9 py-8 sm:py-9">
+        <div class="flex items-center gap-5 sm:gap-9">
+          <svg class="hero-mark w-20 h-20 sm:w-28 sm:h-28 shrink-0" viewBox="0 0 120 120" role="img" aria-label="Zhang Lu mark: a road, a full stop">
+            <path class="zpath" d="M 26 36 H 80 L 32 84 H 70" fill="none" stroke="var(--color-ink)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" pathLength="100" />
+            <circle class="wp" cx="80" cy="36" r="3" fill="var(--color-paper)" />
+            <circle class="wp" cx="32" cy="84" r="3" fill="var(--color-paper)" />
+            <circle class="zdot" cx="88.5" cy="84" r="7.5" fill="var(--color-accent)" />
+          </svg>
+          <div class="min-w-0">
+            <h1 class="font-serif text-4xl sm:text-6xl font-semibold tracking-tight leading-none">
+              {about.name}<span class="text-[var(--color-accent)]">.</span>
+            </h1>
+            <p class="mt-3 sm:mt-4 font-serif text-lg sm:text-2xl leading-snug text-[var(--color-ink)]">
+              {taglinePre}{taglineHasHl && <span class="text-[var(--color-accent)]">traceable</span>}{taglinePost}
+            </p>
+            <p class="mt-2 text-sm sm:text-base text-[var(--color-muted)]">C-suite decision agents · Designed for AI-native organizations</p>
+          </div>
+        </div>
+        <div class="mt-6 flex flex-wrap gap-2">
+          {heroSites.map((s) => (
+            <a href={s.url} target="_blank" rel="noopener" class="inline-flex items-center px-3 py-1 rounded-full border border-[var(--color-rule)] bg-[var(--color-paper-2)] font-mono text-xs text-[var(--color-muted)] hover:border-[var(--color-accent)] hover:text-[var(--color-ink)] transition-colors">{s.host}</a>
+          ))}
+        </div>
+      </div>
+    </div>
+    <p class="text-[var(--color-muted)] max-w-2xl leading-relaxed">
+      {about.bio}
+    </p>
+    <div class="mt-6 flex flex-wrap gap-2">
+      {about.tags.map((t) => (
+        <span class="text-xs px-2 py-1 bg-[var(--color-paper-2)] rounded font-mono">{t}</span>
+      ))}
+    </div>
+  </section>
+
+  <section class="py-8 border-t border-[var(--color-rule)]">
+    <div class="rounded-lg border border-[var(--color-rule)] bg-[var(--color-paper-2)] px-5 py-5 sm:px-6">
+      <div class="flex items-baseline justify-between gap-3 mb-1.5">
+        <p class="font-serif text-lg sm:text-xl text-[var(--color-ink)]">A suite of C-suite decision agents</p>
+        <a href="/en/c-suite" class="shrink-0 text-sm text-[var(--color-accent)] hover:underline">About the suite →</a>
+      </div>
+      <p class="text-sm text-[var(--color-muted)] leading-relaxed mb-4">
+        Designed for AI-native organizations: turning the CEO's strategy calls, the CMO's brand calls, and the CFO's investment-research calls each into a pipeline you can research, score, and review.
+      </p>
+      <div class="flex flex-wrap gap-2 text-sm">
+        <a href="/en/projects/boss" class="inline-flex items-center gap-1 px-3 py-1 rounded-full border border-[var(--color-rule)] bg-white/40 hover:border-[var(--color-accent)] transition-colors">Boss <span class="text-[var(--color-accent)]">· CEO</span></a>
+        <a href="/en/projects/mbabrand" class="inline-flex items-center gap-1 px-3 py-1 rounded-full border border-[var(--color-rule)] bg-white/40 hover:border-[var(--color-accent)] transition-colors">MBA Brand <span class="text-[var(--color-accent)]">· CMO</span></a>
+        <a href="/en/projects/oaf" class="inline-flex items-center gap-1 px-3 py-1 rounded-full border border-[var(--color-rule)] bg-white/40 hover:border-[var(--color-accent)] transition-colors">OAF <span class="text-[var(--color-accent)]">· CFO</span></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-8 border-t border-[var(--color-rule)]">
+    <div class="flex items-baseline justify-between mb-6">
+      <h2 class="font-serif text-2xl font-semibold">Featured projects</h2>
+      <a href="/en/projects" class="text-sm text-[var(--color-muted)] hover:text-[var(--color-ink)]">All →</a>
+    </div>
+    <div class="grid sm:grid-cols-2 gap-4">
+      {featuredProjects.map((p) => <ProjectCard entry={p} />)}
+    </div>
+  </section>
+
+  {presentations.length > 0 && (
+    <section class="py-8 border-t border-[var(--color-rule)]">
+      <div class="flex items-baseline justify-between mb-6">
+        <h2 class="font-serif text-2xl font-semibold">Decks</h2>
+        <a href="/en/presentations" class="text-sm text-[var(--color-muted)] hover:text-[var(--color-ink)]">All →</a>
+      </div>
+      <div class="grid sm:grid-cols-2 gap-4">
+        {presentations.map((p) => <PresentationCard entry={p} />)}
+      </div>
+    </section>
+  )}
+
+  {recentArticles.length > 0 && (
+    <section class="py-8 border-t border-[var(--color-rule)]">
+      <div class="flex items-baseline justify-between mb-2">
+        <h2 class="font-serif text-2xl font-semibold">Recent writing</h2>
+        <a href="/en/articles" class="text-sm text-[var(--color-muted)] hover:text-[var(--color-ink)]">All →</a>
+      </div>
+      <div>
+        {recentArticles.map((a) => <ArticleCard entry={a} />)}
+      </div>
+    </section>
+  )}
+
+  <section class="py-8 border-t border-[var(--color-rule)]">
+    <div class="flex items-baseline justify-between mb-6">
+      <h2 class="font-serif text-2xl font-semibold">Skills</h2>
+      <a href="/en/skills" class="text-sm text-[var(--color-muted)] hover:text-[var(--color-ink)]">
+        All {allSkills.length} →
+      </a>
+    </div>
+    {featuredSkills.length > 0 && (
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
+        {featuredSkills.map((s) => <SkillCard entry={s} />)}
+      </div>
+    )}
+    {otherSkills.length > 0 && (
+      <p class="text-sm text-[var(--color-muted)]">
+        plus {otherSkills.length} more skills:
+        {otherSkills.slice(0, 20).map((s, i) => (
+          <>
+            {i > 0 && <span>, </span>}
+            <a href={`/en/skills/${s.slug}`} class="font-mono hover:text-[var(--color-ink)]">/{s.data.name}</a>
+          </>
+        ))}
+        {otherSkills.length > 20 && <span> …</span>}
+      </p>
+    )}
+  </section>
+
+  <section class="py-8 border-t border-[var(--color-rule)]">
+    <div class="flex items-baseline justify-between mb-2">
+      <h2 class="font-serif text-2xl font-semibold">Past work</h2>
+      <a href="/en/projects/tui3" class="text-sm text-[var(--color-muted)] hover:text-[var(--color-ink)]">Details →</a>
+    </div>
+    <p class="text-[var(--color-muted)] text-sm mb-6 max-w-2xl">
+      Before these AI products —— <a href="https://tui3.com" target="_blank" rel="noopener" class="text-[var(--color-accent)] hover:underline">tui3.com</a> rebuilds several Chinese personal sites I worked on between 1999–2007, from server archives into static sites, preserved for good.
+    </p>
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+      {tui3Sites.map((s) => (
+        <a href={s.url} target="_blank" rel="noopener" class="group block border border-[var(--color-rule)] rounded-md overflow-hidden hover:border-[var(--color-accent)] transition-colors bg-white/40">
+          <div class="aspect-[4/3] overflow-hidden bg-[var(--color-paper-2)]">
+            <img src={s.img} alt={`${s.name} archive screenshot`} loading="lazy" class="w-full h-full object-cover object-top group-hover:scale-[1.02] transition-transform duration-300" />
+          </div>
+          <div class="p-2.5">
+            <div class="text-xs font-medium leading-tight">{s.name}</div>
+            <div class="text-[10px] text-[var(--color-muted)] font-mono mt-0.5">{s.years}</div>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+</Base>
+
+<style>
+  @keyframes road-draw { to { stroke-dashoffset: 0; } }
+  @keyframes road-fade { to { opacity: 1; } }
+  @keyframes road-pop { from { opacity: 0; transform: scale(0.3); } to { opacity: 1; transform: scale(1); } }
+
+  .hero-mark .zpath {
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+    animation: road-draw 1.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+  .hero-mark .wp {
+    opacity: 0;
+    animation: road-fade 0.5s ease forwards;
+    animation-delay: 0.8s;
+  }
+  .hero-mark .zdot {
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: road-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    animation-delay: 1.1s;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-mark .zpath { stroke-dashoffset: 0; animation: none; }
+    .hero-mark .wp,
+    .hero-mark .zdot { opacity: 1; animation: none; }
+  }
+</style>

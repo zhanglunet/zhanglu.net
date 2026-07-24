@@ -60,6 +60,7 @@ docs/dev-log/YYYY-MM-DD-<关键词>.md
 
 新的在上。这段是导航，别当唯一事实源 —— 目录里的 `YYYY-MM-DD-*.md` 才是。
 
+- `2026-07-24-i18n-english-version.md` — 全站英文版：双语 i18n（浏览器自适应 + 手动切换）
 - `2026-07-21-devlog-discipline.md` — 本套开发纪律与 dev-log 约定的落地
 - `2026-07-21-wechat-typeset.md` — C-suite 长文的公众号排版版 + 标题迭代
 - `2026-07-20-aip-project.md` — 第二大脑 (aip.cab) 项目

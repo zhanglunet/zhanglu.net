@@ -1,0 +1,34 @@
+---
+import Base from '../../../layouts/Base.astro';
+
+const posts = [
+  {
+    slug: 'c-suite-design',
+    title: 'The C-suite an AI-native org needs: what kind of decision agents?',
+    date: '2026-07-18',
+    summary: 'Boss / MBA Brand / OAF are really one skeleton: research → deliberation → scoring → attribution. Why an AI-native org’s C-suite needs it.',
+  },
+  {
+    slug: 'agent-cli',
+    title: 'I built a CLI for agents: one `npx zhanglu-net` instead of scraping HTML',
+    date: '2026-06-09',
+    summary: 'No MCP, no SDK — just 9 static JSON endpoints and a 270-line CLI. Shipped in 1.5 hours.',
+  },
+];
+---
+<Base title="Posts" description="Long-form posts on this site">
+  <h1 class="font-serif text-3xl font-semibold mb-2">Posts</h1>
+  <p class="text-[var(--color-muted)] mb-8">On-site long-form, as opposed to the <a href="/en/articles" class="text-[var(--color-accent)] underline underline-offset-4">writing index</a> (external links to WeChat / blogs). {posts.length} in total.</p>
+
+  <div class="space-y-6">
+    {posts.map((p) => (
+      <a href={`/en/posts/${p.slug}`} class="block group p-5 border border-[var(--color-rule)] rounded hover:border-[var(--color-accent)] transition-colors">
+        <div class="flex items-baseline justify-between gap-4 mb-2">
+          <h2 class="font-serif text-xl font-semibold group-hover:text-[var(--color-accent)] transition-colors">{p.title}</h2>
+          <time class="text-xs font-mono text-[var(--color-muted)] shrink-0">{p.date}</time>
+        </div>
+        <p class="text-sm text-[var(--color-muted)] leading-relaxed">{p.summary}</p>
+      </a>
+    ))}
+  </div>
+</Base>
