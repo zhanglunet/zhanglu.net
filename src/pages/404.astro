@@ -1,0 +1,51 @@
+---
+import Base from '../layouts/Base.astro';
+
+// CF Pages 对所有未命中路径只服务这一个 404.html，所以它必须双语。
+// noLangRedirect：错误页不按语言自动跳（否则会多跳一次才停）。
+const apis = [
+  { zh: '中文接口', en: 'Chinese API', url: '/api/index.json' },
+  { zh: '英文接口', en: 'English API', url: '/en/api/index.json' },
+];
+---
+<Base title="404" description="Page not found / 页面不存在" noLangRedirect>
+  <section class="py-10 sm:py-16 max-w-2xl">
+    <p class="font-mono text-6xl sm:text-7xl font-semibold text-[var(--color-accent)] leading-none mb-6">404</p>
+
+    <h1 class="font-serif text-2xl sm:text-3xl font-semibold mb-2">这个地址不存在</h1>
+    <p class="text-[var(--color-muted)] leading-relaxed mb-1">
+      链接可能改过或拼错了。从 <a href="/" class="text-[var(--color-accent)] hover:underline">首页</a> 或
+      <a href="/projects" class="text-[var(--color-accent)] hover:underline">项目</a> 继续。
+    </p>
+    <p class="text-sm text-[var(--color-muted)] leading-relaxed mb-8">
+      如果你是 agent：结构化内容在 <a href="/llms.txt" class="text-[var(--color-accent)] hover:underline font-mono">/llms.txt</a>，
+      不要抓 HTML。
+    </p>
+
+    <div class="border-t border-[var(--color-rule)] pt-8">
+      <h2 class="font-serif text-2xl sm:text-3xl font-semibold mb-2">Page not found</h2>
+      <p class="text-[var(--color-muted)] leading-relaxed mb-1">
+        The link may have moved or been mistyped. Try the
+        <a href="/en/" class="text-[var(--color-accent)] hover:underline">home page</a> or
+        <a href="/en/projects" class="text-[var(--color-accent)] hover:underline">projects</a>.
+      </p>
+      <p class="text-sm text-[var(--color-muted)] leading-relaxed">
+        If you're an agent: structured content lives at
+        <a href="/en/llms.txt" class="text-[var(--color-accent)] hover:underline font-mono">/en/llms.txt</a> —
+        don't scrape the HTML.
+      </p>
+    </div>
+
+    <div class="mt-8 pt-8 border-t border-[var(--color-rule)]">
+      <p class="text-xs font-mono tracking-wider text-[var(--color-muted)] mb-3">MACHINE-READABLE ENTRY POINTS</p>
+      <ul class="space-y-1.5 text-sm">
+        {apis.map((a) => (
+          <li class="flex flex-wrap items-baseline gap-2">
+            <a href={a.url} class="font-mono text-[var(--color-accent)] hover:underline wrap-anywhere">{a.url}</a>
+            <span class="text-xs text-[var(--color-muted)]">{a.zh} · {a.en}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+</Base>

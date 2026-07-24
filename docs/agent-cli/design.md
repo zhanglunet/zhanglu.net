@@ -284,7 +284,11 @@ npx zhanglu-net --help
 - ❌ **GraphQL** —— overkill。语料 < 100 项，全量 < 200KB，直接 list + get 够了。
 - ❌ **WebSocket / SSE** —— 内容更新走 git push，agent 拿快照即可，没有实时需求。
 - ❌ **CLI 自动更新检查** —— `npx` 每次拉最新，全局装的人加个 `--latest` 自检即可。
-- ❌ **i18n 端点** —— 站点 lang=zh-CN，agent 自己处理翻译。
+- ~~❌ **i18n 端点** —— 站点 lang=zh-CN，agent 自己处理翻译。~~
+  **已推翻（2026-07-24）**：站点上了中英双语（`/en/` 子路径），前提不成立了。
+  现在英文数据有平行端点：把任意路径前面加 `/en`（`/en/api/projects.json`），读 `*En` 集合；
+  每个响应带 `lang` 字段；CLI 用 `--lang zh|en` 切。字段形状由 `src/lib/api.ts` 单一定义，
+  zh / en 共用同一份 builder，避免两套漂移。
 
 ---
 

@@ -1,18 +1,26 @@
 ---
+import { readFileSync } from 'node:fs';
 import Base from '../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 
-const [projects, articles, skills] = await Promise.all([
+const [projects, articles, presentations, skills] = await Promise.all([
   getCollection('projects'),
   getCollection('articles'),
+  getCollection('presentations'),
   getCollection('skills'),
 ]);
 
+// build 时数出来，别写死 —— 写死的数字漂过一次（文案说 270 行，实际早就不是）
+const cliLines = readFileSync(new URL('../../cli/bin/zhanglu-net.mjs', import.meta.url), 'utf-8')
+  .trimEnd()
+  .split('\n').length;
+
 const endpoints: Array<{ path: string; desc: string; sample?: string }> = [
-  { path: '/api/index.json',           desc: 'Manifest — counts + 所有端点 URL', sample: '{ "counts": { "skills": ' + skills.length + ' }, "endpoints": { … } }' },
-  { path: '/api/projects.json',        desc: '项目列表',                          sample: `{ "count": ${projects.length}, "items": [{ "slug", "title", "tech": [], "year", … }] }` },
+  { path: '/api/index.json',           desc: 'Manifest — counts + 所有端点 URL', sample: '{ "counts": { "skills": ' + skills.length + ' }, "endpoints": { … }, "languages": { … } }' },
+  { path: '/api/projects.json',        desc: '项目列表',                          sample: `{ "count": ${projects.length}, "items": [{ "slug", "title", "tech": [], "year", "loc", "persona", … }] }` },
   { path: '/api/projects/{slug}.json', desc: '单项目（含 body_md）',              sample: '{ …list 字段, "body_md": "## 是什么\\n…" }' },
   { path: '/api/articles.json',        desc: '公众号 / 博客文章入口',             sample: `{ "count": ${articles.length}, "items": [{ "title", "source", "url", "date", "summary" }] }` },
+  { path: '/api/presentations.json',   desc: '网页版 PPT / 站点入口',             sample: `{ "count": ${presentations.length}, "items": [{ "slug", "title", "tagline", "url", "kind", "year" }] }` },
   { path: '/api/skills.json',          desc: 'Claude Skills 索引',                sample: `{ "count": ${skills.length}, "items": [{ "slug", "name", "description", "source", "featured" }] }` },
   { path: '/api/skills/{slug}.json',   desc: '单 skill（含 body_md）',            sample: '{ …list 字段, "body_md": "本 skill 来源于…" }' },
   { path: '/api/about.json',           desc: '作者简介 + tags',                   sample: '{ "name": "张路", "tagline", "bio", "tags": [], "permalink" }' },
@@ -60,7 +68,9 @@ curl -s https://zhanglu.net/api/skills/mba.json \
 npx zhanglu-net list skills --featured
 npx zhanglu-net get skill mba --md
 npx zhanglu-net search "品牌判断" --type skill
-npx zhanglu-net about --json</code></pre>
+
+# 英文数据
+npx zhanglu-net --lang en about --json</code></pre>
       </div>
     </div>
   </section>
@@ -68,8 +78,16 @@ npx zhanglu-net about --json</code></pre>
   <!-- Endpoints -->
   <section class="mb-12">
     <h2 class="font-serif text-2xl font-semibold mb-2">端点</h2>
-    <p class="text-[var(--color-muted)] text-sm mb-5">
+    <p class="text-[var(--color-muted)] text-sm mb-3">
       所有端点 build 时静态生成，Content-Type 是 <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">application/json</code>，带 <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">Access-Control-Allow-Origin: *</code>。
+      不存在的路径返回真 <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">404</code>，状态码可直接用来判断。
+    </p>
+    <p class="text-sm mb-5 rounded border border-[var(--color-rule)] bg-[var(--color-paper-2)] px-4 py-3 leading-relaxed">
+      <strong class="text-[var(--color-ink)]">中英双语</strong>：下面是中文数据。要英文，把路径前面加
+      <code class="text-xs bg-white/60 px-1 rounded">/en</code> —— 例如
+      <a href="/en/api/projects.json" class="font-mono text-[var(--color-accent)] hover:underline">/en/api/projects.json</a>。
+      每个响应都带 <code class="text-xs bg-white/60 px-1 rounded">lang</code> 字段（<code class="text-xs bg-white/60 px-1 rounded">"zh"</code> / <code class="text-xs bg-white/60 px-1 rounded">"en"</code>）可自查。
+      英文指南见 <a href="/en/agents" class="text-[var(--color-accent)] hover:underline">/en/agents</a>。
     </p>
     <div class="border border-[var(--color-rule)] rounded overflow-hidden">
       {endpoints.map((e, i) => (
@@ -92,15 +110,17 @@ npx zhanglu-net about --json</code></pre>
     <p class="text-[var(--color-muted)] text-sm mb-5">
       包名 <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">zhanglu-net</code>，零运行时依赖。
       Node 18+ 直接 <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">npx</code> 跑，或 <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">npm i -g zhanglu-net</code>。
+      拿不到 npm 包时可以直接跑源码：
+      <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded wrap-anywhere">node cli/bin/zhanglu-net.mjs &lt;command&gt;</code>。
     </p>
 
     <h3 class="font-serif text-lg font-semibold mt-6 mb-3">命令</h3>
     <div class="text-sm">
       <div class="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 font-mono wrap-anywhere">
         <code class="text-[var(--color-accent)]">list &lt;kind&gt;</code>
-        <span class="text-[var(--color-muted)]">列出 skills / projects / articles</span>
+        <span class="text-[var(--color-muted)]">列出 skills / projects / articles / presentations</span>
         <code class="text-[var(--color-accent)]">get &lt;kind&gt; &lt;slug&gt;</code>
-        <span class="text-[var(--color-muted)]">读一条 skill / project / article</span>
+        <span class="text-[var(--color-muted)]">读一条 skill / project / article / presentation</span>
         <code class="text-[var(--color-accent)]">search &lt;keyword&gt;</code>
         <span class="text-[var(--color-muted)]">在所有内容里搜关键词</span>
         <code class="text-[var(--color-accent)]">about</code>
@@ -109,11 +129,15 @@ npx zhanglu-net about --json</code></pre>
         <span class="text-[var(--color-muted)]">公开社交链接</span>
         <code class="text-[var(--color-accent)]">endpoints</code>
         <span class="text-[var(--color-muted)]">打印 manifest</span>
+        <code class="text-[var(--color-accent)]">help &lt;command&gt;</code>
+        <span class="text-[var(--color-muted)]">看某个命令的详细帮助</span>
       </div>
     </div>
 
     <h3 class="font-serif text-lg font-semibold mt-6 mb-3">通用 flags</h3>
     <div class="text-sm grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 font-mono wrap-anywhere">
+      <code class="text-[var(--color-accent)]">--lang &lt;zh|en&gt;</code>
+      <span class="text-[var(--color-muted)]">取哪种语言的数据（默认 zh）</span>
       <code class="text-[var(--color-accent)]">--json</code>
       <span class="text-[var(--color-muted)]">输出原始 JSON（agent 默认要的）</span>
       <code class="text-[var(--color-accent)]">--md</code>
@@ -195,7 +219,7 @@ npx zhanglu-net about --json</code></pre>
       </a>
       <a href="https://github.com/zhanglunet/zhanglu.net/tree/main/cli" class="block hover:text-[var(--color-accent)] transition-colors">
         <span class="font-mono text-xs text-[var(--color-muted)] mr-2">[source]</span>
-        CLI 源码（单文件 ~270 行，零依赖）
+        CLI 源码（单文件 {cliLines} 行，零依赖）
       </a>
       <a href="https://github.com/zhanglunet/zhanglu.net/tree/main/src/pages/api" class="block hover:text-[var(--color-accent)] transition-colors">
         <span class="font-mono text-xs text-[var(--color-muted)] mr-2">[source]</span>

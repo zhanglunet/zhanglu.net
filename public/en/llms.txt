@@ -1,0 +1,63 @@
+# zhanglu.net (English)
+
+> Zhang Lu's personal site. Turning complex judgment into a traceable pipeline, with Harness + Loop.
+> Building AI products that do exactly that: mbabrand (a jury of agents scoring brands),
+> bossagent (a decision agent for leaders), oaf.world (an AI investment-research workbench).
+> Plus 30-some Claude Skills kept on my own machine.
+
+## Languages
+
+This site is bilingual: Chinese at the root, English under /en/ — for both pages and API.
+
+- English entry: https://zhanglu.net/en/llms.txt
+- Chinese entry: https://zhanglu.net/llms.txt
+
+## Human-facing pages for agents
+
+- /en/agents — integration guide (endpoint table + CLI usage + curl examples + Claude Code)
+- /en/posts/agent-cli — the design essay (why it was built this way)
+
+## For AI agents
+
+JSON API (build-time generated, free to fetch, CORS open). English payloads:
+
+- /en/api/index.json — manifest with all endpoints + counts (includes cross-language links)
+- /en/api/projects.json — projects list
+- /en/api/projects/{slug}.json — single project with body_md
+- /en/api/articles.json — writing index (entries link to the original source)
+- /en/api/presentations.json — web decks and related site entries
+- /en/api/skills.json — Claude Skills index
+- /en/api/skills/{slug}.json — single skill with body_md
+- /en/api/about.json — bio + tags
+- /en/api/social.json — public socials (email scrubbed)
+- /en/api/search.json — flat corpus for client-side substring search
+
+Drop the /en prefix from any path above to get the Chinese payload.
+
+Every response carries a `lang` field ("zh" or "en") so you can confirm what you got.
+Missing paths return HTTP 404 (not 200), so status codes are reliable.
+
+Note: the site's own product screenshots and the articles' external links point to
+Chinese-language sources — the API text is translated, the linked originals are not.
+
+## CLI
+
+```
+npx zhanglu-net --lang en list skills
+npx zhanglu-net --lang en list projects --featured
+npx zhanglu-net --lang en list presentations
+npx zhanglu-net --lang en get skill mba --md
+npx zhanglu-net --lang en search "brand judgment"
+npx zhanglu-net --lang en about
+npx zhanglu-net --lang en endpoints
+```
+
+If the npm package is unavailable, run it from source:
+```
+git clone https://github.com/zhanglunet/zhanglu.net
+node zhanglu.net/cli/bin/zhanglu-net.mjs --lang en list skills
+```
+
+Source: https://github.com/zhanglunet/zhanglu.net
+Author: Zhang Lu (@zhanglunet)
+WeChat: 张路的碎碎念

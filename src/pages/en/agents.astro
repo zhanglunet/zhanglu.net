@@ -1,23 +1,31 @@
 ---
+import { readFileSync } from 'node:fs';
 import Base from '../../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 
-const [projects, articles, skills] = await Promise.all([
+const [projects, articles, presentations, skills] = await Promise.all([
   getCollection('projectsEn'),
   getCollection('articlesEn'),
+  getCollection('presentationsEn'),
   getCollection('skillsEn'),
 ]);
 
+// Counted at build time — don't hardcode it (the old hardcoded number drifted).
+const cliLines = readFileSync(new URL('../../../cli/bin/zhanglu-net.mjs', import.meta.url), 'utf-8')
+  .trimEnd()
+  .split('\n').length;
+
 const endpoints: Array<{ path: string; desc: string; sample?: string }> = [
-  { path: '/api/index.json',           desc: 'Manifest — counts + all endpoint URLs', sample: '{ "counts": { "skills": ' + skills.length + ' }, "endpoints": { … } }' },
-  { path: '/api/projects.json',        desc: 'Project list',                          sample: `{ "count": ${projects.length}, "items": [{ "slug", "title", "tech": [], "year", … }] }` },
-  { path: '/api/projects/{slug}.json', desc: 'Single project (with body_md)',         sample: '{ …list fields, "body_md": "## What it is\\n…" }' },
-  { path: '/api/articles.json',        desc: 'WeChat / blog article entries',         sample: `{ "count": ${articles.length}, "items": [{ "title", "source", "url", "date", "summary" }] }` },
-  { path: '/api/skills.json',          desc: 'Claude Skills index',                   sample: `{ "count": ${skills.length}, "items": [{ "slug", "name", "description", "source", "featured" }] }` },
-  { path: '/api/skills/{slug}.json',   desc: 'Single skill (with body_md)',           sample: '{ …list fields, "body_md": "This skill comes from…" }' },
-  { path: '/api/about.json',           desc: 'Author bio + tags',                     sample: '{ "name": "Zhang Lu", "tagline", "bio", "tags": [], "permalink" }' },
-  { path: '/api/social.json',          desc: 'Public social links (email redacted)',  sample: '{ "links": [{ "label", "url", "handle", "icon" }] }' },
-  { path: '/api/search.json',          desc: 'Flat corpus for CLI-side search',       sample: '{ "items": [{ "type", "slug", "title", "text", "url" }] }' },
+  { path: '/en/api/index.json',           desc: 'Manifest — counts + all endpoint URLs', sample: '{ "lang": "en", "counts": { "skills": ' + skills.length + ' }, "endpoints": { … } }' },
+  { path: '/en/api/projects.json',        desc: 'Project list',                          sample: `{ "count": ${projects.length}, "items": [{ "slug", "title", "tech": [], "year", "loc", "persona", … }] }` },
+  { path: '/en/api/projects/{slug}.json', desc: 'Single project (with body_md)',         sample: '{ …list fields, "body_md": "## What it is\\n…" }' },
+  { path: '/en/api/articles.json',        desc: 'Writing index entries',                 sample: `{ "count": ${articles.length}, "items": [{ "title", "source", "url", "date", "summary" }] }` },
+  { path: '/en/api/presentations.json',   desc: 'Web decks / site entries',              sample: `{ "count": ${presentations.length}, "items": [{ "slug", "title", "tagline", "url", "kind", "year" }] }` },
+  { path: '/en/api/skills.json',          desc: 'Claude Skills index',                   sample: `{ "count": ${skills.length}, "items": [{ "slug", "name", "description", "source", "featured" }] }` },
+  { path: '/en/api/skills/{slug}.json',   desc: 'Single skill (with body_md)',           sample: '{ …list fields, "body_md": "This skill comes from…" }' },
+  { path: '/en/api/about.json',           desc: 'Author bio + tags',                     sample: '{ "name": "Zhang Lu", "tagline", "bio", "tags": [], "permalink" }' },
+  { path: '/en/api/social.json',          desc: 'Public social links (email redacted)',  sample: '{ "links": [{ "label", "url", "handle", "icon" }] }' },
+  { path: '/en/api/search.json',          desc: 'Flat corpus for CLI-side search',       sample: '{ "items": [{ "type", "slug", "title", "text", "url" }] }' },
 ];
 
 const title = 'For Agents';
@@ -29,13 +37,13 @@ const desc = 'A unified HTTP / CLI interface for AI agents (Claude Code / Codex 
     <p class="text-xs font-mono text-[var(--color-accent)] mb-3 tracking-wider">FOR AI AGENTS</p>
     <h1 class="font-serif text-3xl sm:text-4xl font-semibold mb-4">Don't scrape HTML — read JSON.</h1>
     <p class="text-[var(--color-muted)] leading-relaxed max-w-2xl mb-6">
-      All structured content on this site is compiled into static JSON at build time, served at <code class="font-mono text-sm bg-[var(--color-paper-2)] px-1.5 py-0.5 rounded">/api/*.json</code>.
+      All structured content on this site is compiled into static JSON at build time, served at <code class="font-mono text-sm bg-[var(--color-paper-2)] px-1.5 py-0.5 rounded">/en/api/*.json</code> (English) and <code class="font-mono text-sm bg-[var(--color-paper-2)] px-1.5 py-0.5 rounded">/api/*.json</code> (Chinese).
       Any agent (Claude Code / Codex / Hermes / OpenClaw / your own) fetches it directly over HTTP GET — CORS wide open, no token.
       There's also a zero-dependency CLI, <code class="font-mono text-sm bg-[var(--color-paper-2)] px-1.5 py-0.5 rounded">npx zhanglu-net</code>.
     </p>
     <div class="flex flex-wrap gap-3 text-sm">
-      <a href="/llms.txt" class="px-3 py-1.5 border border-[var(--color-rule)] rounded hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors">/llms.txt self-discovery</a>
-      <a href="/api/index.json" class="px-3 py-1.5 border border-[var(--color-rule)] rounded hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors">/api/index.json manifest</a>
+      <a href="/en/llms.txt" class="px-3 py-1.5 border border-[var(--color-rule)] rounded hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors">/en/llms.txt self-discovery</a>
+      <a href="/en/api/index.json" class="px-3 py-1.5 border border-[var(--color-rule)] rounded hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors">/en/api/index.json manifest</a>
       <a href="/en/posts/agent-cli" class="px-3 py-1.5 border border-[var(--color-rule)] rounded hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors">Why this design →</a>
     </div>
   </section>
@@ -46,21 +54,21 @@ const desc = 'A unified HTTP / CLI interface for AI agents (Claude Code / Codex 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
         <p class="text-xs font-mono text-[var(--color-muted)] mb-2 tracking-wider">CURL</p>
-        <pre class="bg-[#1a1a1a] text-[#f3f1ea] p-4 rounded text-xs leading-relaxed overflow-x-auto"><code>curl -s https://zhanglu.net/api/index.json | jq
+        <pre class="bg-[#1a1a1a] text-[#f3f1ea] p-4 rounded text-xs leading-relaxed overflow-x-auto"><code>curl -s https://zhanglu.net/en/api/index.json | jq
 
-curl -s https://zhanglu.net/api/skills.json \
+curl -s https://zhanglu.net/en/api/skills.json \
   | jq '.items[] | select(.featured) | .name'
 
-curl -s https://zhanglu.net/api/skills/mba.json \
+curl -s https://zhanglu.net/en/api/skills/mba.json \
   | jq -r .body_md</code></pre>
       </div>
       <div>
         <p class="text-xs font-mono text-[var(--color-muted)] mb-2 tracking-wider">CLI</p>
-        <pre class="bg-[#1a1a1a] text-[#f3f1ea] p-4 rounded text-xs leading-relaxed overflow-x-auto"><code>npx zhanglu-net endpoints
-npx zhanglu-net list skills --featured
-npx zhanglu-net get skill mba --md
-npx zhanglu-net search "brand" --type skill
-npx zhanglu-net about --json</code></pre>
+        <pre class="bg-[#1a1a1a] text-[#f3f1ea] p-4 rounded text-xs leading-relaxed overflow-x-auto"><code>npx zhanglu-net --lang en endpoints
+npx zhanglu-net --lang en list skills --featured
+npx zhanglu-net --lang en get skill mba --md
+npx zhanglu-net --lang en search "brand judgment"
+npx zhanglu-net --lang en about --json</code></pre>
       </div>
     </div>
   </section>
@@ -70,6 +78,14 @@ npx zhanglu-net about --json</code></pre>
     <h2 class="font-serif text-2xl font-semibold mb-2">Endpoints</h2>
     <p class="text-[var(--color-muted)] text-sm mb-5">
       All endpoints are statically generated at build time, with Content-Type <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">application/json</code> and <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">Access-Control-Allow-Origin: *</code>.
+      Missing paths return a real <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">404</code>, so status codes are reliable.
+    </p>
+    <p class="text-sm mb-5 rounded border border-[var(--color-rule)] bg-[var(--color-paper-2)] px-4 py-3 leading-relaxed">
+      <strong class="text-[var(--color-ink)]">Bilingual</strong>: the paths below return English. Drop the
+      <code class="text-xs bg-white/60 px-1 rounded">/en</code> prefix for Chinese — e.g.
+      <a href="/api/projects.json" class="font-mono text-[var(--color-accent)] hover:underline">/api/projects.json</a>.
+      Every response carries a <code class="text-xs bg-white/60 px-1 rounded">lang</code> field so you can confirm what you got.
+      Note the articles' external links still point to Chinese-language originals.
     </p>
     <div class="border border-[var(--color-rule)] rounded overflow-hidden">
       {endpoints.map((e, i) => (
@@ -91,16 +107,16 @@ npx zhanglu-net about --json</code></pre>
     <h2 class="font-serif text-2xl font-semibold mb-2">CLI</h2>
     <p class="text-[var(--color-muted)] text-sm mb-5">
       Package name <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">zhanglu-net</code>, zero runtime dependencies.
-      Run it directly with <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">npx</code> on Node 18+, or <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">npm i -g zhanglu-net</code>.
+      Run it directly with <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">npx</code> on Node 18+, or <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">npm i -g zhanglu-net</code>. If the npm package is unavailable, run the source directly: <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded wrap-anywhere">node cli/bin/zhanglu-net.mjs &lt;command&gt;</code>. Pass <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">--lang en</code> for English payloads.
     </p>
 
     <h3 class="font-serif text-lg font-semibold mt-6 mb-3">Commands</h3>
     <div class="text-sm">
       <div class="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 font-mono wrap-anywhere">
         <code class="text-[var(--color-accent)]">list &lt;kind&gt;</code>
-        <span class="text-[var(--color-muted)]">List skills / projects / articles</span>
+        <span class="text-[var(--color-muted)]">List skills / projects / articles / presentations</span>
         <code class="text-[var(--color-accent)]">get &lt;kind&gt; &lt;slug&gt;</code>
-        <span class="text-[var(--color-muted)]">Read a single skill / project / article</span>
+        <span class="text-[var(--color-muted)]">Read a single skill / project / article / presentation</span>
         <code class="text-[var(--color-accent)]">search &lt;keyword&gt;</code>
         <span class="text-[var(--color-muted)]">Search a keyword across all content</span>
         <code class="text-[var(--color-accent)]">about</code>
@@ -114,6 +130,8 @@ npx zhanglu-net about --json</code></pre>
 
     <h3 class="font-serif text-lg font-semibold mt-6 mb-3">Common flags</h3>
     <div class="text-sm grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 font-mono wrap-anywhere">
+      <code class="text-[var(--color-accent)]">--lang &lt;zh|en&gt;</code>
+      <span class="text-[var(--color-muted)]">Which language's data to fetch (default zh)</span>
       <code class="text-[var(--color-accent)]">--json</code>
       <span class="text-[var(--color-muted)]">Output raw JSON (what agents usually want)</span>
       <code class="text-[var(--color-accent)]">--md</code>
@@ -125,7 +143,7 @@ npx zhanglu-net about --json</code></pre>
       <code class="text-[var(--color-accent)]">--status &lt;s&gt;</code>
       <span class="text-[var(--color-muted)]">Filter by status (list projects)</span>
       <code class="text-[var(--color-accent)]">--type &lt;t&gt;</code>
-      <span class="text-[var(--color-muted)]">Search only skill / project / article</span>
+      <span class="text-[var(--color-muted)]">Search one type: skill|project|article|presentation|about</span>
       <code class="text-[var(--color-accent)]">--since &lt;date&gt;</code>
       <span class="text-[var(--color-muted)]">Filter by date (list articles)</span>
       <code class="text-[var(--color-accent)]">--limit &lt;N&gt;</code>
@@ -195,7 +213,7 @@ npx zhanglu-net about --json</code></pre>
       </a>
       <a href="https://github.com/zhanglunet/zhanglu.net/tree/main/cli" class="block hover:text-[var(--color-accent)] transition-colors">
         <span class="font-mono text-xs text-[var(--color-muted)] mr-2">[source]</span>
-        CLI source (single file, ~270 lines, zero deps)
+        CLI source (single file, {cliLines} lines, zero deps)
       </a>
       <a href="https://github.com/zhanglunet/zhanglu.net/tree/main/src/pages/api" class="block hover:text-[var(--color-accent)] transition-colors">
         <span class="font-mono text-xs text-[var(--color-muted)] mr-2">[source]</span>

@@ -523,7 +523,12 @@ YAML `|` block 在 frontmatter 里保留 `\n`，但 HTML 默认折叠空白。`S
 
 | 端点 | 实现文件 | 说明 |
 |---|---|---|
-| `/api/index.json` | `src/pages/api/index.json.ts` | manifest: counts + 所有端点 |
+> **双语**：下表是中文端点。英文有一整套平行端点 —— 把路径前面加 `/en`（`/en/api/projects.json`），
+> 实现在 `src/pages/en/api/`，读 `*En` 集合。字段形状**只在 `src/lib/api.ts` 定义一次**，zh / en 共用
+> 同一份 builder（曾因各自内联字段漂过一次：列表有 `loc/persona/cover`、详情没有）。**加字段改 `src/lib/api.ts`，别改端点文件。**
+> 每个响应带 `lang` 字段（`"zh"` / `"en"`）。`src/pages/404.astro` 让不存在的路径返回真 404（以前是 200 + 首页）。
+
+| `/api/index.json` | `src/pages/api/index.json.ts` | manifest: counts + 所有端点 + `languages` 交叉链接 |
 | `/api/projects.json` | `src/pages/api/projects.json.ts` | 项目列表 |
 | `/api/projects/{slug}.json` | `src/pages/api/projects/[slug].json.ts` | 单项目（含 `body_md`）|
 | `/api/articles.json` | `src/pages/api/articles.json.ts` | 公众号 / blog 入口 |
@@ -533,9 +538,10 @@ YAML `|` block 在 frontmatter 里保留 `\n`，但 HTML 默认折叠空白。`S
 | `/api/about.json` | `src/pages/api/about.json.ts` | 简介 |
 | `/api/social.json` | `src/pages/api/social.json.ts` | 公开社交（过滤邮箱）|
 | `/api/search.json` | `src/pages/api/search.json.ts` | 扁平语料给 CLI 客户端搜 |
-| `/llms.txt` | `public/llms.txt` | agent 自发现入口 |
-| `/robots.txt` | `public/robots.txt` | 标明 sitemap + allow all |
-| `/agents` | `src/pages/agents.astro` | 人类向的接入指南（端点表 + CLI + curl + Claude Code）|
+| `/llms.txt` · `/en/llms.txt` | `public/llms.txt` · `public/en/llms.txt` | agent 自发现入口（双语，互相指路）|
+| `/robots.txt` | `public/robots.txt` | sitemap + allow all + 指向 `/api/`、`/en/api/` |
+| `/404` | `src/pages/404.astro` | **双语** 404（CF Pages 只服务一个根 404.html）；让不存在路径返回真 404 |
+| `/agents` · `/en/agents` | `src/pages/agents.astro` · `src/pages/en/agents.astro` | 人类向接入指南（端点表 + CLI + curl + Claude Code）|
 | `/posts/agent-cli` | `src/pages/posts/agent-cli.astro` | 设计文章（在站站内长文版本）|
 | `/posts` | `src/pages/posts/index.astro` | 长文索引 |
 
@@ -584,16 +590,21 @@ CLI 与站点端点松耦合 —— 改端点 schema 时若不破坏向下兼容
 
 ### 14.4 加新端点 / 字段（流程）
 
-1. **数据源**：如果是新字段，先改 `src/content/config.ts` Zod schema；如果是新 collection，加 `defineCollection`
-2. **markdown / JSON 落数据**：`src/content/<...>` 或 `src/data/*.json`
-3. **端点**：复制现有的 `*.json.ts` 改字段
-4. **CLI**（可选）：如果想让 CLI 也能拿，在 `bin/zhanglu.mjs` 加子命令
-5. **manifest**：在 `src/pages/api/index.json.ts` 的 `endpoints` 里登记新端点
-6. **llms.txt**：`public/llms.txt` 里加一行说明
-7. **测**：`pnpm build` 过 → `curl localhost:4321/api/<新端点>.json` 看数据
+1. **数据源**：如果是新字段，先改 `src/content/config.ts` Zod schema（zh 与 `*En` 共用同一份 schema 常量）；如果是新 collection，加 `defineCollection` **两份**（`x` 和 `xEn`）
+2. **markdown / JSON 落数据**：`src/content/<coll>/` + `src/content/<coll>En/`（或 `src/data/*.json` + `*.en.json`）
+3. **字段形状**：改 `src/lib/api.ts` 的 builder —— **zh / en 同时生效，这是唯一该改字段的地方**
+4. **端点**（只有新 collection 才需要）：在 `src/pages/api/` 和 `src/pages/en/api/` 各加一个薄包装，只负责「取哪个集合 + 传 `'zh'` / `'en'`」
+5. **CLI**（可选）：`cli/bin/zhanglu-net.mjs` 顶部的 `KINDS` 表加一项即可（`list` / `get` / help 文本都是从它派生的）
+6. **manifest**：`src/lib/api.ts` 的 `buildIndex` 里登记新端点（zh / en 一起生效）
+7. **llms.txt**：`public/llms.txt` **和** `public/en/llms.txt` 各加一行
+8. **文档**：`/agents` 与 `/en/agents` 的 `endpoints` 数组各加一行（数字别写死，`cliLines` 那种就地算）
+9. **测**：`pnpm build` 过 → `curl localhost:4321/api/<新端点>.json` 和 `/en/api/<新端点>.json` 都看一眼
 
 ### 14.5 不要做的事
 
+- ❌ **不要在端点文件里内联字段形状**。字段只在 `src/lib/api.ts` 定义一次，端点文件只做「取哪个集合 + 哪种语言」。曾因内联漂过一次（列表有 `loc/persona/cover`、详情没有）。
+- ❌ **不要只加 zh 端点不加 en**（或反之）。两边都得有，否则 `/en/agents` 承诺的英文数据会落到中文 payload 上。
+- ❌ **不要在页面文案里写死会漂的数字**（端点个数、CLI 行数）。`/agents` 的 `cliLines` 是 build 时 `readFileSync` 数出来的，照这个做。
 - ❌ **不要在端点里塞业务逻辑**。端点只做"读 collection + JSON 序列化"。变换 / 过滤交给 CLI 或 agent。
 - ❌ **不要给端点加鉴权**。站点公开，鉴权之外的内容不该出现在 `src/content/`。
 - ❌ **不要把 `social.json` 的邮箱字段加回来再让端点出**。端点的脱敏过滤是兜底，别依赖它而推任意 PII 进 source。

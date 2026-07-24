@@ -10,9 +10,11 @@ interface Props {
   title?: string;
   description?: string;
   image?: string;
+  /** 404 等错误页用：别再按语言自动跳（否则 /en/不存在 会多跳一次才停）。 */
+  noLangRedirect?: boolean;
 }
 
-const { title, description, image } = Astro.props;
+const { title, description, image, noLangRedirect } = Astro.props;
 const lang = getLangFromUrl(Astro.url);
 const about = lang === 'en' ? aboutEn : aboutZh;
 
@@ -46,6 +48,7 @@ const htmlLang = lang === 'en' ? 'en' : 'zh-CN';
     {ogImage && <meta property="og:image" content={ogImage} />}
     <meta name="twitter:card" content="summary_large_image" />
     {ogImage && <meta name="twitter:image" content={ogImage} />}
+    {!noLangRedirect && (
     <script is:inline>
       // First visit: adapt to the browser language. After a manual switch, remember the choice and stop auto-redirecting.
       (function () {
@@ -63,6 +66,7 @@ const htmlLang = lang === 'en' ? 'en' : 'zh-CN';
         } catch (e) {}
       })();
     </script>
+    )}
   </head>
   <body class="min-h-screen flex flex-col">
     <Header />

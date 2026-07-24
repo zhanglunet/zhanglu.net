@@ -1,0 +1,20 @@
+# Cloudflare Pages headers.
+#
+# 为什么需要：静态构建下端点文件里 `new Response(..., { headers })` 的头不会落盘
+# （Astro 只把 body 写成文件），CORS 实际由托管层决定。线上此前的
+# `access-control-allow-origin: *` 是 CF 的默认行为 —— 不该依赖未声明的默认值。
+# 这里把 agent 依赖的两个头显式钉住。
+
+/api/*
+  Access-Control-Allow-Origin: *
+  Content-Type: application/json; charset=utf-8
+
+/en/api/*
+  Access-Control-Allow-Origin: *
+  Content-Type: application/json; charset=utf-8
+
+/llms.txt
+  Access-Control-Allow-Origin: *
+
+/en/llms.txt
+  Access-Control-Allow-Origin: *

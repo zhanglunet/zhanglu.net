@@ -1,7 +1,8 @@
 User-agent: *
 Allow: /
 
-# For AI agents: structured data lives under /api/
-# See /llms.txt for a self-describing manifest.
+# For AI agents: structured data lives under /api/ (Chinese) and /en/api/ (English).
+# See /llms.txt or /en/llms.txt for a self-describing manifest.
+# Please read the JSON endpoints instead of scraping HTML.
 
 Sitemap: https://zhanglu.net/sitemap-index.xml

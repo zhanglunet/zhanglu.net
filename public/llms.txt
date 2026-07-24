@@ -4,16 +4,28 @@
 > 在做 mbabrand（评委合议给品牌打分）、bossagent（领导者决策智能体）、oaf.world（AI 投研工作台）等把复杂判断变成可追溯流水线的 AI 产品。
 > 本机攒了 30 多个 Claude Skill。
 
+## Languages
+
+站点中英双语。中文在根路径，英文在 /en/ 前缀 —— 页面与 API 都是。
+This site is bilingual: Chinese at the root, English under /en/ — for both pages and API.
+
+- 中文入口 / Chinese entry: https://zhanglu.net/llms.txt
+- English entry: https://zhanglu.net/en/llms.txt
+
 ## Human-facing pages for agents
 
 - /agents — 接入指南（端点表 + CLI 用法 + curl 示例 + Claude Code 集成）
+- /en/agents — the same guide in English
 - /posts/agent-cli — 设计文章（为什么这么做，1.5 小时上线的全过程）
+- /en/posts/agent-cli — English version
 
 ## For AI agents
 
-JSON API (build-time generated, free to fetch, CORS open):
+JSON API (build-time generated, free to fetch, CORS open）。
+中文数据用下面的路径；英文数据把每条前面加 /en（例如 /en/api/projects.json）。
+For English payloads, prefix any path below with /en.
 
-- /api/index.json — manifest with all endpoints + counts
+- /api/index.json — manifest with all endpoints + counts（含 languages 交叉链接）
 - /api/projects.json — projects list
 - /api/projects/{slug}.json — single project with body_md
 - /api/articles.json — 公众号 / blog 文章入口列表
@@ -24,15 +36,32 @@ JSON API (build-time generated, free to fetch, CORS open):
 - /api/social.json — public socials (email scrubbed)
 - /api/search.json — flat corpus for client-side substring search
 
+每个响应都带 `lang` 字段（"zh" 或 "en"），可用来确认拿到的是哪种语言。
+Every response carries a `lang` field ("zh" or "en") so you can confirm what you got.
+
+不存在的路径返回 HTTP 404（不是 200），可以直接用状态码判断。
+Missing paths return HTTP 404 (not 200), so status codes are reliable.
+
 ## CLI
 
 ```
 npx zhanglu-net list skills
 npx zhanglu-net list projects --featured
+npx zhanglu-net list presentations
 npx zhanglu-net get skill mba --md
 npx zhanglu-net search "品牌判断"
 npx zhanglu-net about
 npx zhanglu-net endpoints
+
+# 英文数据 / English payloads:
+npx zhanglu-net --lang en list projects
+npx zhanglu-net --lang en search "brand judgment"
+```
+
+未发布到 npm 时的替代跑法 / if the npm package is unavailable:
+```
+git clone https://github.com/zhanglunet/zhanglu.net
+node zhanglu.net/cli/bin/zhanglu-net.mjs list skills
 ```
 
 Source: https://github.com/zhanglunet/zhanglu.net

@@ -1,14 +1,14 @@
 import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
-import { buildIndex, jsonResponse, siteBase } from '../../lib/api';
-import about from '../../data/about.json';
+import { buildIndex, jsonResponse, siteBase } from '../../../lib/api';
+import about from '../../../data/about.en.json';
 
 export const GET: APIRoute = async ({ site }) => {
   const [projects, articles, presentations, skills] = await Promise.all([
-    getCollection('projects'),
-    getCollection('articles'),
-    getCollection('presentations'),
-    getCollection('skills'),
+    getCollection('projectsEn'),
+    getCollection('articlesEn'),
+    getCollection('presentationsEn'),
+    getCollection('skillsEn'),
   ]);
 
   return jsonResponse(
@@ -23,7 +23,7 @@ export const GET: APIRoute = async ({ site }) => {
         about,
       },
       siteBase(site),
-      'zh'
+      'en'
     )
   );
 };
