@@ -1,11 +1,15 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-interface Props { entry: CollectionEntry<'articles'> }
+import { getLangFromUrl } from '../i18n/utils';
+import { useTranslations } from '../i18n/ui';
+interface Props { entry: CollectionEntry<'articles'> | CollectionEntry<'articlesEn'> }
 const { entry } = Astro.props;
 const { title, summary, url, date, source, tags } = entry.data;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
 const dateStr = date.toISOString().slice(0, 10);
 const sourceLabel: Record<string, string> = {
-  wechat: '公众号', substack: 'Substack', blog: '博客', x: 'X', other: '其它',
+  wechat: t('src.wechat'), substack: t('src.substack'), blog: t('src.blog'), x: t('src.x'), other: t('src.other'),
 };
 const siteOrigin = Astro.site?.origin ?? 'https://zhanglu.net';
 const isInternal = url.startsWith(siteOrigin) || url.startsWith('/');
@@ -17,7 +21,7 @@ const displayHref = isInternal && url.startsWith(siteOrigin)
   <div class="flex items-baseline gap-3 text-xs text-[var(--color-muted)] mb-1.5">
     <time>{dateStr}</time>
     <span>·</span>
-    <span>{isInternal ? '站内' : (sourceLabel[source] ?? source)}</span>
+    <span>{isInternal ? t('common.onsite') : (sourceLabel[source] ?? source)}</span>
   </div>
   <h3 class="font-serif text-lg font-semibold mb-1.5">
     <a

@@ -1,16 +1,20 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-interface Props { entry: CollectionEntry<'projects'> }
+import { getLangFromUrl, localizePath } from '../i18n/utils';
+import { useTranslations } from '../i18n/ui';
+interface Props { entry: CollectionEntry<'projects'> | CollectionEntry<'projectsEn'> }
 const { entry } = Astro.props;
 const { title, tagline, url, tech, year, status, loc, persona, cover } = entry.data;
-const detailHref = `/projects/${entry.slug}`;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const detailHref = localizePath(`/projects/${entry.slug}`, lang);
 ---
 <article class="group border border-[var(--color-rule)] rounded-md overflow-hidden hover:border-[var(--color-ink)] transition-colors bg-white/40">
   {cover && (
     <a href={detailHref} class="block aspect-[16/9] overflow-hidden bg-[var(--color-paper-2)] border-b border-[var(--color-rule)]">
       <img
         src={cover}
-        alt={`${title} 网站截图`}
+        alt={t('card.shot', { x: title })}
         loading="lazy"
         class="w-full h-full object-cover object-top group-hover:scale-[1.015] transition-transform duration-300"
       />
@@ -25,7 +29,7 @@ const detailHref = `/projects/${entry.slug}`;
     </div>
     {persona && (
       <p class="mb-2">
-        <span class="inline-block px-2 py-0.5 text-xs rounded bg-[var(--color-paper-2)] text-[var(--color-accent)] font-medium">为 {persona} 设计</span>
+        <span class="inline-block px-2 py-0.5 text-xs rounded bg-[var(--color-paper-2)] text-[var(--color-accent)] font-medium">{t('card.builtFor', { x: persona })}</span>
       </p>
     )}
     <p class="text-[var(--color-muted)] text-sm leading-relaxed mb-3">{tagline}</p>
@@ -37,16 +41,16 @@ const detailHref = `/projects/${entry.slug}`;
         <span class="px-2 py-0.5 border border-[var(--color-rule)] rounded text-[var(--color-muted)]">{status}</span>
       )}
       {loc && (
-        <span class="ml-auto font-mono text-[var(--color-muted)]" title="源码行数（cloc 统计，排除文档/数据/生成物）">≈ {loc.toLocaleString()} 行</span>
+        <span class="ml-auto font-mono text-[var(--color-muted)]" title={t('card.locTitle')}>{t('card.loc', { x: loc.toLocaleString() })}</span>
       )}
     </div>
     <div class="mt-4 flex gap-4 text-sm">
       {url && (
         <a href={url} class="text-[var(--color-accent)] hover:underline" target="_blank" rel="noopener">
-          访问 →
+          {t('common.visit')}
         </a>
       )}
-      <a href={detailHref} class="text-[var(--color-muted)] hover:text-[var(--color-ink)]">详情</a>
+      <a href={detailHref} class="text-[var(--color-muted)] hover:text-[var(--color-ink)]">{t('common.details')}</a>
     </div>
   </div>
 </article>

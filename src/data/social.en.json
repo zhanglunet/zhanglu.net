@@ -1,0 +1,23 @@
+{
+  "links": [
+    {
+      "label": "GitHub",
+      "handle": "@zhanglunet",
+      "url": "https://github.com/zhanglunet",
+      "icon": "github"
+    },
+    {
+      "label": "X",
+      "handle": "@zhanglu",
+      "url": "https://x.com/zhanglu",
+      "icon": "x"
+    },
+    {
+      "label": "WeChat",
+      "handle": "Zhang Lu's Murmurs",
+      "url": "",
+      "qrcode": "/wechat-qr.jpg",
+      "icon": "wechat"
+    }
+  ]
+}

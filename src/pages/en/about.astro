@@ -1,0 +1,23 @@
+---
+import Base from '../../layouts/Base.astro';
+import SocialLinks from '../../components/SocialLinks.astro';
+import about from '../../data/about.en.json';
+import { useTranslations } from '../../i18n/ui';
+const t = useTranslations('en');
+---
+<Base title="About" description={about.bio}>
+  <section class="py-6">
+    <h1 class="font-serif text-3xl font-semibold mb-4">About</h1>
+    <p class="font-serif text-xl mb-4 leading-snug">{about.tagline}</p>
+    <p class="text-[var(--color-ink)] leading-relaxed max-w-2xl mb-8">{about.bio}</p>
+    <div class="mb-10 flex flex-wrap gap-2">
+      {about.tags.map((tag) => (
+        <span class="text-xs px-2 py-1 bg-[var(--color-paper-2)] rounded font-mono">{tag}</span>
+      ))}
+    </div>
+    <div class="border-t border-[var(--color-rule)] pt-8">
+      <h2 class="font-serif text-xl font-semibold mb-4">{t('about.contact')}</h2>
+      <SocialLinks />
+    </div>
+  </section>
+</Base>

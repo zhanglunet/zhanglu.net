@@ -1,13 +1,22 @@
 ---
-import about from '../data/about.json';
-import social from '../data/social.json';
+import aboutZh from '../data/about.json';
+import aboutEn from '../data/about.en.json';
+import socialZh from '../data/social.json';
+import socialEn from '../data/social.en.json';
+import { getLangFromUrl, localizePath } from '../i18n/utils';
+import { useTranslations } from '../i18n/ui';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const about = lang === 'en' ? aboutEn : aboutZh;
+const social = lang === 'en' ? socialEn : socialZh;
 const year = new Date().getFullYear();
 const visibleLinks = social.links.filter((l) => l.url && !l.url.includes('TODO'));
 ---
 <footer class="border-t border-[var(--color-rule)] mt-16">
   <div class="max-w-4xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-sm text-[var(--color-muted)]">
     <div>
-      © {year} {about.name}. 用 Astro + Cloudflare Pages 搭建。
+      © {year} {about.name}. {t('footer.built')}
     </div>
     <div class="flex items-center gap-4">
       {visibleLinks.map((l) => (
@@ -15,8 +24,8 @@ const visibleLinks = social.links.filter((l) => l.url && !l.url.includes('TODO')
           {l.label}
         </a>
       ))}
-      <a href="/brand" class="hover:text-[var(--color-ink)] transition-colors">品牌</a>
-      <a href="/rss.xml" class="hover:text-[var(--color-ink)] transition-colors">RSS</a>
+      <a href={localizePath('/brand', lang)} class="hover:text-[var(--color-ink)] transition-colors">{t('footer.brand')}</a>
+      <a href="/rss.xml" class="hover:text-[var(--color-ink)] transition-colors">{t('footer.rss')}</a>
     </div>
   </div>
 </footer>

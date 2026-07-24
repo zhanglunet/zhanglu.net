@@ -1,6 +1,11 @@
 ---
-import social from '../data/social.json';
-const links = social.links;
+import socialZh from '../data/social.json';
+import socialEn from '../data/social.en.json';
+import { getLangFromUrl } from '../i18n/utils';
+import { useTranslations } from '../i18n/ui';
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const links = (lang === 'en' ? socialEn : socialZh).links;
 ---
 <ul class="space-y-4">
   {links.map((l) => (
@@ -14,9 +19,9 @@ const links = social.links;
         ) : l.qrcode ? (
           <details class="group">
             <summary class="cursor-pointer text-[var(--color-accent)] hover:underline list-none">
-              {l.handle} <span class="text-xs text-[var(--color-muted)] group-open:hidden">[展开二维码]</span><span class="text-xs text-[var(--color-muted)] hidden group-open:inline">[收起]</span>
+              {l.handle} <span class="text-xs text-[var(--color-muted)] group-open:hidden">{t('social.qropen')}</span><span class="text-xs text-[var(--color-muted)] hidden group-open:inline">{t('social.qrclose')}</span>
             </summary>
-            <img src={l.qrcode} alt={`${l.label} 二维码`} width="180" height="180" class="mt-3 rounded border border-[var(--color-rule)]" />
+            <img src={l.qrcode} alt={t('social.qralt', { x: l.label })} width="180" height="180" class="mt-3 rounded border border-[var(--color-rule)]" />
           </details>
         ) : (
           <span class="text-[var(--color-muted)]">{l.handle}</span>

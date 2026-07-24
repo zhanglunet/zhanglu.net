@@ -1,13 +1,16 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-interface Props { entry: CollectionEntry<'skills'> }
+import { getLangFromUrl, localizePath } from '../i18n/utils';
+interface Props { entry: CollectionEntry<'skills'> | CollectionEntry<'skillsEn'> }
 const { entry } = Astro.props;
 const { name, description, featured, handwritten } = entry.data;
+const lang = getLangFromUrl(Astro.url);
+const skillHref = localizePath(`/skills/${entry.slug}`, lang);
 ---
 <article class="border border-[var(--color-rule)] rounded-md p-4 hover:border-[var(--color-ink)] transition-colors">
   <div class="flex items-start justify-between gap-2 mb-1.5">
     <h3 class="font-mono text-sm font-semibold">
-      <a href={`/skills/${entry.slug}`} class="hover:text-[var(--color-accent)]">
+      <a href={skillHref} class="hover:text-[var(--color-accent)]">
         /{name}
       </a>
     </h3>
