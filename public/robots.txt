@@ -1,5 +1,47 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Content Signals Policy —— https://contentsignals.org
+#
+# 这段前言是该政策的标准文本（逐字保留，别改措辞：它的法律效力来自原文）。
+# 2026-07-25 之前这段由 Cloudflare 的 managed robots.txt 自动注入，同时还注入了
+# 对 ClaudeBot / GPTBot / CCBot 等 9 个 AI 爬虫的 Disallow —— 与本站「欢迎 agent
+# 读 /api/」的意图冲突，已在 CF dashboard（AI Crawl Control）关掉整段。
+# 关掉后训练声明也一起没了，所以现在把 Content-Signal 写进仓库自己管，
+# 不再依赖 CF 的开关。
+# ─────────────────────────────────────────────────────────────────────────────
+
+# As a condition of accessing this website, you agree to abide by the following
+# content signals:
+
+# (a)  If a Content-Signal = yes, you may collect content for the corresponding
+#      use.
+# (b)  If a Content-Signal = no, you may not collect content for the
+#      corresponding use.
+# (c)  If the website operator does not include a Content-Signal for a
+#      corresponding use, the website operator neither grants nor restricts
+#      permission via Content-Signal with respect to the corresponding use.
+
+# The content signals and their meanings are:
+
+# search:   building a search index and providing search results (e.g., returning
+#           hyperlinks and short excerpts from your website's contents). Search does not
+#           include providing AI-generated search summaries.
+# ai-input: inputting content into one or more AI models (e.g., retrieval
+#           augmented generation, grounding, or other real-time taking of content for
+#           generative AI search answers).
+# ai-train: training or fine-tuning AI models.
+
+# ANY RESTRICTIONS EXPRESSED VIA CONTENT SIGNALS ARE EXPRESS RESERVATIONS OF
+# RIGHTS UNDER ARTICLE 4 OF THE EUROPEAN UNION DIRECTIVE 2019/790 ON COPYRIGHT
+# AND RELATED RIGHTS IN THE DIGITAL SINGLE MARKET.
+
 User-agent: *
+Content-Signal: search=yes, ai-input=yes, ai-train=no
 Allow: /
+
+# 本站立场：欢迎索引、欢迎 agent 实时读取并引用（这就是 /api/ 存在的理由），
+# 但不同意被用于模型训练。
+# Our stance: indexing and real-time agent reading / citing are welcome
+# (that's what /api/ is for); training on this content is not granted.
 
 # For AI agents: structured data lives under /api/ (Chinese) and /en/api/ (English).
 # See /llms.txt or /en/llms.txt for a self-describing manifest.

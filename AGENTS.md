@@ -454,6 +454,31 @@ YAML `|` block 在 frontmatter 里保留 `\n`，但 HTML 默认折叠空白。`S
 
 项目 `cover` 字段现在**会渲染**（ProjectCard 顶部 banner + 详情页），不再是"暂未渲染"。presentations 的 cover 仍未渲染。
 
+### 9.10 线上 robots.txt 可能和仓库不一致（Cloudflare 会注入）
+
+**症状**：`curl https://zhanglu.net/robots.txt` 的内容比 `public/robots.txt` 多出一大段，
+以 `# BEGIN Cloudflare Managed content` / `# END Cloudflare Managed Content` 包裹，
+里面对 `ClaudeBot` / `GPTBot` / `CCBot` / `Google-Extended` / `Applebot-Extended` /
+`meta-externalagent` / `Bytespider` / `Amazonbot` / `CloudflareBrowserRenderingCrawler`
+逐个 `Disallow: /`。
+
+**为什么要在意**：本站整套 agent 接入层（§14）就是为了让 AI agent 来读 `/api/`，
+这段注入等于把主流 AI 爬虫挡在门外 —— 意图直接冲突。而且**你在 `public/robots.txt` 里写
+`User-agent: * / Allow: /` 是覆盖不掉它的**：robots.txt 规则里具体 UA 段优先于 `*`。
+
+**它不在仓库里，改不到**。开关在 Cloudflare dashboard：
+选账号 → 选 `zhanglu.net` 域 → **AI Crawl Control** →
+`Crawlers` 标签页逐个爬虫设 Allow / Block，或 `Robots.txt` 标签页整体关掉 managed robots.txt。
+（Content Signals 单独的开关在 Security → Settings。）
+
+**当前状态（2026-07-25 起）**：已在 dashboard 关掉整段注入，线上 robots.txt 与仓库逐字一致。
+关掉后 CF 的 `Content-Signal: ai-train=no` 也一并消失，所以**训练声明已改为写进
+`public/robots.txt` 自己管**（`search=yes, ai-input=yes, ai-train=no`，含 Content Signals Policy
+标准前言 —— 那段前言逐字保留，法律效力来自原文，别改措辞）。
+
+**如果哪天线上又冒出 `BEGIN Cloudflare Managed content`**：就是那个 dashboard 开关被重新打开了，
+不是仓库出了问题，别去改 `public/robots.txt` 试图绕过。
+
 ### 9.8 手机端横向溢出的三个惯犯
 
 390px 视口下把页面撑破的三类元素（已修，新增内容别再犯）：
