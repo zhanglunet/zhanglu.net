@@ -32,6 +32,8 @@ For English payloads, prefix any path below with /en.
 - /api/presentations.json — 网页版 PPT 与相关站点入口
 - /api/skills.json — Claude Skills 索引
 - /api/skills/{slug}.json — single skill with body_md
+- /api/weekly.json — 公开周报（脱敏版）列表
+- /api/weekly/{slug}.json — 单篇周报 with body_md
 - /api/about.json — bio + tags
 - /api/social.json — public socials (email scrubbed)
 - /api/search.json — flat corpus for client-side substring search
@@ -48,6 +50,7 @@ Missing paths return HTTP 404 (not 200), so status codes are reliable.
 npx zhanglu-net list skills
 npx zhanglu-net list projects --featured
 npx zhanglu-net list presentations
+npx zhanglu-net list weekly
 npx zhanglu-net get skill mba --md
 npx zhanglu-net search "品牌判断"
 npx zhanglu-net about

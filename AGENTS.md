@@ -535,6 +535,8 @@ YAML `|` block 在 frontmatter 里保留 `\n`，但 HTML 默认折叠空白。`S
 | `/api/presentations.json` | `src/pages/api/presentations.json.ts` | 网页 PPT / 站点入口 |
 | `/api/skills.json` | `src/pages/api/skills.json.ts` | Skill 索引 |
 | `/api/skills/{slug}.json` | `src/pages/api/skills/[slug].json.ts` | 单 skill（含 `body_md`）|
+| `/api/weekly.json` | `src/pages/api/weekly.json.ts` | 公开周报列表 |
+| `/api/weekly/{slug}.json` | `src/pages/api/weekly/[slug].json.ts` | 单篇周报（含 `body_md`）|
 | `/api/about.json` | `src/pages/api/about.json.ts` | 简介 |
 | `/api/social.json` | `src/pages/api/social.json.ts` | 公开社交（过滤邮箱）|
 | `/api/search.json` | `src/pages/api/search.json.ts` | 扁平语料给 CLI 客户端搜 |

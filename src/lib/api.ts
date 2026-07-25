@@ -64,6 +64,14 @@ type SkillEntry = {
   };
 };
 
+type WeeklyEntry = {
+  slug: string;
+  body: string;
+  data: {
+    title: string; week: string; dateRange: string; date: Date; summary: string;
+  };
+};
+
 type AboutData = {
   name: string; handle: string; tagline: string; bio: string;
   tags: string[]; location: string; avatar: string;
@@ -190,6 +198,40 @@ export function buildSkillDetail(entry: SkillEntry, base: string, lang: Lang) {
   };
 }
 
+// ─────────────────────────────── weekly ───────────────────────────────
+
+function weeklyCore(w: WeeklyEntry, base: string, lang: Lang) {
+  return {
+    slug: w.slug,
+    title: w.data.title,
+    week: w.data.week,
+    date_range: w.data.dateRange,
+    date: w.data.date.toISOString().slice(0, 10),
+    summary: w.data.summary,
+    permalink: `${base}${langPrefix(lang)}/weekly/${w.slug}`,
+  };
+}
+
+export function buildWeeklyList(entries: WeeklyEntry[], base: string, lang: Lang) {
+  const items = entries
+    .slice()
+    .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+    .map((w) => ({
+      ...weeklyCore(w, base, lang),
+      body_url: `${base}${langPrefix(lang)}/api/weekly/${w.slug}.json`,
+    }));
+  return { version: '1', lang, count: items.length, items };
+}
+
+export function buildWeeklyDetail(entry: WeeklyEntry, base: string, lang: Lang) {
+  return {
+    version: '1',
+    lang,
+    ...weeklyCore(entry, base, lang),
+    body_md: entry.body,
+  };
+}
+
 // ─────────────────────────── about / social ───────────────────────────
 
 export function buildAbout(about: AboutData, base: string, lang: Lang) {
@@ -231,13 +273,14 @@ type SearchInput = {
   articles: ArticleEntry[];
   presentations: PresentationEntry[];
   skills: SkillEntry[];
+  weekly: WeeklyEntry[];
   about: AboutData;
 };
 
 export function buildSearch(input: SearchInput, base: string, lang: Lang) {
   const prefix = langPrefix(lang);
   type Item = {
-    type: 'skill' | 'project' | 'article' | 'presentation' | 'about';
+    type: 'skill' | 'project' | 'article' | 'presentation' | 'weekly' | 'about';
     slug: string; title: string; text: string; url: string;
   };
   const items: Item[] = [];
@@ -290,13 +333,23 @@ export function buildSearch(input: SearchInput, base: string, lang: Lang) {
     });
   }
 
+  for (const w of input.weekly) {
+    items.push({
+      type: 'weekly',
+      slug: w.slug,
+      title: w.data.title,
+      text: [w.data.title, w.data.week, w.data.dateRange, w.data.summary, w.body].join('\n'),
+      url: `${base}${prefix}/weekly/${w.slug}`,
+    });
+  }
+
   return { version: '1', lang, count: items.length, items };
 }
 
 // ─────────────────────────────── manifest ─────────────────────────────
 
 type IndexInput = {
-  counts: { projects: number; articles: number; presentations: number; skills: number };
+  counts: { projects: number; articles: number; presentations: number; skills: number; weekly: number };
   about: AboutData;
 };
 
@@ -318,6 +371,8 @@ export function buildIndex(input: IndexInput, base: string, lang: Lang) {
       presentations: `${base}${p}/api/presentations.json`,
       skills: `${base}${p}/api/skills.json`,
       skill: `${base}${p}/api/skills/{slug}.json`,
+      weekly: `${base}${p}/api/weekly.json`,
+      weekly_entry: `${base}${p}/api/weekly/{slug}.json`,
       about: `${base}${p}/api/about.json`,
       social: `${base}${p}/api/social.json`,
       search: `${base}${p}/api/search.json`,

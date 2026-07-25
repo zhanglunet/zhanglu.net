@@ -3,11 +3,12 @@ import { readFileSync } from 'node:fs';
 import Base from '../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 
-const [projects, articles, presentations, skills] = await Promise.all([
+const [projects, articles, presentations, skills, weekly] = await Promise.all([
   getCollection('projects'),
   getCollection('articles'),
   getCollection('presentations'),
   getCollection('skills'),
+  getCollection('weekly'),
 ]);
 
 // build 时数出来，别写死 —— 写死的数字漂过一次（文案说 270 行，实际早就不是）
@@ -23,6 +24,8 @@ const endpoints: Array<{ path: string; desc: string; sample?: string }> = [
   { path: '/api/presentations.json',   desc: '网页版 PPT / 站点入口',             sample: `{ "count": ${presentations.length}, "items": [{ "slug", "title", "tagline", "url", "kind", "year" }] }` },
   { path: '/api/skills.json',          desc: 'Claude Skills 索引',                sample: `{ "count": ${skills.length}, "items": [{ "slug", "name", "description", "source", "featured" }] }` },
   { path: '/api/skills/{slug}.json',   desc: '单 skill（含 body_md）',            sample: '{ …list 字段, "body_md": "本 skill 来源于…" }' },
+  { path: '/api/weekly.json',          desc: '公开周报（脱敏版）',                 sample: `{ "count": ${weekly.length}, "items": [{ "slug", "title", "week", "date_range", "summary" }] }` },
+  { path: '/api/weekly/{slug}.json',   desc: '单篇周报（含 body_md）',            sample: '{ …list 字段, "body_md": "## 三个产品…" }' },
   { path: '/api/about.json',           desc: '作者简介 + tags',                   sample: '{ "name": "张路", "tagline", "bio", "tags": [], "permalink" }' },
   { path: '/api/social.json',          desc: '公开社交链接（邮箱已脱敏）',         sample: '{ "links": [{ "label", "url", "handle", "icon" }] }' },
   { path: '/api/search.json',          desc: '扁平语料给 CLI 客户端搜',           sample: '{ "items": [{ "type", "slug", "title", "text", "url" }] }' },
@@ -118,9 +121,9 @@ npx zhanglu-net --lang en about --json</code></pre>
     <div class="text-sm">
       <div class="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 font-mono wrap-anywhere">
         <code class="text-[var(--color-accent)]">list &lt;kind&gt;</code>
-        <span class="text-[var(--color-muted)]">列出 skills / projects / articles / presentations</span>
+        <span class="text-[var(--color-muted)]">列出 skills / projects / articles / presentations / weekly</span>
         <code class="text-[var(--color-accent)]">get &lt;kind&gt; &lt;slug&gt;</code>
-        <span class="text-[var(--color-muted)]">读一条 skill / project / article / presentation</span>
+        <span class="text-[var(--color-muted)]">读一条 skill / project / article / presentation / weekly</span>
         <code class="text-[var(--color-accent)]">search &lt;keyword&gt;</code>
         <span class="text-[var(--color-muted)]">在所有内容里搜关键词</span>
         <code class="text-[var(--color-accent)]">about</code>
@@ -149,7 +152,7 @@ npx zhanglu-net --lang en about --json</code></pre>
       <code class="text-[var(--color-accent)]">--status &lt;s&gt;</code>
       <span class="text-[var(--color-muted)]">按 status 过滤（list projects）</span>
       <code class="text-[var(--color-accent)]">--type &lt;t&gt;</code>
-      <span class="text-[var(--color-muted)]">只搜 skill / project / article</span>
+      <span class="text-[var(--color-muted)]">只搜某类型：skill|project|article|presentation|weekly|about</span>
       <code class="text-[var(--color-accent)]">--since &lt;date&gt;</code>
       <span class="text-[var(--color-muted)]">按日期过滤（list articles）</span>
       <code class="text-[var(--color-accent)]">--limit &lt;N&gt;</code>

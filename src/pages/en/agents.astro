@@ -3,11 +3,12 @@ import { readFileSync } from 'node:fs';
 import Base from '../../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 
-const [projects, articles, presentations, skills] = await Promise.all([
+const [projects, articles, presentations, skills, weekly] = await Promise.all([
   getCollection('projectsEn'),
   getCollection('articlesEn'),
   getCollection('presentationsEn'),
   getCollection('skillsEn'),
+  getCollection('weeklyEn'),
 ]);
 
 // Counted at build time — don't hardcode it (the old hardcoded number drifted).
@@ -23,6 +24,8 @@ const endpoints: Array<{ path: string; desc: string; sample?: string }> = [
   { path: '/en/api/presentations.json',   desc: 'Web decks / site entries',              sample: `{ "count": ${presentations.length}, "items": [{ "slug", "title", "tagline", "url", "kind", "year" }] }` },
   { path: '/en/api/skills.json',          desc: 'Claude Skills index',                   sample: `{ "count": ${skills.length}, "items": [{ "slug", "name", "description", "source", "featured" }] }` },
   { path: '/en/api/skills/{slug}.json',   desc: 'Single skill (with body_md)',           sample: '{ …list fields, "body_md": "This skill comes from…" }' },
+  { path: '/en/api/weekly.json',          desc: 'Public weekly notes (redacted)',        sample: `{ "count": ${weekly.length}, "items": [{ "slug", "title", "week", "date_range", "summary" }] }` },
+  { path: '/en/api/weekly/{slug}.json',   desc: 'Single weekly note (with body_md)',     sample: '{ …list fields, "body_md": "## Three products…" }' },
   { path: '/en/api/about.json',           desc: 'Author bio + tags',                     sample: '{ "name": "Zhang Lu", "tagline", "bio", "tags": [], "permalink" }' },
   { path: '/en/api/social.json',          desc: 'Public social links (email redacted)',  sample: '{ "links": [{ "label", "url", "handle", "icon" }] }' },
   { path: '/en/api/search.json',          desc: 'Flat corpus for CLI-side search',       sample: '{ "items": [{ "type", "slug", "title", "text", "url" }] }' },
@@ -114,9 +117,9 @@ npx zhanglu-net --lang en about --json</code></pre>
     <div class="text-sm">
       <div class="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 font-mono wrap-anywhere">
         <code class="text-[var(--color-accent)]">list &lt;kind&gt;</code>
-        <span class="text-[var(--color-muted)]">List skills / projects / articles / presentations</span>
+        <span class="text-[var(--color-muted)]">List skills / projects / articles / presentations / weekly</span>
         <code class="text-[var(--color-accent)]">get &lt;kind&gt; &lt;slug&gt;</code>
-        <span class="text-[var(--color-muted)]">Read a single skill / project / article / presentation</span>
+        <span class="text-[var(--color-muted)]">Read a single skill / project / article / presentation / weekly</span>
         <code class="text-[var(--color-accent)]">search &lt;keyword&gt;</code>
         <span class="text-[var(--color-muted)]">Search a keyword across all content</span>
         <code class="text-[var(--color-accent)]">about</code>
@@ -143,7 +146,7 @@ npx zhanglu-net --lang en about --json</code></pre>
       <code class="text-[var(--color-accent)]">--status &lt;s&gt;</code>
       <span class="text-[var(--color-muted)]">Filter by status (list projects)</span>
       <code class="text-[var(--color-accent)]">--type &lt;t&gt;</code>
-      <span class="text-[var(--color-muted)]">Search one type: skill|project|article|presentation|about</span>
+      <span class="text-[var(--color-muted)]">Search one type: skill|project|article|presentation|weekly|about</span>
       <code class="text-[var(--color-accent)]">--since &lt;date&gt;</code>
       <span class="text-[var(--color-muted)]">Filter by date (list articles)</span>
       <code class="text-[var(--color-accent)]">--limit &lt;N&gt;</code>

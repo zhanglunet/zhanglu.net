@@ -48,6 +48,7 @@ const KINDS = {
   projects: { singular: 'project', perSlug: true },
   articles: { singular: 'article', perSlug: false },
   presentations: { singular: 'presentation', perSlug: false },
+  weekly: { singular: 'weekly', perSlug: true },
 };
 const KIND_LIST = Object.keys(KINDS);
 const SINGULAR_TO_PLURAL = Object.fromEntries(
@@ -75,7 +76,7 @@ ${c.bold('FLAGS')}
   --featured           只看 featured 项
   --source <s>         按 source 过滤（list skills/articles）
   --status <s>         按 status 过滤（list projects）
-  --type <t>           只搜某类型（search）：skill|project|article|presentation|about
+  --type <t>           只搜某类型（search）：skill|project|article|presentation|weekly|about
   --since <YYYY-MM-DD> 按日期过滤（list articles）
   --limit <N>          最多 N 项
   --md                 get 时只输出 body_md
@@ -121,7 +122,7 @@ const CMD_HELP = {
   get: `${c.bold('get <kind> <slug>')} — 读一条内容（含正文）
 
   kind:  ${Object.values(KINDS).map((k) => k.singular).join(' | ')}
-  ${c.dim(`skill / project 有独立端点；article / presentation 从列表里取（无 body_md）`)}
+  ${c.dim(`skill / project / weekly 有独立端点（带 body_md）；article / presentation 从列表里取（无正文）`)}
 
   相关 flags:
     --md                 只输出 body_md（适合喂给模型；优先于 --json）
@@ -135,11 +136,11 @@ const CMD_HELP = {
 
   search: `${c.bold('search <keyword>')} — 在全语料里做子串搜索
 
-  打 /api/search.json（约 48 条：projects + articles + presentations + skills + about），
+  打 /api/search.json（projects + articles + presentations + skills + weekly + about），
   客户端匹配。标题命中额外加权。
 
   相关 flags:
-    --type <t>           skill | project | article | presentation | about
+    --type <t>           skill | project | article | presentation | weekly | about
     --limit <N>          最多 N 项
     --lang <zh|en>       语言 ${c.dim('（中文语料搜中文词，英文语料搜英文词）')}
     --json               原始 JSON
@@ -314,7 +315,14 @@ async function cmdGet(ctx, kind, slug, flags) {
   }
   if (flags.json) return out(item);
 
-  if (kind === 'skill') {
+  if (kind === 'weekly') {
+    process.stdout.write(c.bold(item.title) + ' ' + c.dim(`(${item.week})`) + '\n');
+    process.stdout.write(c.dim(item.date_range) + '\n');
+    process.stdout.write(c.dim('─'.repeat(tableWidth())) + '\n');
+    process.stdout.write((item.summary || '').trim() + '\n\n');
+    if (item.body_md) process.stdout.write(item.body_md.trim() + '\n');
+    process.stdout.write('\n' + c.cyan(item.permalink) + '\n');
+  } else if (kind === 'skill') {
     process.stdout.write(
       c.bold(`/${item.name}`) +
         ' ' +
@@ -346,12 +354,12 @@ async function cmdGet(ctx, kind, slug, flags) {
 
 async function cmdSearch(ctx, kw, flags) {
   if (!kw) {
-    die('usage: npx zhanglu-net search <keyword> [--type skill|project|article|presentation|about] [--limit N]');
+    die('usage: npx zhanglu-net search <keyword> [--type skill|project|article|presentation|weekly|about] [--limit N]');
   }
   const data = await fetchJson(ctx.base, ctx.prefix, '/api/search.json');
   const needle = kw.toLowerCase();
 
-  const TYPES = ['skill', 'project', 'article', 'presentation', 'about'];
+  const TYPES = ['skill', 'project', 'article', 'presentation', 'weekly', 'about'];
   if (flags.type && !TYPES.includes(flags.type)) {
     die(`unknown --type "${flags.type}". try: ${TYPES.join(' / ')}`);
   }
@@ -400,7 +408,7 @@ async function cmdSearch(ctx, kw, flags) {
   }
   for (const h of hits) {
     const badge =
-      { skill: '[skill]  ', project: '[project]', article: '[article]', presentation: '[deck]   ', about: '[about]  ' }[
+      { skill: '[skill]  ', project: '[project]', article: '[article]', presentation: '[deck]   ', weekly: '[weekly] ', about: '[about]  ' }[
         h.type
       ] || `[${h.type}]`;
     process.stdout.write(

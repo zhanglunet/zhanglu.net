@@ -70,6 +70,28 @@ Agent 接入层现在双语齐备：`/api/*`（中）+ `/en/api/*`（英），CL
 在此之前 `/agents`、`llms.txt`、README 都已给出 `node cli/bin/zhanglu-net.mjs` 的替代跑法，
 所以文案不再是空头承诺。
 
-**已知未做（超出 A/B 范围）**：`/api/weekly.json` 仍不存在（weekly 集合有中英两份内容但没端点）；
-线上 `robots.txt` 被 Cloudflare 注入的 Managed content 段仍对 ClaudeBot / GPTBot 等 `Disallow: /`
+**已知未做**：线上 `robots.txt` 被 Cloudflare 注入的 Managed content 段仍对 ClaudeBot / GPTBot 等 `Disallow: /`
 —— 那是 CF dashboard 的设置，改不到仓库里。
+
+---
+
+## 追加（同日）：`/api/weekly.json`
+
+用户要求把漏掉的 weekly 端点补上。因为字段形状已经收在 `src/lib/api.ts`，这次是**照流程走**而不是再造轮子：
+
+- `src/lib/api.ts` — 加 `buildWeeklyList` / `buildWeeklyDetail`（`weeklyCore` 保证列表与详情不漂），
+  `buildSearch` 加 weekly 语料，`buildIndex` 加 `weekly` count + `weekly` / `weekly_entry` 端点。
+- 生成器加两个模板 → `api/weekly.json.ts`、`api/weekly/[slug].json.ts` × zh/en（共 24 个端点文件）。
+- CLI：`KINDS` 表加一行 `weekly: { singular: 'weekly', perSlug: true }` —— `list` / `get` / 帮助文本
+  **全部自动跟上**（这就是上一轮把它做成表驱动的回报）。另加 weekly 显示分支
+  （否则会掉进 project 分支打出 `(undefined, undefined)`）、`--type weekly`、badge。
+- 文档：`llms.txt` ×2、`/agents` ×2 端点表、AGENTS §14.1 表。
+
+**顺带修好一个没人提的漏**：weekly 原本**不在 `/api/search.json` 语料里**（48 条 = 8+5+4+30+1，
+漏了 weekly）。现在 49 条，zh/en 都含。
+
+验证：build Complete（107 页）；`weekly.json` + `weekly/2026-w29.json` × zh/en 全 200；
+zh 列表 `本周做了什么 · 2026-W29`，en 详情 `What I Shipped This Week`；
+search 两语各含 1 条 weekly；CLI `list weekly` / `get weekly` / `--lang en get weekly --md` /
+`search --type weekly` 全过，`list <kind>` 五类 × 两语回归全绿。
+（`search "周报"` 是 0 命中 —— 那篇周报正文里确实没有"周报"这个词，`"本周"` 能命中，属正确行为。）

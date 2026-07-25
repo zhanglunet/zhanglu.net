@@ -4,11 +4,12 @@ import { buildIndex, jsonResponse, siteBase } from '../../../lib/api';
 import about from '../../../data/about.en.json';
 
 export const GET: APIRoute = async ({ site }) => {
-  const [projects, articles, presentations, skills] = await Promise.all([
+  const [projects, articles, presentations, skills, weekly] = await Promise.all([
     getCollection('projectsEn'),
     getCollection('articlesEn'),
     getCollection('presentationsEn'),
     getCollection('skillsEn'),
+    getCollection('weeklyEn'),
   ]);
 
   return jsonResponse(
@@ -19,6 +20,7 @@ export const GET: APIRoute = async ({ site }) => {
           articles: articles.length,
           presentations: presentations.length,
           skills: skills.length,
+          weekly: weekly.length,
         },
         about,
       },

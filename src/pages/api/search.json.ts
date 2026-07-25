@@ -4,14 +4,15 @@ import { buildSearch, jsonResponse, siteBase } from '../../lib/api';
 import about from '../../data/about.json';
 
 export const GET: APIRoute = async ({ site }) => {
-  const [projects, articles, presentations, skills] = await Promise.all([
+  const [projects, articles, presentations, skills, weekly] = await Promise.all([
     getCollection('projects'),
     getCollection('articles'),
     getCollection('presentations'),
     getCollection('skills'),
+    getCollection('weekly'),
   ]);
 
   return jsonResponse(
-    buildSearch({ projects, articles, presentations, skills, about }, siteBase(site), 'zh')
+    buildSearch({ projects, articles, presentations, skills, weekly, about }, siteBase(site), 'zh')
   );
 };
