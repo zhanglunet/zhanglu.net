@@ -70,6 +70,15 @@ Agent 接入层现在双语齐备：`/api/*`（中）+ `/en/api/*`（英），CL
 在此之前 `/agents`、`llms.txt`、README 都已给出 `node cli/bin/zhanglu-net.mjs` 的替代跑法，
 所以文案不再是空头承诺。
 
+> **✅ 已完成（2026-07-25）**：用户在本机发布了 `zhanglu-net@0.2.0`。
+> 独立复核：registry `latest = 0.2.0`、`bin.zhanglu-net` 完好、零依赖、unpacked 24,335 bytes；
+> 从干净环境 `npx -y zhanglu-net@latest` 拉包打线上，中/英文命令与英文搜索全部正常。
+> 至此站上所有 `npx zhanglu-net` 文案对外成立。AGENTS §14.3 已从"第一次发"的待办口气改为
+> "已发布 + bump 流程"。
+>
+> 过程中的一个环境细节：本机没装 nvm、Node 是 Homebrew 的 v25.8.2。查证后确认无需装版本管理器 ——
+> CLI 只要 `>=18`，且 v25 落在 Astro 声明的 `>=22.0.0` 内，`.nvmrc` 的 22 只服务 CF Pages 构建。
+
 **已知未做**：线上 `robots.txt` 被 Cloudflare 注入的 Managed content 段仍对 ClaudeBot / GPTBot 等 `Disallow: /`
 —— 那是 CF dashboard 的设置，改不到仓库里。
 

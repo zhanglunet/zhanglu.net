@@ -578,17 +578,26 @@ CLI 是端点的薄包装。改命令逻辑改 `cli/bin/zhanglu-net.mjs`，改�
 
 ### 14.3 发布到 npm
 
-第一次发：
+**已发布**：`zhanglu-net@0.2.0`（2026-07-25 首发）。`npx zhanglu-net <cmd>` 对任何人可用，
+所以站上 `/agents`、`llms.txt`、`skills/zhanglu` 里的 `npx` 文案都是真的 —— **别再退回"包还没发"的措辞**。
+（`zhanglu` 这个名字在 npm 被别人占了，所以包名和 bin 名都是 `zhanglu-net`。）
+
+后续 bump：**只改 `cli/package.json` 的 `version`** 一处（CLI 里的版本号是运行时 `createRequire`
+读 package.json 的，不存在第二处要同步；这坑踩过一次），然后：
 
 ```bash
 cd cli
-npm login                # 或 npm config set //registry.npmjs.org/:_authToken ...
+npm publish --dry-run          # 先看要发什么：应是 3 个文件（bin/ + README.md + package.json）
 npm publish --access public
 ```
 
-后续 bump 版本：改 `cli/package.json` 的 `version`，`npm publish` 再发一次。
+- 需要 npm 登录态（`npm whoami` 验；没登录 `npm login`）。**远程 agent 会话做不了这步**，留给人。
+- 开了发布 2FA 就加 `--otp=<6位码>`。
+- 本地 Node 只要 ≥18 即可（CLI 零依赖、只用 `parseArgs` / `createRequire`）。`.nvmrc` 的 22 是给 CF Pages 构建的，与 publish 无关。
 
 CLI 与站点端点松耦合 —— 改端点 schema 时若不破坏向下兼容，CLI 不需要发新版。
+反过来：**给 CLI 加 `list`/`get` 新类型只需改 `KINDS` 表**（`list`/`get`/帮助文本都从它派生），
+但如果那个类型的端点还没上线，得先加端点再发 CLI。
 
 ### 14.4 加新端点 / 字段（流程）
 
