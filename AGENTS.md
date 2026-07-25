@@ -321,9 +321,14 @@ CF Pages 构建机没有这个目录 —— 所以 **`/skills` 是「最后一�
 | 先检查再决定 | `pnpm run sync:check` | **只读不写**，有漂移 exit 1。适合放进 git pre-commit hook 或定时提醒 |
 | 全自动 | `pnpm run sync:auto` | 同步 → 校验 → 构建 → 提交 → 推送，一条龙。配 launchd 可定时跑 |
 
-**定时自动跑（macOS launchd）** —— 存成 `~/Library/LaunchAgents/net.zhanglu.sync-skills.plist`：
+**定时自动跑（macOS launchd）** —— 整段可直接粘进终端（会自动用你的真实仓库路径生成 plist）：
 
-```xml
+```bash
+REPO="$HOME/zhanglu"                                  # 仓库真实路径，不对就改这里
+ls "$REPO/scripts/auto-sync-skills.sh" || echo "❌ 路径不对，先改 REPO"
+
+mkdir -p ~/Library/LaunchAgents
+cat > ~/Library/LaunchAgents/net.zhanglu.sync-skills.plist <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0"><dict>
@@ -331,18 +336,44 @@ CF Pages 构建机没有这个目录 —— 所以 **`/skills` 是「最后一�
   <key>ProgramArguments</key>
   <array>
     <string>/bin/bash</string>
-    <string>/Users/john/zhanglu/scripts/auto-sync-skills.sh</string>
+    <string>$REPO/scripts/auto-sync-skills.sh</string>
   </array>
   <key>StartCalendarInterval</key><dict><key>Hour</key><integer>9</integer><key>Minute</key><integer>0</integer></dict>
   <key>StandardOutPath</key><string>/tmp/zhanglu-sync-skills.log</string>
   <key>StandardErrorPath</key><string>/tmp/zhanglu-sync-skills.err</string>
+  <key>RunAtLoad</key><false/>
 </dict></plist>
+PLIST
+
+plutil -lint ~/Library/LaunchAgents/net.zhanglu.sync-skills.plist     # 必须打印 OK
+
+launchctl bootout   gui/$(id -u)/net.zhanglu.sync-skills 2>/dev/null  # 清掉旧的（没装过会报错，忽略）
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/net.zhanglu.sync-skills.plist
+launchctl print     gui/$(id -u)/net.zhanglu.sync-skills | head -20   # 确认装上
 ```
 
+立刻试跑一次（不等到 9:00）、看日志、卸载：
+
 ```bash
-launchctl load ~/Library/LaunchAgents/net.zhanglu.sync-skills.plist   # 装上（每天 9:00）
-bash scripts/auto-sync-skills.sh --dry-run                            # 先干跑看看会改什么
-launchctl unload ~/Library/LaunchAgents/net.zhanglu.sync-skills.plist # 卸掉
+launchctl kickstart -p gui/$(id -u)/net.zhanglu.sync-skills   # 手动触发
+tail -f /tmp/zhanglu-sync-skills.log                          # 看输出
+launchctl bootout gui/$(id -u)/net.zhanglu.sync-skills        # 卸载
+```
+
+⚠️ **`launchctl load` / `unload` 是遗留命令**，在新版 macOS 上报错极不透明
+（最典型的就是 `Load failed: 5: Input/output error` —— 实际原因往往只是
+**plist 文件不存在**或 XML 被富文本粘贴弄坏了）。一律用 `bootstrap` / `bootout`，
+并且**先 `plutil -lint` 验一遍**。另外 LaunchAgents 是用户级的，**不要用 `sudo`**。
+
+**不想折腾 launchd** —— 两个更省事的替代：
+
+```bash
+# 1) cron（macOS 仍支持）：crontab -e 加一行，每天 9:00
+0 9 * * * cd $HOME/zhanglu && /bin/bash scripts/auto-sync-skills.sh >> /tmp/zhanglu-sync.log 2>&1
+
+# 2) 干脆手动，想起来就跑（最不容易出错）
+pnpm run sync:check    # 先看差多少
+pnpm run sync:auto     # 确认后一条龙
 ```
 
 `auto-sync-skills.sh` 的安全设计：**无改动不提交**（不产生空提交）、**构建不过就中止**（不推坏 commit）、
