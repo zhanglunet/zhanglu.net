@@ -24,6 +24,7 @@ const visibleLinks = social.links.filter((l) => l.url && !l.url.includes('TODO')
           {l.label}
         </a>
       ))}
+      <a href={localizePath('/how-it-works', lang)} class="hover:text-[var(--color-ink)] transition-colors">{t('footer.arch')}</a>
       <a href={localizePath('/brand', lang)} class="hover:text-[var(--color-ink)] transition-colors">{t('footer.brand')}</a>
       <a href={localizePath('/rss.xml', lang)} class="hover:text-[var(--color-ink)] transition-colors">{t('footer.rss')}</a>
     </div>

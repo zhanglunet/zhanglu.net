@@ -1,0 +1,319 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+
+const [projects, articles, presentations, skills, weekly] = await Promise.all([
+  getCollection('projectsEn'),
+  getCollection('articlesEn'),
+  getCollection('presentationsEn'),
+  getCollection('skillsEn'),
+  getCollection('weeklyEn'),
+]);
+
+// Every number here is computed at build time — hardcoded numbers always drift (AGENTS §14.5)
+const collections = [
+  { name: 'projects', label: 'Projects', n: projects.length, page: 'list + detail', api: 'list + detail', note: 'carries loc / persona / cover' },
+  { name: 'articles', label: 'Writing', n: articles.length, page: 'list only', api: 'list only', note: 'a writing index — links point to the original source' },
+  { name: 'presentations', label: 'Decks', n: presentations.length, page: 'list only', api: 'list only', note: 'cards link straight out' },
+  { name: 'skills', label: 'Skills', n: skills.length, page: 'list + detail', api: 'list + detail', note: '16 auto-synced + 14 hand-written' },
+  { name: 'weekly', label: 'Weekly', n: weekly.length, page: 'list + detail', api: 'list + detail', note: 'redacted public notes' },
+];
+const contentTotal = collections.reduce((s, c) => s + c.n, 0);
+
+// Endpoint kinds: 9 flat + 3 dynamic {slug}
+const FLAT = ['index', 'projects', 'articles', 'presentations', 'skills', 'weekly', 'about', 'social', 'search'];
+const DYNAMIC = ['projects/{slug}', 'skills/{slug}', 'weekly/{slug}'];
+const kindsPerLang = FLAT.length + DYNAMIC.length;
+const filesPerLang = FLAT.length + projects.length + skills.length + weekly.length;
+
+const fanout = [
+  { out: '/en/projects/boss page', who: 'human' },
+  { out: '/en/projects list card', who: 'human' },
+  { out: 'homepage “Featured projects”', who: 'human' },
+  { out: '/en/api/projects.json', who: 'agent' },
+  { out: '/en/api/projects/boss.json (full text)', who: 'agent' },
+  { out: '/en/api/search.json corpus', who: 'agent / CLI' },
+  { out: 'RSS + sitemap entry', who: 'subscribers / search' },
+];
+
+const principles = [
+  { t: 'No server', d: 'Production is nothing but static files. Always up, zero ops, a build is a snapshot. Every other decision follows from this — that is why search runs client-side, why endpoints are files written at build time, and why there is no auth.' },
+  { t: 'Schema is enforced', d: 'Zod schemas live in src/content/config.ts. A missing field or wrong type fails the build — instead of shipping a blank page to production.' },
+  { t: 'Field shapes defined once', d: 'All endpoint field shapes live in src/lib/api.ts, shared by the zh and en endpoints. Early on each endpoint inlined its own fields and they drifted: the list had loc/persona/cover, the detail did not.' },
+  { t: 'Drifty numbers are computed', d: 'Every count on this page, and the CLI line count and version on /agents, are read at build time. The copy once hardcoded “270 lines” long after it had passed 500.' },
+  { t: 'Status codes are honest', d: 'A missing path returns a real 404, not 200 plus the homepage. An agent can trust the status code to tell whether an endpoint exists.' },
+  { t: 'Table-driven', d: "The CLI's KINDS table: adding a content type touches one place, and list / get / help text all follow automatically." },
+];
+
+const bilingual = [
+  { k: 'Routing', v: 'Chinese at the root <code>/</code>, English under <code>/en/</code>. Assets, <code>/api</code>, external links and anchors are never prefixed — only page routes are.' },
+  { k: 'Detection', v: 'Components call <code>getLangFromUrl(Astro.url)</code> and <strong>detect for themselves</strong>, rather than threading a prop down every level.' },
+  { k: 'Content', v: 'Parallel <code>*En</code> collections, not one collection with a language field — the latter needs filtering in a dozen consumers, and missing one leaks the wrong language. The cost is writing content twice.' },
+  { k: 'UI strings', v: 'A dictionary in <code>src/i18n/ui.ts</code> (zh / en). Page-specific prose stays in each language’s own page file, out of the dictionary.' },
+  { k: 'First visit', v: 'Redirects by <code>navigator.language</code> — an English browser opening zhanglu.net lands on /en/.' },
+  { k: 'Manual switch', v: 'The header “中 / EN” writes the choice to <code>localStorage</code>; after that <strong>your choice wins and the auto-redirect stops</strong>.' },
+  { k: 'SEO', v: '<code>&lt;html lang&gt;</code>, <code>hreflang</code> (zh-CN / en / x-default), <code>og:locale</code>, per-language RSS, sitemap i18n.' },
+];
+
+const desc = 'How zhanglu.net works: content is plain text in git, compiled to a static site, deployed on push. Data flow, the bilingual setup, the machine-readable layer, and the constraints behind them.';
+---
+<Base title="How this site works" description={desc}>
+  <!-- Hero -->
+  <section class="pb-8 border-b border-[var(--color-rule)] mb-10">
+    <p class="text-xs font-mono text-[var(--color-accent)] mb-3 tracking-wider">ARCHITECTURE</p>
+    <h1 class="font-serif text-3xl sm:text-4xl font-semibold mb-4">How this site works</h1>
+    <p class="text-[var(--color-muted)] leading-relaxed max-w-2xl mb-3">
+      <strong class="text-[var(--color-ink)]">Content is plain text files in a git repo; one command compiles it into a full set of static artifacts; pushing deploys it.</strong>
+      No CMS, no database, no server runtime — production is static files on a CDN.
+    </p>
+    <p class="text-[var(--color-muted)] text-sm leading-relaxed max-w-2xl">
+      That single constraint is the root of everything else: with no server, search has to run in the client,
+      endpoints have to be files written at build time, there can be no auth, and nothing can depend on a third-party API at request time.
+    </p>
+    <div class="flex flex-wrap gap-3 text-sm mt-6">
+      <a href="/en/agents" class="px-3 py-1.5 border border-[var(--color-rule)] rounded hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors">Integration guide for agents →</a>
+      <a href="https://github.com/zhanglunet/zhanglu.net/blob/main/docs/architecture.md" target="_blank" rel="noopener" class="px-3 py-1.5 border border-[var(--color-rule)] rounded hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors">Architecture doc in the repo →</a>
+      <a href="https://github.com/zhanglunet/zhanglu.net" target="_blank" rel="noopener" class="px-3 py-1.5 border border-[var(--color-rule)] rounded hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors">Source →</a>
+    </div>
+  </section>
+
+  <!-- Big picture -->
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-2">Big picture: one file to production</h2>
+    <p class="text-[var(--color-muted)] text-sm mb-6 max-w-2xl">
+      Four layers — <strong class="text-[var(--color-ink)]">source → contract → build → artifacts</strong> — then a push to the CDN.
+      Only the first layer is written by hand.
+    </p>
+
+    <div class="border border-[var(--color-rule)] rounded-lg bg-[var(--color-paper-2)] p-4 sm:p-7">
+      <div class="flex flex-col items-center gap-1 text-center">
+
+        <div class="w-full rounded border border-[var(--color-rule)] bg-white/60 px-4 py-3">
+          <p class="text-sm font-semibold mb-2">① Source · the only hand-written part</p>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {[
+              { f: 'src/content/<coll>/', d: 'Chinese content' },
+              { f: 'src/content/<coll>En/', d: 'English parallel' },
+              { f: 'src/data/*.json', d: 'bio / socials' },
+              { f: 'src/i18n/ui.ts', d: 'UI strings' },
+            ].map((x) => (
+              <div class="rounded bg-[var(--color-paper-2)] px-2 py-1.5">
+                <p class="font-mono text-[10px] text-[var(--color-ink)] wrap-anywhere">{x.f}</p>
+                <p class="text-[10px] text-[var(--color-muted)] mt-0.5">{x.d}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <p class="font-mono text-[11px] text-[var(--color-muted)] leading-tight py-1">│</p>
+
+        <div class="w-full max-w-lg rounded border border-[var(--color-rule)] bg-white/60 px-4 py-2.5">
+          <p class="text-sm font-semibold">② Contract · Zod schema</p>
+          <p class="font-mono text-[11px] text-[var(--color-muted)] mt-0.5 wrap-anywhere">src/content/config.ts</p>
+          <p class="text-[11px] text-[var(--color-accent)] mt-1">missing field / wrong type → build fails (not a blank page in production)</p>
+        </div>
+
+        <p class="font-mono text-[11px] text-[var(--color-muted)] leading-tight py-1">│<br />pnpm build</p>
+
+        <div class="w-full max-w-lg rounded border border-[var(--color-rule)] bg-white/60 px-4 py-2.5">
+          <p class="text-sm font-semibold">③ Build · Astro</p>
+          <p class="font-mono text-[11px] text-[var(--color-muted)] mt-0.5 wrap-anywhere">field shapes: src/lib/api.ts (one copy, shared by zh / en)</p>
+        </div>
+
+        <p class="font-mono text-[11px] text-[var(--color-muted)] leading-tight py-1">│</p>
+
+        <div class="w-full rounded border-2 border-[var(--color-accent)] bg-white/70 px-4 py-3">
+          <p class="text-sm font-semibold text-[var(--color-ink)] mb-2">④ Artifacts · all static files</p>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-left">
+            {[
+              { n: `${collections.length} content types × 2 languages`, d: `${contentTotal} entries × 2` },
+              { n: 'HTML pages', d: 'every page in both languages + 404' },
+              { n: `${kindsPerLang * 2} endpoint kinds`, d: `${kindsPerLang} × 2 languages → ${filesPerLang * 2} JSON files` },
+              { n: '2 RSS feeds', d: '/rss.xml · /en/rss.xml' },
+              { n: '2 llms.txt', d: 'agent discovery entry' },
+              { n: 'sitemap · robots · _headers', d: 'hreflang / Content-Signal / CORS' },
+            ].map((x) => (
+              <div class="rounded bg-[var(--color-paper-2)] px-2.5 py-1.5">
+                <p class="text-[11px] font-semibold text-[var(--color-ink)] wrap-anywhere">{x.n}</p>
+                <p class="text-[10px] text-[var(--color-muted)] mt-0.5 wrap-anywhere">{x.d}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <p class="font-mono text-[11px] text-[var(--color-muted)] leading-tight py-1">│<br />git push origin main</p>
+
+        <div class="w-full max-w-sm rounded border border-[var(--color-rule)] bg-white/60 px-4 py-2">
+          <p class="text-sm font-medium">Cloudflare Pages</p>
+          <p class="text-[11px] text-[var(--color-muted)] mt-0.5">live in 1–2 minutes</p>
+        </div>
+
+        <p class="font-mono text-[11px] text-[var(--color-muted)] leading-tight py-1">│</p>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+        {[
+          { k: 'humans', d: 'browser', hint: 'zhanglu.net · /en/' },
+          { k: 'agents', d: 'JSON endpoints', hint: '/api · /en/api' },
+          { k: 'CLI', d: 'npm package', hint: 'npx zhanglu-net' },
+          { k: 'crawlers', d: 'sitemap + robots', hint: 'Content-Signal' },
+        ].map((x) => (
+          <div class="rounded border border-[var(--color-rule)] bg-white/60 px-3 py-2.5 text-center">
+            <p class="text-xs font-semibold">{x.k}</p>
+            <p class="text-[10px] text-[var(--color-muted)] mt-1">{x.d}</p>
+            <p class="font-mono text-[10px] text-[var(--color-accent)] mt-1 wrap-anywhere">{x.hint}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Content matrix -->
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-2">{collections.length} content types</h2>
+    <p class="text-[var(--color-muted)] text-sm mb-5 max-w-2xl">
+      Each type has parallel Chinese and English content, <strong class="text-[var(--color-ink)]">1:1 in count</strong>.
+      One collection = one directory; one entry = one markdown file.
+    </p>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm border-collapse">
+        <thead>
+          <tr class="border-b border-[var(--color-rule)] text-left">
+            <th class="py-2 pr-4 font-medium whitespace-nowrap">Collection</th>
+            <th class="py-2 pr-4 font-medium whitespace-nowrap text-right">Entries</th>
+            <th class="py-2 pr-4 font-medium whitespace-nowrap">Pages</th>
+            <th class="py-2 pr-4 font-medium whitespace-nowrap">Endpoints</th>
+            <th class="py-2 font-medium">Notes</th>
+          </tr>
+        </thead>
+        <tbody class="text-[var(--color-muted)]">
+          {collections.map((c, i) => (
+            <tr class:list={[i !== collections.length - 1 && 'border-b border-[var(--color-rule)]', 'align-top']}>
+              <td class="py-2.5 pr-4 whitespace-nowrap">
+                <span class="font-mono text-xs text-[var(--color-ink)]">{c.name}</span>
+                <span class="text-xs ml-1.5">{c.label}</span>
+              </td>
+              <td class="py-2.5 pr-4 text-right font-mono text-xs tabular-nums text-[var(--color-ink)]">{c.n} × 2</td>
+              <td class="py-2.5 pr-4 text-xs whitespace-nowrap">{c.page}</td>
+              <td class="py-2.5 pr-4 text-xs whitespace-nowrap">{c.api}</td>
+              <td class="py-2.5 text-xs leading-relaxed">{c.note}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- fan-out -->
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-2">Write once, appear in {fanout.length} places</h2>
+    <p class="text-[var(--color-muted)] text-sm mb-6 max-w-2xl">
+      This is where the structure pays for itself. Take
+      <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded wrap-anywhere">src/content/projectsEn/boss.md</code> —
+      write one file and it shows up in every one of these, with
+      <strong class="text-[var(--color-ink)]">nothing to sync by hand</strong>.
+    </p>
+    <div class="rounded-lg border border-[var(--color-rule)] bg-[var(--color-paper-2)] p-5">
+      <p class="font-mono text-xs text-center text-[var(--color-ink)] mb-1 wrap-anywhere">projectsEn/boss.md</p>
+      <p class="text-center font-mono text-[11px] text-[var(--color-muted)] mb-3">│ pnpm build</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        {fanout.map((f, i) => (
+          <div class="flex items-baseline gap-2.5 rounded bg-white/60 border border-[var(--color-rule)] px-3 py-2">
+            <span class="font-mono text-[10px] text-[var(--color-accent)] shrink-0">{i + 1}</span>
+            <span class="text-xs flex-1 wrap-anywhere">{f.out}</span>
+            <span class="text-[10px] text-[var(--color-muted)] shrink-0">{f.who}</span>
+          </div>
+        ))}
+      </div>
+      <p class="text-xs text-[var(--color-muted)] text-center mt-3">
+        The Chinese <code class="font-mono text-[11px]">projects/boss.md</code> produces {fanout.length} more
+      </p>
+    </div>
+  </section>
+
+  <!-- Bilingual -->
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-2">How the bilingual setup works</h2>
+    <div class="border border-[var(--color-rule)] rounded overflow-hidden text-sm">
+      {bilingual.map((r, i, arr) => (
+        <div class:list={['px-4 py-3 grid grid-cols-1 sm:grid-cols-[8rem_1fr] gap-x-4 gap-y-1', i !== arr.length - 1 && 'border-b border-[var(--color-rule)]']}>
+          <p class="font-medium text-[var(--color-ink)] text-xs sm:text-sm">{r.k}</p>
+          <p class="text-[var(--color-muted)] leading-relaxed text-xs sm:text-sm wrap-anywhere" set:html={r.v.replace(/<code>/g, '<code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">').replace(/<strong>/g, '<strong class="text-[var(--color-ink)]">')} />
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Machine-readable layer -->
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-2">The layer built for machines</h2>
+    <p class="text-[var(--color-muted)] text-sm mb-5 max-w-2xl">
+      Everything is published as JSON too, so agents never have to parse HTML. Full usage lives at
+      <a href="/en/agents" class="text-[var(--color-accent)] hover:underline">/en/agents</a>.
+    </p>
+    <div class="rounded-lg border border-[var(--color-rule)] bg-[var(--color-paper-2)] p-5 mb-4">
+      <div class="flex flex-col gap-1 text-center">
+        <div class="rounded border border-[var(--color-rule)] bg-white/60 px-4 py-2">
+          <p class="text-xs font-semibold">Discovery entry</p>
+          <p class="font-mono text-[11px] text-[var(--color-muted)] mt-0.5 wrap-anywhere">/en/llms.txt · /llms.txt</p>
+        </div>
+        <p class="font-mono text-[11px] text-[var(--color-muted)]">↓</p>
+        <div class="rounded border border-[var(--color-rule)] bg-white/60 px-4 py-2">
+          <p class="text-xs font-semibold">manifest</p>
+          <p class="font-mono text-[11px] text-[var(--color-muted)] mt-0.5 wrap-anywhere">/en/api/index.json — counts + every endpoint + cross-language links</p>
+        </div>
+        <p class="font-mono text-[11px] text-[var(--color-muted)]">↓</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div class="rounded border border-[var(--color-rule)] bg-white/60 px-3 py-2 text-left">
+            <p class="text-xs font-semibold">Lists · {FLAT.length - 1}</p>
+            <p class="font-mono text-[10px] text-[var(--color-muted)] mt-1 wrap-anywhere">{FLAT.filter((f) => f !== 'index').join(' · ')}</p>
+          </div>
+          <div class="rounded border border-[var(--color-rule)] bg-white/60 px-3 py-2 text-left">
+            <p class="text-xs font-semibold">Details · {DYNAMIC.length} (with body_md)</p>
+            <p class="font-mono text-[10px] text-[var(--color-muted)] mt-1 wrap-anywhere">{DYNAMIC.join(' · ')}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <ul class="space-y-2 text-sm text-[var(--color-muted)]">
+      <li>· Every response carries a <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">lang</code> field, so you can confirm what you got.</li>
+      <li>· Missing paths return a <strong class="text-[var(--color-ink)]">real 404</strong> — status codes are reliable.</li>
+      <li>· CORS is declared explicitly in <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">public/_headers</code>, not left to the host's defaults.</li>
+      <li>· Search is client-side: fetch the whole corpus once, match substrings — because there is no server.</li>
+    </ul>
+  </section>
+
+  <!-- Principles -->
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-2">A few constraints, and why</h2>
+    <p class="text-[var(--color-muted)] text-sm mb-6 max-w-2xl">
+      These aren't abstract principles — each one came out of a real piece of rework.
+    </p>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      {principles.map((p) => (
+        <div class="border border-[var(--color-rule)] rounded-md p-4 bg-white/40">
+          <h3 class="font-serif text-base font-semibold mb-1.5">{p.t}</h3>
+          <p class="text-[var(--color-muted)] text-sm leading-relaxed wrap-anywhere">{p.d}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- One word to production -->
+  <section class="mb-8 pt-8 border-t border-[var(--color-rule)]">
+    <h2 class="font-serif text-2xl font-semibold mb-2">From one edit to production</h2>
+    <div class="overflow-x-auto">
+      <pre class="bg-[#1a1a1a] text-[#f3f1ea] p-4 rounded text-xs leading-relaxed"><code>edit src/content/... or src/data/...
+  │
+  ├── pnpm dev      hot reload locally
+  ├── pnpm build    must pass (schema check + artifact generation)
+  ├── docs/dev-log/ leave a process record
+  └── git push main → Cloudflare Pages → live in 1–2 minutes</code></pre>
+    </div>
+    <p class="text-sm text-[var(--color-muted)] mt-4">
+      The full working rules live in <a href="https://github.com/zhanglunet/zhanglu.net/blob/main/AGENTS.md" target="_blank" rel="noopener" class="text-[var(--color-accent)] hover:underline">AGENTS.md</a>
+      — the authoritative guide for AI agents and for future me, covering schemas, traps already hit, and the release flow.
+      The architecture doc behind this page: <a href="https://github.com/zhanglunet/zhanglu.net/blob/main/docs/architecture.md" target="_blank" rel="noopener" class="text-[var(--color-accent)] hover:underline">docs/architecture.md</a>.
+    </p>
+  </section>
+</Base>

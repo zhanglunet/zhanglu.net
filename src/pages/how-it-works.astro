@@ -1,0 +1,322 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+
+const [projects, articles, presentations, skills, weekly] = await Promise.all([
+  getCollection('projects'),
+  getCollection('articles'),
+  getCollection('presentations'),
+  getCollection('skills'),
+  getCollection('weekly'),
+]);
+
+// 全部数字 build 时算出来 —— 写死的数字必漂（AGENTS §14.5）
+const collections = [
+  { name: 'projects', zh: '项目', n: projects.length, page: '列表 + 详情', api: '列表 + 详情', note: '带 loc / persona / cover' },
+  { name: 'articles', zh: '文章', n: articles.length, page: '仅列表', api: '仅列表', note: '写作索引，链接指向原始出处' },
+  { name: 'presentations', zh: '展示', n: presentations.length, page: '仅列表', api: '仅列表', note: '卡片直接跳外链' },
+  { name: 'skills', zh: 'Skills', n: skills.length, page: '列表 + 详情', api: '列表 + 详情', note: '16 个自动同步 + 14 个手写' },
+  { name: 'weekly', zh: '周报', n: weekly.length, page: '列表 + 详情', api: '列表 + 详情', note: '脱敏公开版' },
+];
+const contentTotal = collections.reduce((s, c) => s + c.n, 0);
+
+// 端点类型：9 个平铺 + 3 个 {slug}
+const FLAT = ['index', 'projects', 'articles', 'presentations', 'skills', 'weekly', 'about', 'social', 'search'];
+const DYNAMIC = ['projects/{slug}', 'skills/{slug}', 'weekly/{slug}'];
+const kindsPerLang = FLAT.length + DYNAMIC.length;
+// 展开后的实际 JSON 文件数（每语）：平铺 + 各详情条目
+const filesPerLang = FLAT.length + projects.length + skills.length + weekly.length;
+
+// 一个文件的下游消费
+const fanout = [
+  { out: '/projects/boss', who: '人' },
+  { out: '/projects 列表卡片', who: '人' },
+  { out: '首页「精选项目」', who: '人' },
+  { out: '/api/projects.json', who: 'agent' },
+  { out: '/api/projects/boss.json（含全文）', who: 'agent' },
+  { out: '/api/search.json 语料', who: 'agent / CLI' },
+  { out: 'RSS + sitemap 条目', who: '订阅者 / 搜索引擎' },
+];
+
+const principles = [
+  { t: '没有服务端', d: '线上只有静态文件。永远可用、零运维、构建即快照。所有其它设计都是这条的推论 —— 所以搜索在客户端做、端点是构建时落盘的文件、不做鉴权。' },
+  { t: 'schema 强校验', d: 'Zod 定义在 src/content/config.ts。内容缺字段或类型不对，build 直接失败 —— 而不是线上出一个空白页。' },
+  { t: '字段只定义一次', d: '所有端点的字段形状在 src/lib/api.ts，zh / en 共用同一份 builder。早期各端点内联字段，漂过一次：列表有 loc/persona/cover、详情没有。' },
+  { t: '会漂的数字 build 时算', d: '本页所有计数、/agents 上的 CLI 行数与版本号，都是构建时读出来的。曾经写死「270 行」，实际早已 500+。' },
+  { t: '状态码可信', d: '不存在的路径返回真 404，不是 200 + 首页。agent 可以直接用状态码判断端点存在与否。' },
+  { t: '表驱动', d: 'CLI 的 KINDS 表：加一种内容类型只改一处，list / get / 帮助文本自动跟上。' },
+];
+
+const desc = 'zhanglu.net 是怎么运作的：内容是 git 里的纯文本，build 成静态站，push 即部署。数据流、双语机制、机读层与设计约束。';
+---
+<Base title="这个站怎么运作" description={desc}>
+  <!-- Hero -->
+  <section class="pb-8 border-b border-[var(--color-rule)] mb-10">
+    <p class="text-xs font-mono text-[var(--color-accent)] mb-3 tracking-wider">ARCHITECTURE</p>
+    <h1 class="font-serif text-3xl sm:text-4xl font-semibold mb-4">这个站怎么运作</h1>
+    <p class="text-[var(--color-muted)] leading-relaxed max-w-2xl mb-3">
+      <strong class="text-[var(--color-ink)]">内容是 git 仓库里的纯文本文件，一条命令编译成一整套静态产物，push 即部署。</strong>
+      没有 CMS、没有数据库、没有服务端运行时 —— 线上只有静态文件和 CDN。
+    </p>
+    <p class="text-[var(--color-muted)] text-sm leading-relaxed max-w-2xl">
+      这条约束是所有其它设计的根源：因为没有服务端，搜索必须在客户端做、端点必须是构建时落盘的文件、
+      不能有鉴权、也不可能实时依赖外部 API。
+    </p>
+    <div class="flex flex-wrap gap-3 text-sm mt-6">
+      <a href="/agents" class="px-3 py-1.5 border border-[var(--color-rule)] rounded hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors">给 agent 的接入指南 →</a>
+      <a href="https://github.com/zhanglunet/zhanglu.net/blob/main/docs/architecture.md" target="_blank" rel="noopener" class="px-3 py-1.5 border border-[var(--color-rule)] rounded hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors">仓库里的架构文档 →</a>
+      <a href="https://github.com/zhanglunet/zhanglu.net" target="_blank" rel="noopener" class="px-3 py-1.5 border border-[var(--color-rule)] rounded hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors">源码 →</a>
+    </div>
+  </section>
+
+  <!-- 全景图 -->
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-2">全景：从一个文件到线上</h2>
+    <p class="text-[var(--color-muted)] text-sm mb-6 max-w-2xl">
+      四层：<strong class="text-[var(--color-ink)]">内容源 → 契约 → 构建 → 产物</strong>，然后 push 到 CDN。
+      唯一需要人手写的是第一层。
+    </p>
+
+    <div class="border border-[var(--color-rule)] rounded-lg bg-[var(--color-paper-2)] p-4 sm:p-7">
+      <div class="flex flex-col items-center gap-1 text-center">
+
+        <!-- 内容源 -->
+        <div class="w-full rounded border border-[var(--color-rule)] bg-white/60 px-4 py-3">
+          <p class="text-sm font-semibold mb-2">① 内容源 · 唯一需要人手写的东西</p>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {[
+              { f: 'src/content/<coll>/', d: '中文内容' },
+              { f: 'src/content/<coll>En/', d: '英文平行版' },
+              { f: 'src/data/*.json', d: '简介 / 社交' },
+              { f: 'src/i18n/ui.ts', d: 'UI 文案' },
+            ].map((x) => (
+              <div class="rounded bg-[var(--color-paper-2)] px-2 py-1.5">
+                <p class="font-mono text-[10px] text-[var(--color-ink)] wrap-anywhere">{x.f}</p>
+                <p class="text-[10px] text-[var(--color-muted)] mt-0.5">{x.d}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <p class="font-mono text-[11px] text-[var(--color-muted)] leading-tight py-1">│</p>
+
+        <!-- 契约 -->
+        <div class="w-full max-w-lg rounded border border-[var(--color-rule)] bg-white/60 px-4 py-2.5">
+          <p class="text-sm font-semibold">② 契约层 · Zod schema</p>
+          <p class="font-mono text-[11px] text-[var(--color-muted)] mt-0.5 wrap-anywhere">src/content/config.ts</p>
+          <p class="text-[11px] text-[var(--color-accent)] mt-1">缺字段 / 类型不对 → build 失败（不是线上出空白页）</p>
+        </div>
+
+        <p class="font-mono text-[11px] text-[var(--color-muted)] leading-tight py-1">│<br />pnpm build</p>
+
+        <!-- 构建 -->
+        <div class="w-full max-w-lg rounded border border-[var(--color-rule)] bg-white/60 px-4 py-2.5">
+          <p class="text-sm font-semibold">③ 构建 · Astro</p>
+          <p class="font-mono text-[11px] text-[var(--color-muted)] mt-0.5 wrap-anywhere">字段形状：src/lib/api.ts（zh / en 共用一份）</p>
+        </div>
+
+        <p class="font-mono text-[11px] text-[var(--color-muted)] leading-tight py-1">│</p>
+
+        <!-- 产物 -->
+        <div class="w-full rounded border-2 border-[var(--color-accent)] bg-white/70 px-4 py-3">
+          <p class="text-sm font-semibold text-[var(--color-ink)] mb-2">④ 产物 · 全部是静态文件</p>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-left">
+            {[
+              { n: `${collections.length} 类内容 × 2 语言`, d: `共 ${contentTotal} 篇 × 2` },
+              { n: '页面 HTML', d: '每页都有中英两版 + 404' },
+              { n: `${kindsPerLang * 2} 个端点类型`, d: `${kindsPerLang} 类 × 2 语言 → ${filesPerLang * 2} 个 JSON 文件` },
+              { n: '2 份 RSS', d: '/rss.xml · /en/rss.xml' },
+              { n: '2 份 llms.txt', d: 'agent 自发现入口' },
+              { n: 'sitemap · robots · _headers', d: '含 hreflang / Content-Signal / CORS' },
+            ].map((x) => (
+              <div class="rounded bg-[var(--color-paper-2)] px-2.5 py-1.5">
+                <p class="text-[11px] font-semibold text-[var(--color-ink)] wrap-anywhere">{x.n}</p>
+                <p class="text-[10px] text-[var(--color-muted)] mt-0.5 wrap-anywhere">{x.d}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <p class="font-mono text-[11px] text-[var(--color-muted)] leading-tight py-1">│<br />git push origin main</p>
+
+        <div class="w-full max-w-sm rounded border border-[var(--color-rule)] bg-white/60 px-4 py-2">
+          <p class="text-sm font-medium">Cloudflare Pages</p>
+          <p class="text-[11px] text-[var(--color-muted)] mt-0.5">1–2 分钟上线</p>
+        </div>
+
+        <p class="font-mono text-[11px] text-[var(--color-muted)] leading-tight py-1">│</p>
+      </div>
+
+      <!-- 消费者 -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+        {[
+          { k: '人', d: '浏览器', hint: 'zhanglu.net · /en/' },
+          { k: 'agent', d: 'JSON 端点', hint: '/api · /en/api' },
+          { k: 'CLI', d: 'npm 包', hint: 'npx zhanglu-net' },
+          { k: '爬虫', d: 'sitemap + robots', hint: 'Content-Signal' },
+        ].map((x) => (
+          <div class="rounded border border-[var(--color-rule)] bg-white/60 px-3 py-2.5 text-center">
+            <p class="text-xs font-semibold">{x.k}</p>
+            <p class="text-[10px] text-[var(--color-muted)] mt-1">{x.d}</p>
+            <p class="font-mono text-[10px] text-[var(--color-accent)] mt-1 wrap-anywhere">{x.hint}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- 内容矩阵 -->
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-2">{collections.length} 类内容</h2>
+    <p class="text-[var(--color-muted)] text-sm mb-5 max-w-2xl">
+      每一类都有中英两份平行内容，<strong class="text-[var(--color-ink)]">数量 1:1</strong>。
+      一个集合 = 一个目录，一篇内容 = 一个 markdown 文件。
+    </p>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm border-collapse">
+        <thead>
+          <tr class="border-b border-[var(--color-rule)] text-left">
+            <th class="py-2 pr-4 font-medium whitespace-nowrap">集合</th>
+            <th class="py-2 pr-4 font-medium whitespace-nowrap text-right">篇数</th>
+            <th class="py-2 pr-4 font-medium whitespace-nowrap">页面</th>
+            <th class="py-2 pr-4 font-medium whitespace-nowrap">端点</th>
+            <th class="py-2 font-medium">备注</th>
+          </tr>
+        </thead>
+        <tbody class="text-[var(--color-muted)]">
+          {collections.map((c, i) => (
+            <tr class:list={[i !== collections.length - 1 && 'border-b border-[var(--color-rule)]', 'align-top']}>
+              <td class="py-2.5 pr-4 whitespace-nowrap">
+                <span class="font-mono text-xs text-[var(--color-ink)]">{c.name}</span>
+                <span class="text-xs ml-1.5">{c.zh}</span>
+              </td>
+              <td class="py-2.5 pr-4 text-right font-mono text-xs tabular-nums text-[var(--color-ink)]">{c.n} × 2</td>
+              <td class="py-2.5 pr-4 text-xs whitespace-nowrap">{c.page}</td>
+              <td class="py-2.5 pr-4 text-xs whitespace-nowrap">{c.api}</td>
+              <td class="py-2.5 text-xs leading-relaxed">{c.note}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- fan-out -->
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-2">写一次，出现在 {fanout.length} 个地方</h2>
+    <p class="text-[var(--color-muted)] text-sm mb-6 max-w-2xl">
+      这是整个结构最实在的收益。以 <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded wrap-anywhere">src/content/projects/boss.md</code> 为例 ——
+      写一个文件，自动出现在下面每一处，<strong class="text-[var(--color-ink)]">没有任何一处需要手动同步</strong>。
+    </p>
+    <div class="rounded-lg border border-[var(--color-rule)] bg-[var(--color-paper-2)] p-5">
+      <p class="font-mono text-xs text-center text-[var(--color-ink)] mb-1 wrap-anywhere">projects/boss.md</p>
+      <p class="text-center font-mono text-[11px] text-[var(--color-muted)] mb-3">│ pnpm build</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        {fanout.map((f, i) => (
+          <div class="flex items-baseline gap-2.5 rounded bg-white/60 border border-[var(--color-rule)] px-3 py-2">
+            <span class="font-mono text-[10px] text-[var(--color-accent)] shrink-0">{i + 1}</span>
+            <span class="text-xs flex-1 wrap-anywhere">{f.out}</span>
+            <span class="text-[10px] text-[var(--color-muted)] shrink-0">{f.who}</span>
+          </div>
+        ))}
+      </div>
+      <p class="text-xs text-[var(--color-muted)] text-center mt-3">
+        英文版 <code class="font-mono text-[11px]">projectsEn/boss.md</code> 同理再出 {fanout.length} 份
+      </p>
+    </div>
+  </section>
+
+  <!-- 双语 -->
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-2">双语是怎么做的</h2>
+    <div class="border border-[var(--color-rule)] rounded overflow-hidden text-sm">
+      {[
+        { k: '路由', v: '中文在根 <code>/</code>，英文在 <code>/en/</code>。资源、<code>/api</code>、外链、锚点都不加前缀 —— 只有页面路由加。' },
+        { k: '语言判定', v: '组件里 <code>getLangFromUrl(Astro.url)</code> <strong>自检</strong>，不靠 props 一层层传下去。' },
+        { k: '内容', v: '平行 <code>*En</code> 集合，不是同集合加语言字段 —— 后者要在十几处消费端加过滤，漏一处就串语言。代价是内容写两份。' },
+        { k: 'UI 文案', v: '<code>src/i18n/ui.ts</code> 字典（zh / en 两套）。页面独有的长散文写在各自语言的页面文件里，不进字典。' },
+        { k: '首访自适应', v: '按 <code>navigator.language</code> 跳转 —— 英文浏览器打开 zhanglu.net 会自动到 /en/。' },
+        { k: '手动切换', v: '页头「中 / EN」把选择写进 <code>localStorage</code>，之后<strong>以你的选择为准，不再自动跳</strong>。' },
+        { k: 'SEO', v: '<code>&lt;html lang&gt;</code>、<code>hreflang</code>（zh-CN / en / x-default）、<code>og:locale</code>、分语言 RSS、sitemap i18n。' },
+      ].map((r, i, arr) => (
+        <div class:list={['px-4 py-3 grid grid-cols-1 sm:grid-cols-[7rem_1fr] gap-x-4 gap-y-1', i !== arr.length - 1 && 'border-b border-[var(--color-rule)]']}>
+          <p class="font-medium text-[var(--color-ink)] text-xs sm:text-sm">{r.k}</p>
+          <p class="text-[var(--color-muted)] leading-relaxed text-xs sm:text-sm wrap-anywhere" set:html={r.v.replace(/<code>/g, '<code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">').replace(/<strong>/g, '<strong class="text-[var(--color-ink)]">')} />
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- 机读层 -->
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-2">给机器读的那一层</h2>
+    <p class="text-[var(--color-muted)] text-sm mb-5 max-w-2xl">
+      站点内容同时以 JSON 形式发布，agent 不需要解析 HTML。详细用法在
+      <a href="/agents" class="text-[var(--color-accent)] hover:underline">/agents</a>。
+    </p>
+    <div class="rounded-lg border border-[var(--color-rule)] bg-[var(--color-paper-2)] p-5 mb-4">
+      <div class="flex flex-col gap-1 text-center">
+        <div class="rounded border border-[var(--color-rule)] bg-white/60 px-4 py-2">
+          <p class="text-xs font-semibold">自发现入口</p>
+          <p class="font-mono text-[11px] text-[var(--color-muted)] mt-0.5 wrap-anywhere">/llms.txt · /en/llms.txt</p>
+        </div>
+        <p class="font-mono text-[11px] text-[var(--color-muted)]">↓</p>
+        <div class="rounded border border-[var(--color-rule)] bg-white/60 px-4 py-2">
+          <p class="text-xs font-semibold">manifest</p>
+          <p class="font-mono text-[11px] text-[var(--color-muted)] mt-0.5 wrap-anywhere">/api/index.json —— counts + 全部端点 + 语言交叉链接</p>
+        </div>
+        <p class="font-mono text-[11px] text-[var(--color-muted)]">↓</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div class="rounded border border-[var(--color-rule)] bg-white/60 px-3 py-2 text-left">
+            <p class="text-xs font-semibold">列表类 · {FLAT.length - 1} 个</p>
+            <p class="font-mono text-[10px] text-[var(--color-muted)] mt-1 wrap-anywhere">{FLAT.filter((f) => f !== 'index').join(' · ')}</p>
+          </div>
+          <div class="rounded border border-[var(--color-rule)] bg-white/60 px-3 py-2 text-left">
+            <p class="text-xs font-semibold">详情类 · {DYNAMIC.length} 个（含 body_md 全文）</p>
+            <p class="font-mono text-[10px] text-[var(--color-muted)] mt-1 wrap-anywhere">{DYNAMIC.join(' · ')}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <ul class="space-y-2 text-sm text-[var(--color-muted)]">
+      <li>· 每个响应带 <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">lang</code> 字段，可自查拿到的是哪种语言。</li>
+      <li>· 不存在的路径返回<strong class="text-[var(--color-ink)]">真 404</strong>，状态码可直接用来判断。</li>
+      <li>· CORS 由 <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">public/_headers</code> 显式声明，不依赖托管层的默认行为。</li>
+      <li>· 搜索是客户端的：一次拉完全部语料做 substring 匹配 —— 因为没有服务端。</li>
+    </ul>
+  </section>
+
+  <!-- 设计原则 -->
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-2">几条约束，以及为什么</h2>
+    <p class="text-[var(--color-muted)] text-sm mb-6 max-w-2xl">
+      这些不是抽象原则，每条背后都有一次真实的返工。
+    </p>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      {principles.map((p) => (
+        <div class="border border-[var(--color-rule)] rounded-md p-4 bg-white/40">
+          <h3 class="font-serif text-base font-semibold mb-1.5">{p.t}</h3>
+          <p class="text-[var(--color-muted)] text-sm leading-relaxed wrap-anywhere">{p.d}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- 改一个字到上线 -->
+  <section class="mb-8 pt-8 border-t border-[var(--color-rule)]">
+    <h2 class="font-serif text-2xl font-semibold mb-2">从改一个字到上线</h2>
+    <div class="overflow-x-auto">
+      <pre class="bg-[#1a1a1a] text-[#f3f1ea] p-4 rounded text-xs leading-relaxed"><code>改 src/content/... 或 src/data/...
+  │
+  ├── pnpm dev      本地热更新看效果
+  ├── pnpm build    必过（schema 校验 + 产物生成）
+  ├── docs/dev-log/ 留一条过程记录
+  └── git push main → Cloudflare Pages → 1–2 分钟上线</code></pre>
+    </div>
+    <p class="text-sm text-[var(--color-muted)] mt-4">
+      完整操作规范在仓库的 <a href="https://github.com/zhanglunet/zhanglu.net/blob/main/AGENTS.md" target="_blank" rel="noopener" class="text-[var(--color-accent)] hover:underline">AGENTS.md</a>
+      —— 那是给 AI agent 和未来的我看的权威指南，含 schema、踩过的坑、发版流程。
+      本页的架构文档版本：<a href="https://github.com/zhanglunet/zhanglu.net/blob/main/docs/architecture.md" target="_blank" rel="noopener" class="text-[var(--color-accent)] hover:underline">docs/architecture.md</a>。
+    </p>
+  </section>
+</Base>

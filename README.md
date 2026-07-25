@@ -53,6 +53,8 @@ pnpm preview      # 看构建结果
 | 改 UI 文案（双语） | `src/i18n/ui.ts`（zh / en 两处都加同一个 key） |
 | 重截截图 | `agent-browser open <url> && agent-browser screenshot --full docs/screenshots/<name>.png` |
 
+**整体架构**: [`docs/architecture.md`](./docs/architecture.md) · 站上图示版 [zhanglu.net/how-it-works](https://zhanglu.net/how-it-works)
+
 **详细指南**: [AGENTS.md](./AGENTS.md)（必读，含 schema、踩过的坑、CF Pages 配置、排错表）
 
 ## 部署链路

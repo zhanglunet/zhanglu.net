@@ -18,6 +18,7 @@ export const ui = {
 
     'footer.built': '用 Astro + Cloudflare Pages 搭建。',
     'footer.brand': '品牌',
+    'footer.arch': '架构',
     'footer.rss': 'RSS',
 
     'common.all': '全部 →',
@@ -63,6 +64,7 @@ export const ui = {
 
     'footer.built': 'Built with Astro + Cloudflare Pages.',
     'footer.brand': 'Brand',
+    'footer.arch': 'Architecture',
     'footer.rss': 'RSS',
 
     'common.all': 'All →',

@@ -60,6 +60,7 @@ docs/dev-log/YYYY-MM-DD-<关键词>.md
 
 新的在上。这段是导航，别当唯一事实源 —— 目录里的 `YYYY-MM-DD-*.md` 才是。
 
+- `2026-07-25-how-it-works.md` — 站点架构说明：docs/architecture.md + /how-it-works 双语页 + 主页入口
 - `2026-07-25-release-v0.3.0.md` — 发版 v0.3.0 + 更新 README / `/agents` / AGENTS 快照
 - `2026-07-24-agent-api-cli-bilingual.md` — Agent 接入层：CLI 修缺陷 + `/en/api/*` 英文端点 + 真 404
 - `2026-07-24-i18n-english-version.md` — 全站英文版：双语 i18n（浏览器自适应 + 手动切换）

@@ -116,6 +116,7 @@ zhanglu/
 │   │   ├── weekly/{index,[slug]}.astro
 │   │   ├── posts/                 ← 站内长文
 │   │   ├── agents.astro           ← agent 接入指南
+│   │   ├── how-it-works.astro     ← ★ 站点架构说明（双语，图示；文档版 docs/architecture.md）
 │   │   ├── about.astro
 │   │   ├── brand.astro            ← 本站 logo 品牌页「一条路，一个句点」(Footer 有入口)
 │   │   ├── projects/{index,[slug]}.astro
@@ -133,6 +134,7 @@ zhanglu/
 │   └── README.md
 │
 ├── docs/
+│   ├── architecture.md            ← ★ 架构总览（站上版本 /how-it-works）
 │   ├── dev-log/                   ← ★ 每次开发的过程记录 (见 §15)
 │   ├── agent-cli/                 ← 接口设计文档 / 开发记录
 │   └── brand/                     ← logo 设计说明
@@ -556,7 +558,7 @@ YAML `|` block 在 frontmatter 里保留 `\n`，但 HTML 默认折叠空白。`S
 （英文版在 `about.en.json`）。
 
 **页面规模**：`pnpm build` 产出 107 页 —— 中文 53 + 英文 53 + 404。
-**机读层**：22 个 JSON 端点（11 类 × 2 语言）+ 双语 `llms.txt` + 分语言 RSS。
+**机读层**：24 个端点类型（12 类 × 2 语言），`[slug]` 展开后共 96 个 JSON 文件 + 双语 `llms.txt` + 分语言 RSS。
 **CLI**：`zhanglu-net` 已发布 npm（版本号在 `cli/package.json`，与站点版本独立）。
 
 ---
