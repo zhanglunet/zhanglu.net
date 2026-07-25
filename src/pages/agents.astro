@@ -11,10 +11,13 @@ const [projects, articles, presentations, skills, weekly] = await Promise.all([
   getCollection('weekly'),
 ]);
 
-// build 时数出来，别写死 —— 写死的数字漂过一次（文案说 270 行，实际早就不是）
+// build 时数出来 / 读出来，别写死 —— 写死的数字漂过一次（文案说 270 行，实际早就不是）
 const cliLines = readFileSync(new URL('../../cli/bin/zhanglu-net.mjs', import.meta.url), 'utf-8')
   .trimEnd()
   .split('\n').length;
+const cliVersion: string = JSON.parse(
+  readFileSync(new URL('../../cli/package.json', import.meta.url), 'utf-8')
+).version;
 
 const endpoints: Array<{ path: string; desc: string; sample?: string }> = [
   { path: '/api/index.json',           desc: 'Manifest — counts + 所有端点 URL', sample: '{ "counts": { "skills": ' + skills.length + ' }, "endpoints": { … }, "languages": { … } }' },
@@ -111,10 +114,11 @@ npx zhanglu-net --lang en about --json</code></pre>
   <section class="mb-12">
     <h2 class="font-serif text-2xl font-semibold mb-2">CLI</h2>
     <p class="text-[var(--color-muted)] text-sm mb-5">
-      包名 <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">zhanglu-net</code>，零运行时依赖。
-      Node 18+ 直接 <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">npx</code> 跑，或 <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">npm i -g zhanglu-net</code>。
-      拿不到 npm 包时可以直接跑源码：
-      <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded wrap-anywhere">node cli/bin/zhanglu-net.mjs &lt;command&gt;</code>。
+      <a href="https://www.npmjs.com/package/zhanglu-net" target="_blank" rel="noopener" class="font-mono text-[var(--color-accent)] hover:underline">zhanglu-net</a>
+      已发布在 npm（当前 <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">v{cliVersion}</code>），<strong class="text-[var(--color-ink)]">零运行时依赖</strong>，Node 18+。
+      直接 <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">npx zhanglu-net &lt;command&gt;</code> 就能跑，不用装；
+      也可以 <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">npm i -g zhanglu-net</code>。
+      离线 / 内网环境可以直接跑源码：<code class="text-xs bg-[var(--color-paper-2)] px-1 rounded wrap-anywhere">node cli/bin/zhanglu-net.mjs &lt;command&gt;</code>。
     </p>
 
     <h3 class="font-serif text-lg font-semibold mt-6 mb-3">命令</h3>
@@ -202,6 +206,37 @@ npx zhanglu-net --lang en about --json</code></pre>
         <p class="text-[var(--color-muted)]">CORS 全开，<code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">fetch('https://zhanglu.net/api/skills.json')</code> 直接用，无 preflight。</p>
       </div>
     </div>
+  </section>
+
+  <!-- Access & signals -->
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-2">准入与授权</h2>
+    <p class="text-[var(--color-muted)] text-sm mb-5 max-w-2xl">
+      不用申请、不用 token。下面是这个站对爬虫和 agent 的明确立场 —— 写在
+      <a href="/robots.txt" class="font-mono text-[var(--color-accent)] hover:underline">/robots.txt</a> 里，机器可读。
+    </p>
+    <div class="border border-[var(--color-rule)] rounded overflow-hidden text-sm">
+      <div class="p-4 border-b border-[var(--color-rule)]">
+        <p class="mb-1"><code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">User-agent: *</code> · <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">Allow: /</code></p>
+        <p class="text-[var(--color-muted)]">全站放行，不拦任何 AI 爬虫（ClaudeBot / GPTBot / CCBot 等都可以来）。</p>
+      </div>
+      <div class="p-4">
+        <p class="mb-2 font-mono text-xs wrap-anywhere">Content-Signal: search=yes, ai-input=yes, ai-train=no</p>
+        <ul class="space-y-1.5 text-[var(--color-muted)]">
+          <li><strong class="text-[var(--color-ink)]">search=yes</strong> —— 欢迎建索引、返回链接与摘录。</li>
+          <li><strong class="text-[var(--color-ink)]">ai-input=yes</strong> —— 欢迎实时读取、grounding / RAG、生成回答时引用。<span class="text-[var(--color-ink)]">这正是 <code class="font-mono text-xs">/api/</code> 存在的理由。</span></li>
+          <li><strong class="text-[var(--color-ink)]">ai-train=no</strong> —— 不同意用于训练 / 微调模型。</li>
+        </ul>
+        <p class="text-xs text-[var(--color-muted)] mt-3">
+          遵循 <a href="https://contentsignals.org" target="_blank" rel="noopener" class="text-[var(--color-accent)] hover:underline">Content Signals Policy</a>。
+          一句话：<strong class="text-[var(--color-ink)]">可以读、可以引用我，请别拿去训练。</strong>
+        </p>
+      </div>
+    </div>
+    <p class="text-xs text-[var(--color-muted)] mt-3">
+      引用时请指回原页（每条数据都带 <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">permalink</code>）。
+      速率没有硬限制 —— 端点是静态文件，但请别拿它跑压测。
+    </p>
   </section>
 
   <!-- Design / source -->

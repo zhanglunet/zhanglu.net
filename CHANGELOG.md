@@ -2,6 +2,73 @@
 
 本文件记录 [zhanglu.net](https://zhanglu.net) 站点的版本更新，采用 [Keep a Changelog](https://keepachangelog.com/zh-CN/) 风格，遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+> 版本号说明：本文件记的是**站点**版本（`package.json`）。CLI 是独立发布的 npm 包，
+> 版本号在 `cli/package.json`，与站点版本不同步（当前 `zhanglu-net@0.2.0`）。
+
+## [0.3.0] - 2026-07-25
+
+站点最大的一次改动：**全站中英双语**，外加把 agent 接入层补成双语、CLI 正式发到 npm。
+
+### 新增
+
+- **全站英文版**（`/en/` 子路径，53 页）—— 中文默认在根路径，英文在 `/en/`。
+  - 浏览器**首访按语言自适应**跳转；页头「中 / EN」手动切换并**记住选择**（之后以选择为准）。
+  - 每个集合有平行 `*En` 版（projects / articles / presentations / skills / weekly），zh 集合零改动。
+  - SEO：`<html lang>`、`hreflang`（zh-CN / en / x-default）、`og:locale`、分语言 RSS（`/en/rss.xml`）、sitemap i18n。
+  - UI 文案进 `src/i18n/ui.ts` 字典；helpers 在 `src/i18n/utils.ts`。
+- **C-suite 决策智能体专题**（`/c-suite`）—— Boss（CEO）· MBA Brand（CMO）· OAF（CFO）三件套定位「为 AI 原生组织而设计」，含
+  三个席位介绍、共同方法论、[设计思想长文](https://zhanglu.net/posts/c-suite-design)、
+  [品牌页](https://zhanglu.net/c-suite/brand)（logo「三弧一点，一枚印」四变体）与 OG 分享图。
+- **本站 logo「一条路，一个句点」** + [品牌页 `/brand`](https://zhanglu.net/brand)（四变体 + 新 favicon），
+  首页 hero 换成带绘制动画的标识版式，配首页 OG 分享图。
+- **第二大脑**（<https://aip.cab>）项目。
+- **往期作品 · tui3.com** 网站存档项目（archived），首页加 5 个子站截图画廊。
+- **公开周报**（`/weekly`）—— 新增 `weekly` 集合 + 索引 + 单页，首篇 2026-W29 脱敏版。
+- **全项目网站截图封面** —— `projects` 的 `cover` 字段现在会渲染（卡片顶部 banner + 详情页）。
+- **项目人群标注** —— `projects` schema 加 `persona`，卡片 / 详情页显示朱砂徽章「为 CEO/CMO/CFO 设计」。
+- **Agent 接入层双语化**：`/en/api/*` 一整套英文端点（读 `*En` 集合），响应带 `lang` 字段，
+  `/api/index.json` 加 `languages` 交叉链接；新增 `/en/llms.txt`。
+- **`/api/weekly.json` + `/api/weekly/{slug}.json`**（zh/en 各一对），weekly 同时进 `/api/search.json` 语料。
+- **`zhanglu-net` CLI 发布到 npm**（`0.2.0`）—— `npx zhanglu-net <cmd>` 对任何人可用；
+  新增 `--lang zh|en`、`list/get presentations`、`list/get weekly`、真正分命令的 `help <command>`。
+- **真 404** —— 新增双语 `src/pages/404.astro`。此前不存在的路径返回 `200` + 中文首页，
+  agent 无法用状态码判断端点是否存在；现在返回 `404`。
+- **`public/_headers`** —— 显式声明 `/api/*` 与 `/en/api/*` 的 `Access-Control-Allow-Origin: *`
+  （静态构建下端点代码里设的响应头不落盘，CORS 实际由托管层决定，不该依赖未声明的默认值）。
+- **`Content-Signal`**（`public/robots.txt`）—— `search=yes, ai-input=yes, ai-train=no`：
+  欢迎索引、欢迎 agent 实时读取引用，不同意用于模型训练。含 Content Signals Policy 标准前言。
+- **开发纪律与过程记录**（`AGENTS.md` §15 + `docs/dev-log/`）—— 采纳 Superpowers 内核的原生版：
+  计划 → 改 → **验证** → 过程记录；并回溯补写了 07-18→07-25 共 12 条 dev-log。
+
+### 变更
+
+- 首页标语改为「用 Harness + Loop 把复杂判断变成可追溯的流水线」（同步 `about.json` / `llms.txt` / OG 图）。
+- **手机阅读优化** —— 导航改单行横滑；修 390px 视口下三处横向溢出（grid 隐式轨道 + `<pre>`、
+  长英文 token 不断行、导航换行）；`.prose-zh` 表格 ≤640px 整表横滑。
+- **端点字段收敛到 `src/lib/api.ts` 单一定义** —— 原来 10 个端点各自内联字段形状，已经漂过一次
+  （列表有 `loc/persona/cover`、详情没有）。现在 zh / en 共用同一份 builder，加字段只改一处。
+- `/agents` 与 `/en/agents` 补 `presentations` / `weekly` 端点、双语说明、`--lang`；
+  **CLI 行数改为 build 时 `readFileSync` 数出来**（此前文案写死「270 行」，实际早已不是）。
+- `docs/agent-cli/design.md` 中「❌ 不做 i18n 端点」的决策标记为**已推翻**（前提「站点单语 zh-CN」不再成立）。
+
+### 修复
+
+- `/en/agents` 端点表原本指向 `/api/*`（中文 payload）却在页面上承诺英文样例（`"name": "Zhang Lu"`）
+  —— 现指向 `/en/api/*`，实际返回英文。
+- 英文搜索此前几乎必然 0 命中（`/api/search.json` 只含中文语料）—— 现在 `/en/api/search.json` 含英文正文。
+- `/api/projects/{slug}.json` 补回列表里有、详情里缺的 `loc` / `persona` / `cover`。
+- CLI：`| head` 触发未捕获 EPIPE 打一屏堆栈（对主要在管道里调用的 CLI 是硬伤）；
+  版本号两处硬编码会漂（改为运行时读 `package.json`）；`--limit abc` / `--source` 用错类型等
+  非法用法此前静默返回空 = 假成功，现在一律明确报错 + exit 1。
+- 移除 README / skill 描述里「CDN cache 友好」的错误说法（端点实际响应头是
+  `cache-control: public, max-age=0, must-revalidate`，`cf-cache-status: DYNAMIC`，边缘并未缓存）。
+
+### 已知限制
+
+- 项目卡片上的**网站截图仍是中文**（三个产品本身是中文界面），`articles` 的外链同样指向中文原文
+  —— 英文版翻的是站内文案与正文，不是被链接的外部原文。
+- `/en/brand` 刻意保留「张路 / 路」二字：整个 logo 概念就是解释名字里的「路」= road。
+
 ## [0.2.0] - 2026-07-18
 
 ### 新增

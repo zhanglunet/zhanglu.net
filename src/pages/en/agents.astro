@@ -11,10 +11,13 @@ const [projects, articles, presentations, skills, weekly] = await Promise.all([
   getCollection('weeklyEn'),
 ]);
 
-// Counted at build time — don't hardcode it (the old hardcoded number drifted).
+// Counted / read at build time — don't hardcode it (the old hardcoded number drifted).
 const cliLines = readFileSync(new URL('../../../cli/bin/zhanglu-net.mjs', import.meta.url), 'utf-8')
   .trimEnd()
   .split('\n').length;
+const cliVersion: string = JSON.parse(
+  readFileSync(new URL('../../../cli/package.json', import.meta.url), 'utf-8')
+).version;
 
 const endpoints: Array<{ path: string; desc: string; sample?: string }> = [
   { path: '/en/api/index.json',           desc: 'Manifest — counts + all endpoint URLs', sample: '{ "lang": "en", "counts": { "skills": ' + skills.length + ' }, "endpoints": { … } }' },
@@ -109,8 +112,11 @@ npx zhanglu-net --lang en about --json</code></pre>
   <section class="mb-12">
     <h2 class="font-serif text-2xl font-semibold mb-2">CLI</h2>
     <p class="text-[var(--color-muted)] text-sm mb-5">
-      Package name <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">zhanglu-net</code>, zero runtime dependencies.
-      Run it directly with <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">npx</code> on Node 18+, or <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">npm i -g zhanglu-net</code>. If the npm package is unavailable, run the source directly: <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded wrap-anywhere">node cli/bin/zhanglu-net.mjs &lt;command&gt;</code>. Pass <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">--lang en</code> for English payloads.
+      <a href="https://www.npmjs.com/package/zhanglu-net" target="_blank" rel="noopener" class="font-mono text-[var(--color-accent)] hover:underline">zhanglu-net</a>
+      is published on npm (currently <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">v{cliVersion}</code>), with <strong class="text-[var(--color-ink)]">zero runtime dependencies</strong>, Node 18+.
+      Just <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">npx zhanglu-net &lt;command&gt;</code> — no install needed; or <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">npm i -g zhanglu-net</code>.
+      Offline / air-gapped: run the source directly with <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded wrap-anywhere">node cli/bin/zhanglu-net.mjs &lt;command&gt;</code>.
+      Pass <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">--lang en</code> for English payloads.
     </p>
 
     <h3 class="font-serif text-lg font-semibold mt-6 mb-3">Commands</h3>
@@ -196,6 +202,37 @@ npx zhanglu-net --lang en about --json</code></pre>
         <p class="text-[var(--color-muted)]">CORS wide open — <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">fetch('https://zhanglu.net/api/skills.json')</code> works directly, no preflight.</p>
       </div>
     </div>
+  </section>
+
+  <!-- Access & signals -->
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-2">Access &amp; permissions</h2>
+    <p class="text-[var(--color-muted)] text-sm mb-5 max-w-2xl">
+      No application, no token. Here is this site's explicit stance toward crawlers and agents —
+      stated machine-readably in <a href="/robots.txt" class="font-mono text-[var(--color-accent)] hover:underline">/robots.txt</a>.
+    </p>
+    <div class="border border-[var(--color-rule)] rounded overflow-hidden text-sm">
+      <div class="p-4 border-b border-[var(--color-rule)]">
+        <p class="mb-1"><code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">User-agent: *</code> · <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">Allow: /</code></p>
+        <p class="text-[var(--color-muted)]">Everything is allowed. No AI crawler is blocked — ClaudeBot, GPTBot, CCBot and friends are welcome.</p>
+      </div>
+      <div class="p-4">
+        <p class="mb-2 font-mono text-xs wrap-anywhere">Content-Signal: search=yes, ai-input=yes, ai-train=no</p>
+        <ul class="space-y-1.5 text-[var(--color-muted)]">
+          <li><strong class="text-[var(--color-ink)]">search=yes</strong> — indexing, links and short excerpts are welcome.</li>
+          <li><strong class="text-[var(--color-ink)]">ai-input=yes</strong> — real-time reading, grounding / RAG and citing in generated answers are welcome. <span class="text-[var(--color-ink)]">This is exactly what <code class="font-mono text-xs">/api/</code> is for.</span></li>
+          <li><strong class="text-[var(--color-ink)]">ai-train=no</strong> — training or fine-tuning models on this content is not granted.</li>
+        </ul>
+        <p class="text-xs text-[var(--color-muted)] mt-3">
+          Following the <a href="https://contentsignals.org" target="_blank" rel="noopener" class="text-[var(--color-accent)] hover:underline">Content Signals Policy</a>.
+          In one line: <strong class="text-[var(--color-ink)]">read me, cite me, don't train on me.</strong>
+        </p>
+      </div>
+    </div>
+    <p class="text-xs text-[var(--color-muted)] mt-3">
+      When citing, please link back to the source page (every record carries a <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">permalink</code>).
+      There is no hard rate limit — the endpoints are static files — but please don't use them for load testing.
+    </p>
   </section>
 
   <!-- Design / source -->

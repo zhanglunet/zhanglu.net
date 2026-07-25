@@ -8,7 +8,8 @@
 
 ## 1. 项目概览
 
-**zhanglu.net** —— 张路的个人站。聚合：项目、公众号文章入口、本机 Claude Skills 索引、社交链接。
+**zhanglu.net** —— 张路的个人站。聚合：项目、展示、公众号文章入口、公开周报、本机 Claude Skills 索引、社交链接。
+**中英双语**（中文在 `/`，英文在 `/en/`，见 §16），并对外提供 agent 机读接口（见 §14）。
 
 | 维度 | 现状 |
 |---|---|
@@ -19,7 +20,8 @@
 | 托管 | Cloudflare Pages（project name: `zhanglu-net`），DNS 同账号托管 |
 | 部署触发 | push `main` → CF Pages 自动构建部署，~1-2 分钟上线 |
 | PR 预览 | 自动出 `<branch>.zhanglu-net.pages.dev` |
-| 语言 | 中文为主，前端 lang="zh-CN" |
+| 语言 | **中英双语**：zh 在根路径（`lang="zh-CN"`），en 在 `/en/`（`lang="en"`）。首访按浏览器语言自适应，页头可手动切换 |
+| 版本 | 站点 `package.json`（当前 0.3.0）；CLI 独立发布在 npm（`cli/package.json`），两者不同步 |
 | 视觉 | 书卷气、低饱和度、衬线标题（Source Serif / Noto Serif SC）、`#b14b3a` 朱砂色 accent |
 
 ---
@@ -61,6 +63,10 @@ zhanglu/
 ├── .gitignore
 │
 ├── public/                        ← 原样拷贝到站点根
+│   ├── _headers                   ← ★ CF Pages 响应头: 显式声明 /api/* 与 /en/api/* 的 CORS
+│   ├── llms.txt                   ← agent 自发现入口 (中文)
+│   ├── en/llms.txt                ← ★ 英文版
+│   ├── robots.txt                 ← allow all + Content-Signal (见 §9.10)
 │   ├── favicon.svg                ← 深底方形 + 反白 Z 路 + 朱砂句点 (zhanglu logo 简化版)
 │   ├── wechat-qr.jpg              ← 公众号「张路的碎碎念」二维码 (258×258)
 │   ├── og/                        ← OG 分享图 (1200×630), <Base image="/og/xxx.png"> 挂载
@@ -70,14 +76,26 @@ zhanglu/
 │
 ├── src/
 │   ├── content/
-│   │   ├── config.ts              ← Zod schemas (改这里 = 改全站数据契约)
+│   │   ├── config.ts              ← Zod schemas (改这里 = 改全站数据契约); zh 与 *En 共用同一份 schema
 │   │   ├── projects/              ← 一个项目 = 一个 .md
-│   │   ├── articles/              ← 公众号 / 博客文章入口 = 一个 .md
-│   │   └── skills/                ← 30 个 skill, 16 个 sync 自动生成 + 14 个手写中文
+│   │   ├── articles/              ← 写作索引 (指向原始出处) = 一个 .md
+│   │   ├── presentations/         ← 网页版 PPT / 站点入口
+│   │   ├── weekly/                ← 公开周报 (脱敏版)
+│   │   ├── skills/                ← 30 个 skill, 16 个 sync 自动生成 + 14 个手写中文
+│   │   └── <coll>En/              ← ★ 每个集合的英文平行版 (projectsEn / articlesEn / ...)
+│   │
+│   ├── i18n/                      ← ★ 双语基建 (见 §16)
+│   │   ├── ui.ts                  ← UI 文案字典 (zh / en 两套, 加 key 要两边都加)
+│   │   └── utils.ts               ← getLangFromUrl / localizePath / stripLang / altPath
+│   │
+│   ├── lib/
+│   │   └── api.ts                 ← ★ 所有 API 端点的字段形状与 builder (zh/en 共用, 加字段只改这里)
 │   │
 │   ├── data/                      ← 静态 JSON, 给所有页面读
 │   │   ├── about.json             ← 名字 / tagline / bio / tags (首页 hero 直接读)
-│   │   └── social.json            ← GitHub / X / 公众号 (含 QR)
+│   │   ├── about.en.json          ← ★ 英文版
+│   │   ├── social.json            ← GitHub / X / 公众号 (含 QR)
+│   │   └── social.en.json         ← ★ 英文版
 │   │
 │   ├── components/
 │   │   ├── Header.astro           ← 导航栏 (首页/项目/文章/Skills/关于)
@@ -92,6 +110,12 @@ zhanglu/
 │   │
 │   ├── pages/                     ← Astro 文件系统路由
 │   │   ├── index.astro            ← 首页: hero + 精选项目 + 最近 5 篇文章 + Skills 概览
+│   │   ├── 404.astro              ← ★ 双语 404 (让不存在路径返回真 404, 见 §9.10)
+│   │   ├── api/                   ← JSON 端点 (薄包装, 字段在 src/lib/api.ts)
+│   │   ├── en/                    ← ★ 英文镜像: 每个 zh 页一份, 含 en/api/ 与 en/rss.xml.ts
+│   │   ├── weekly/{index,[slug]}.astro
+│   │   ├── posts/                 ← 站内长文
+│   │   ├── agents.astro           ← agent 接入指南
 │   │   ├── about.astro
 │   │   ├── brand.astro            ← 本站 logo 品牌页「一条路，一个句点」(Footer 有入口)
 │   │   ├── projects/{index,[slug]}.astro
@@ -102,6 +126,16 @@ zhanglu/
 │   │
 │   └── styles/
 │       └── global.css             ← Tailwind 4 import + @theme 自定义 + prose-zh 中文长文样式
+│
+├── cli/                           ← ★ 独立 npm 包 zhanglu-net (零依赖, 版本号独立于站点)
+│   ├── package.json
+│   ├── bin/zhanglu-net.mjs        ← 单文件; KINDS 表驱动 list/get/帮助
+│   └── README.md
+│
+├── docs/
+│   ├── dev-log/                   ← ★ 每次开发的过程记录 (见 §15)
+│   ├── agent-cli/                 ← 接口设计文档 / 开发记录
+│   └── brand/                     ← logo 设计说明
 │
 └── scripts/
     ├── sync-skills.mjs            ← ~/.claude/skills 同步 (含 symlink 支持)
@@ -505,7 +539,10 @@ YAML `|` block 在 frontmatter 里保留 `\n`，但 HTML 默认折叠空白。`S
 
 ---
 
-## 11. 当前内容快照（截至 2026-07-18）
+## 11. 当前内容快照（截至 2026-07-25，站点 v0.3.0）
+
+> **每个集合都有平行的英文版**（`src/content/<coll>En/`，同 slug、同数量）。下表是中文侧；
+> 英文侧数量 1:1 对齐（见 §16）。改内容时**两边都要动**。
 
 | collection | 数量 | featured |
 |---|---|---|
@@ -515,7 +552,12 @@ YAML `|` block 在 frontmatter 里保留 `\n`，但 HTML 默认折叠空白。`S
 | weekly | 1 | 2026-w29 (脱敏公开周报, 集合 src/content/weekly + /weekly 索引 + [slug] 页) |
 | skills | 30 | zhanglu（14 个 handwritten:true） |
 
-`src/data/about.json` 当前 hero / bio 是基于公开项目信息撰写的占位描述，可随时替换为本人定义版。
+`src/data/about.json` 当前 hero / bio 是基于公开项目信息撰写的占位描述，可随时替换为本人定义版
+（英文版在 `about.en.json`）。
+
+**页面规模**：`pnpm build` 产出 107 页 —— 中文 53 + 英文 53 + 404。
+**机读层**：22 个 JSON 端点（11 类 × 2 语言）+ 双语 `llms.txt` + 分语言 RSS。
+**CLI**：`zhanglu-net` 已发布 npm（版本号在 `cli/package.json`，与站点版本独立）。
 
 ---
 
