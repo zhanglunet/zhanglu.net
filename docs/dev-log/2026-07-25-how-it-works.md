@@ -109,3 +109,15 @@
 
 同步必须在有 `~/.claude/skills` 的那台机器上跑 —— agent 在远程会话里做不到。
 建议先 `pnpm run sync:check` 看漂移，再决定手动跑还是装 launchd 定时任务。
+
+### 追加 2：launchd 粘贴块在 zsh 里翻车（真实用户复现）
+
+用户粘贴 §5.4.1 的块，撞出 `zsh: command not found: #`：macOS 默认 zsh 交互态
+**不认行内 `#` 注释**，`REPO=… # 注释` 变成给命令 `#` 的临时赋值 → `REPO` 为空 →
+plist 里脚本路径写成 `/scripts/auto-sync-skills.sh`（`launchctl print` 的 arguments 铁证），
+服务装上了但 kickstart 立刻失败，错误落在 `.err`（stdout 无内容，`.log` 不存在，tail 报 no such file）。
+`plutil -lint` 全程报 OK —— XML 合法、路径错误，静默得很。
+
+修复：§5.4.1 的命令块去掉全部行内注释（说明移到块外散文），`launchctl print` 改 grep arguments
+以便一眼核对路径；新增 §9.11 记这个坑。另外提醒了用户：`launchctl print` 会打印继承环境变量，
+这次粘贴把 CLIPROXY_API_KEY 的值带进了对话，建议轮换。

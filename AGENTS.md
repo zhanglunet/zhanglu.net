@@ -321,11 +321,13 @@ CF Pages 构建机没有这个目录 —— 所以 **`/skills` 是「最后一�
 | 先检查再决定 | `pnpm run sync:check` | **只读不写**，有漂移 exit 1。适合放进 git pre-commit hook 或定时提醒 |
 | 全自动 | `pnpm run sync:auto` | 同步 → 校验 → 构建 → 提交 → 推送，一条龙。配 launchd 可定时跑 |
 
-**定时自动跑（macOS launchd）** —— 整段可直接粘进终端（会自动用你的真实仓库路径生成 plist）：
+**定时自动跑（macOS launchd）** —— 整段可直接粘进终端（用 `$REPO` 生成 plist）。
+**块里刻意不放行内 `#` 注释**：zsh 交互态默认不认 `#`（见 §9.11），行内注释会把第一行的 `REPO` 赋值整个搞坏。
+三处自检：`plutil` 必须打印 OK；`launchctl print` 出的 arguments 必须是真实绝对路径；出错先看 `/tmp/zhanglu-sync-skills.err`。
 
 ```bash
-REPO="$HOME/zhanglu"                                  # 仓库真实路径，不对就改这里
-ls "$REPO/scripts/auto-sync-skills.sh" || echo "❌ 路径不对，先改 REPO"
+REPO="$HOME/zhanglu"
+ls "$REPO/scripts/auto-sync-skills.sh" || echo "路径不对：先改 REPO 再往下"
 
 mkdir -p ~/Library/LaunchAgents
 cat > ~/Library/LaunchAgents/net.zhanglu.sync-skills.plist <<PLIST
@@ -345,20 +347,22 @@ cat > ~/Library/LaunchAgents/net.zhanglu.sync-skills.plist <<PLIST
 </dict></plist>
 PLIST
 
-plutil -lint ~/Library/LaunchAgents/net.zhanglu.sync-skills.plist     # 必须打印 OK
+plutil -lint ~/Library/LaunchAgents/net.zhanglu.sync-skills.plist
 
-launchctl bootout   gui/$(id -u)/net.zhanglu.sync-skills 2>/dev/null  # 清掉旧的（没装过会报错，忽略）
+launchctl bootout gui/$(id -u)/net.zhanglu.sync-skills 2>/dev/null
 launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/net.zhanglu.sync-skills.plist
-launchctl print     gui/$(id -u)/net.zhanglu.sync-skills | head -20   # 确认装上
+launchctl print gui/$(id -u)/net.zhanglu.sync-skills | grep -A 3 arguments
 ```
 
-立刻试跑一次（不等到 9:00）、看日志、卸载：
+立刻试跑一次（不等到 9:00）：
 
 ```bash
-launchctl kickstart -p gui/$(id -u)/net.zhanglu.sync-skills   # 手动触发
-tail -f /tmp/zhanglu-sync-skills.log                          # 看输出
-launchctl bootout gui/$(id -u)/net.zhanglu.sync-skills        # 卸载
+launchctl kickstart -p gui/$(id -u)/net.zhanglu.sync-skills
+tail -f /tmp/zhanglu-sync-skills.log
 ```
+
+卸载：`launchctl bootout gui/$(id -u)/net.zhanglu.sync-skills`。
+没输出先 `cat /tmp/zhanglu-sync-skills.err` —— stdout 没内容时 `.log` 可能根本不存在。
 
 ⚠️ **`launchctl load` / `unload` 是遗留命令**，在新版 macOS 上报错极不透明
 （最典型的就是 `Load failed: 5: Input/output error` —— 实际原因往往只是
@@ -596,6 +600,18 @@ YAML `|` block 在 frontmatter 里保留 `\n`，但 HTML 默认折叠空白。`S
 
 **如果哪天线上又冒出 `BEGIN Cloudflare Managed content`**：就是那个 dashboard 开关被重新打开了，
 不是仓库出了问题，别去改 `public/robots.txt` 试图绕过。
+
+### 9.11 给人的「可粘贴命令块」里别放行内 # 注释
+
+macOS 默认 zsh 的**交互态不把 `#` 当注释**（`interactivecomments` 默认关）。
+`REPO="$HOME/zhanglu"  # 说明` 会被解析成「给命令 `#` 临时赋环境变量」——
+`REPO` 根本没定义，后续 heredoc 里 `$REPO` 展开成空。实际踩过一次：
+plist 里的脚本路径被写成 `/scripts/auto-sync-skills.sh`，服务装上了但永远跑不起来，
+而且 `plutil -lint` 照样报 OK（XML 本身合法），特别难察觉。
+
+规矩：**给用户粘贴的命令块，注释全部写在代码块外面的散文里**；
+块内实在要注释，先加一行 `setopt interactive_comments`。
+排查线索：`zsh: command not found: #` 出现 = 有人把带行内注释的块粘进了 zsh。
 
 ### 9.8 手机端横向溢出的三个惯犯
 
