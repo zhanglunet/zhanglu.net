@@ -64,3 +64,48 @@
 - 页面：`/how-it-works` · `/en/how-it-works`
 - 入口：双语首页卡片 + 双语 Footer 链接
 - 两个数字口径被纠正并写进 AGENTS，避免继续传播
+
+---
+
+## 追加（同日）：导航入口 + skills 自动更新
+
+用户追问两点：`/how-it-works` 找不到；`/skills` 是不是最新、怎么自动保持更新。
+
+### 导航
+
+`Header.astro` 的 nav 数组加 `{ base:'/how-it-works', key:'nav.arch' }`，`ui.ts` 两语加 `nav.arch`
+（架构 / Architecture）。现在共 11 项，导航本就是单行横滑（§9.8），390/360px 页面均无横向滚动。
+
+### /skills 的真相：它不会自动更新
+
+`sync-skills.mjs` 读 `~/.claude/skills/` —— **只存在于本机 Mac**。CF Pages 构建机没有这个目录，
+所以站上 `/skills` 是「最后一次手动同步并 push」的快照。
+实测 `synced_at` 全是 **2026-06-08 / 06-09**，距今约 6-7 周 —— 期间本机新增的 skill 站上都没有。
+
+顺带查出**两个此前没人提的静默缺陷**：
+
+1. **孤儿永不消失**：脚本只新增/更新，本机删掉的 skill 会永远留在仓库和站上。
+2. **中英会静默不对齐**：`sync` 只写中文侧，新 skill 在 `skillsEn/` 没有对应文件 →
+   `/en/skills` 少内容，而且**不会构建失败**（没有 1:1 强制约束）。
+
+### 改动
+
+- `scripts/sync-skills.mjs` 升级：
+  - `--check` 只读不写、有漂移 exit 1（给 hook / 定时任务用）
+  - `--prune` 删除非 handwritten 的孤儿（handwritten 的只报告，去留由人定）
+  - 始终报告孤儿清单与中英缺失清单
+- `scripts/auto-sync-skills.sh` 新增：同步 → 校验 → 构建 → 提交 → 推送一条龙。
+  安全设计：无改动不提交、构建不过即中止、`--ff-only` 拉取、只 `git add src/content/skills`。
+- `package.json`：加 `sync:check` / `sync:auto`
+- `AGENTS.md` §5.4.1（不会自动更新 + 三条自动化路径 + launchd plist 模板）、§5.4.2（两个坑）
+
+### 验证
+
+- `--check` 在本容器实跑：报出 10 created + 16 孤儿 + 14 handwritten 孤儿，exit 1，
+  **且 `git status` 干净 —— 确认只读不写**。（容器的 `~/.claude/skills` 与用户 Mac 不同，正好当测试夹具。）
+- `bash -n` 通过；`pnpm build` Complete（109 页）；导航两语渲染正确，移动端 4 项检查无横滑。
+
+### 留给人的一步
+
+同步必须在有 `~/.claude/skills` 的那台机器上跑 —— agent 在远程会话里做不到。
+建议先 `pnpm run sync:check` 看漂移，再决定手动跑还是装 launchd 定时任务。

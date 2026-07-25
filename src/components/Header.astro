@@ -18,6 +18,7 @@ const nav = [
   { base: '/weekly', key: 'nav.weekly' as const },
   { base: '/skills', key: 'nav.skills' as const },
   { base: '/agents', key: 'nav.agents' as const },
+  { base: '/how-it-works', key: 'nav.arch' as const },
   { base: '/about', key: 'nav.about' as const },
 ];
 const isActive = (base: string) => (base === '/' ? here === '/' : here.startsWith(base));

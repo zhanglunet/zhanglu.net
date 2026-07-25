@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+#
+# 自动同步本机 Claude Skills 到 zhanglu.net 并上线。
+#
+# 为什么需要它：sync-skills.mjs 读的是 ~/.claude/skills/，只存在于你的 Mac 上。
+# CF Pages 构建机没有这个目录，所以站上的 /skills 不会自动更新 ——
+# 必须在本机跑一次同步再推。这个脚本把「同步 → 校验 → 构建 → 提交 → 推送」串起来，
+# 配合 launchd 就能定时自动跑（安装方法见 AGENTS.md §5.4）。
+#
+# 安全设计：
+#   - 只有 src/content/skills/ 真的有改动才提交，否则安静退出（不会产生空提交）
+#   - 构建不过就中止，绝不推坏的 commit 上线
+#   - 用 --ff-only 拉取，遇到分叉就停下来让人处理，不会自动 merge 出乱子
+#   - 只 add src/content/skills/，不会把你工作区里其它半成品一起提交
+#
+# 手动跑：bash scripts/auto-sync-skills.sh
+# 只看会发生什么：bash scripts/auto-sync-skills.sh --dry-run
+
+set -euo pipefail
+
+REPO="${ZHANGLU_REPO:-$HOME/zhanglu}"
+DRY_RUN=0
+[[ "${1:-}" == "--dry-run" ]] && DRY_RUN=1
+
+log() { printf '%s  %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$*"; }
+
+cd "$REPO" || { log "❌ 找不到仓库：$REPO（可用 ZHANGLU_REPO 环境变量指定）"; exit 1; }
+
+# Homebrew / nvm 装的 node 在 launchd 的最小 PATH 里找不到，显式补上
+export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+command -v node >/dev/null || { log "❌ PATH 里没有 node"; exit 1; }
+command -v pnpm >/dev/null || { log "❌ PATH 里没有 pnpm"; exit 1; }
+
+log "▶ 开始同步 skills"
+
+# 1) 拉到最新，避免和远端分叉
+git fetch --quiet origin main
+if ! git merge --ff-only origin/main --quiet 2>/dev/null; then
+  log "⚠️ 本地与 origin/main 分叉，先人工处理再跑（本次中止）"
+  exit 1
+fi
+
+# 2) 同步（--prune 会删掉本机已经不存在的 skill；不想删就去掉这个 flag）
+pnpm run sync:skills -- --prune
+
+# 3) 有改动才继续
+if git diff --quiet -- src/content/skills; then
+  log "✓ 无变化，退出"
+  exit 0
+fi
+
+CHANGED=$(git diff --name-only -- src/content/skills | wc -l | tr -d ' ')
+log "检测到 ${CHANGED} 个 skill 文件变化"
+
+# 中英对齐提醒：sync 只写中文侧，新 skill 的英文版要人工补
+ZH=$(ls src/content/skills/*.md 2>/dev/null | wc -l | tr -d ' ')
+EN=$(ls src/content/skillsEn/*.md 2>/dev/null | wc -l | tr -d ' ')
+if [[ "$ZH" != "$EN" ]]; then
+  log "⚠️ 中英不对齐：zh=${ZH} en=${EN} —— /en/skills 会少内容，记得补 src/content/skillsEn/"
+fi
+
+if [[ "$DRY_RUN" == "1" ]]; then
+  log "[dry-run] 到此为止，不构建不提交"
+  git diff --stat -- src/content/skills
+  exit 0
+fi
+
+# 4) 构建必须过（AGENTS §15：没验证 = 没完成）
+log "▶ pnpm build"
+if ! pnpm run build > /tmp/zhanglu-autosync-build.log 2>&1; then
+  log "❌ 构建失败，已中止（日志：/tmp/zhanglu-autosync-build.log）"
+  tail -20 /tmp/zhanglu-autosync-build.log
+  exit 1
+fi
+log "✓ 构建通过"
+
+# 5) 提交并推送（只提交 skills 目录）
+git add src/content/skills
+git commit -q -m "$(cat <<EOF
+chore: 同步本机 Claude Skills（${CHANGED} 个文件）
+
+由 scripts/auto-sync-skills.sh 自动执行。
+EOF
+)"
+git push --quiet origin main
+log "✅ 已推送，CF Pages 1–2 分钟后上线"

@@ -11,7 +11,9 @@
     "preview": "astro preview",
     "check": "astro check",
     "sync:skills": "node scripts/sync-skills.mjs",
-    "new:project": "node scripts/new-project.mjs"
+    "new:project": "node scripts/new-project.mjs",
+    "sync:check": "node scripts/sync-skills.mjs --check",
+    "sync:auto": "bash scripts/auto-sync-skills.sh"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.0.3",

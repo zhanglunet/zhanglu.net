@@ -307,6 +307,57 @@ pnpm run sync:skills
    - 改正文（用 `## 用途` / `## 何时用` 等小节）
 3. 以后 `sync:skills` 不会覆盖它
 
+### 5.4.1 站上的 /skills 不会自动更新（重要）
+
+**`sync-skills.mjs` 读的是 `~/.claude/skills/`，只存在于你的 Mac 上。**
+CF Pages 构建机没有这个目录 —— 所以 **`/skills` 是「最后一次手动同步并 push」的快照**，
+不会随本机新增 skill 自动更新。想确认站上是不是最新的，看任意 skill 的 `synced_at` 字段。
+
+三条路，按自动化程度排：
+
+| 方式 | 命令 | 说明 |
+|---|---|---|
+| 手动 | `pnpm run sync:skills` → build → push | 最简单，但要记得做 |
+| 先检查再决定 | `pnpm run sync:check` | **只读不写**，有漂移 exit 1。适合放进 git pre-commit hook 或定时提醒 |
+| 全自动 | `pnpm run sync:auto` | 同步 → 校验 → 构建 → 提交 → 推送，一条龙。配 launchd 可定时跑 |
+
+**定时自动跑（macOS launchd）** —— 存成 `~/Library/LaunchAgents/net.zhanglu.sync-skills.plist`：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <key>Label</key><string>net.zhanglu.sync-skills</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>/Users/john/zhanglu/scripts/auto-sync-skills.sh</string>
+  </array>
+  <key>StartCalendarInterval</key><dict><key>Hour</key><integer>9</integer><key>Minute</key><integer>0</integer></dict>
+  <key>StandardOutPath</key><string>/tmp/zhanglu-sync-skills.log</string>
+  <key>StandardErrorPath</key><string>/tmp/zhanglu-sync-skills.err</string>
+</dict></plist>
+```
+
+```bash
+launchctl load ~/Library/LaunchAgents/net.zhanglu.sync-skills.plist   # 装上（每天 9:00）
+bash scripts/auto-sync-skills.sh --dry-run                            # 先干跑看看会改什么
+launchctl unload ~/Library/LaunchAgents/net.zhanglu.sync-skills.plist # 卸掉
+```
+
+`auto-sync-skills.sh` 的安全设计：**无改动不提交**（不产生空提交）、**构建不过就中止**（不推坏 commit）、
+**`--ff-only` 拉取**（遇到分叉停下来让人处理）、**只 `git add src/content/skills`**（不会顺手提交你工作区里的半成品）。
+仓库路径默认 `$HOME/zhanglu`，可用 `ZHANGLU_REPO` 覆盖。
+
+### 5.4.2 sync 的两个坑（脚本现在会报，但要知道为什么）
+
+1. **孤儿**：本机删掉一个 skill，`sync:skills` **不会**删掉仓库里对应的 md —— 它只新增/更新。
+   结果是站上永远留着一个已经不存在的 skill。现在脚本会列出孤儿，加 `--prune` 删除
+   （`handwritten: true` 的孤儿只报告不删，因为那是你手写的中文版，去留得你定）。
+2. **中英不对齐**：`sync` **只写中文侧**（`src/content/skills/`）。新同步进来的 skill 在
+   `src/content/skillsEn/` 里没有对应文件 → `/en/skills` 会少内容，而且**不会构建失败**（没有 1:1 的强制约束）。
+   脚本现在会打印「⚠️ 英文版缺失」清单，补完再 push。
+
 **首页精选**: `featured: true` 上首页 "Skills" 精选区。  
 **当前 30 个 skill 状态**:
 - 16 个自动同步（中文版 SKILL.md 直接拿过来）
