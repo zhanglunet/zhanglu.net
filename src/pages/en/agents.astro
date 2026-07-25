@@ -54,6 +54,87 @@ const desc = 'A unified HTTP / CLI interface for AI agents (Claude Code / Codex 
     </div>
   </section>
 
+  <!-- How it fits together -->
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-2">How it fits together</h2>
+    <p class="text-[var(--color-muted)] text-sm mb-6 max-w-2xl">
+      Content lives in the repo as markdown / JSON and is compiled to static files at build time.
+      <strong class="text-[var(--color-ink)]">The endpoints are the single source of truth</strong>; the CLI is just a thin
+      wrapper over them — so all four paths below return the same data. The only question is what you have on hand.
+    </p>
+
+    <!-- diagram -->
+    <div class="border border-[var(--color-rule)] rounded-lg bg-[var(--color-paper-2)] p-5 sm:p-7">
+      <div class="flex flex-col items-center gap-1 text-center">
+        <div class="w-full max-w-xs rounded border border-[var(--color-rule)] bg-white/60 px-4 py-2.5">
+          <p class="text-sm font-medium">Source content</p>
+          <p class="font-mono text-[11px] text-[var(--color-muted)] mt-0.5 wrap-anywhere">src/content/**.md · src/data/*.json</p>
+        </div>
+        <p class="font-mono text-[11px] text-[var(--color-muted)] leading-tight py-1">│<br />pnpm build (Astro)</p>
+        <div class="w-full max-w-md rounded border-2 border-[var(--color-accent)] bg-white/70 px-4 py-3">
+          <p class="text-sm font-semibold text-[var(--color-ink)]">Static JSON endpoints — source of truth</p>
+          <p class="font-mono text-[11px] text-[var(--color-muted)] mt-1 wrap-anywhere">/api/*.json (Chinese) · /en/api/*.json (English)</p>
+          <p class="font-mono text-[11px] text-[var(--color-muted)] mt-0.5 wrap-anywhere">Discovery: /en/llms.txt → /en/api/index.json</p>
+        </div>
+        <p class="font-mono text-[11px] text-[var(--color-muted)] leading-tight py-1">│<br />HTTP GET (CORS open · no token)</p>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-2">
+        {[
+          { k: 'curl + jq', d: 'scripts / CI', hint: 'fewest deps' },
+          { k: 'CLI', d: 'npx zhanglu-net', hint: 'nicest by hand' },
+          { k: 'browser fetch', d: 'frontend / extension', hint: 'no preflight' },
+          { k: 'Claude Code', d: '/zhanglu skill', hint: 'plain language' },
+        ].map((x) => (
+          <div class="rounded border border-[var(--color-rule)] bg-white/60 px-3 py-2.5 text-center">
+            <p class="text-xs font-semibold">{x.k}</p>
+            <p class="font-mono text-[10px] text-[var(--color-muted)] mt-1 wrap-anywhere">{x.d}</p>
+            <p class="text-[10px] text-[var(--color-accent)] mt-1">{x.hint}</p>
+          </div>
+        ))}
+      </div>
+      <p class="text-center font-mono text-[11px] text-[var(--color-muted)] mt-3">↓ same data ↓<br />your agent</p>
+    </div>
+
+    <!-- which one -->
+    <h3 class="font-serif text-lg font-semibold mt-8 mb-3">Which one to pick</h3>
+    <div class="border border-[var(--color-rule)] rounded overflow-hidden text-sm">
+      {[
+        {
+          name: 'curl + jq',
+          cmd: 'curl -s https://zhanglu.net/en/api/skills.json | jq',
+          when: "You are an agent, or writing a script / CI job. **Recommended if you can make HTTP calls directly** — no extra Node process in the way.",
+        },
+        {
+          name: 'CLI (npx)',
+          cmd: 'npx zhanglu-net --lang en list skills',
+          when: "You are browsing by hand in a terminal, or want the filtering / search / body-only (`--md`) helpers for free. Needs Node 18+.",
+        },
+        {
+          name: 'browser / any language fetch',
+          cmd: "fetch('https://zhanglu.net/en/api/skills.json')",
+          when: "Building a web page, an extension, or a client in any language. CORS is wide open, no preflight, no proxy needed.",
+        },
+        {
+          name: 'Claude Code skill',
+          cmd: 'ask "what is Zhang Lu working on"',
+          when: "You use Claude Code. Install the /zhanglu skill and trigger it in plain language; it calls the CLI for you.",
+        },
+      ].map((r, i, arr) => (
+        <div class:list={['p-4', i !== arr.length - 1 && 'border-b border-[var(--color-rule)]']}>
+          <div class="flex items-baseline justify-between gap-3 flex-wrap mb-1.5">
+            <p class="font-semibold">{r.name}</p>
+            <code class="font-mono text-xs text-[var(--color-accent)] wrap-anywhere">{r.cmd}</code>
+          </div>
+          <p class="text-[var(--color-muted)] text-sm leading-relaxed" set:html={r.when.replace(/\*\*(.+?)\*\*/g, '<strong class="text-[var(--color-ink)]">$1</strong>').replace(/`(.+?)`/g, '<code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">$1</code>')} />
+        </div>
+      ))}
+    </div>
+    <p class="text-xs text-[var(--color-muted)] mt-3">
+      When in doubt, use <strong class="text-[var(--color-ink)]">curl</strong> — the endpoints are always there; the CLI is only convenience.
+    </p>
+  </section>
+
   <!-- Quick start -->
   <section class="mb-12">
     <h2 class="font-serif text-2xl font-semibold mb-5">Get started in 30 seconds</h2>
@@ -112,11 +193,69 @@ npx zhanglu-net --lang en about --json</code></pre>
   <section class="mb-12">
     <h2 class="font-serif text-2xl font-semibold mb-2">CLI</h2>
     <p class="text-[var(--color-muted)] text-sm mb-5">
-      <a href="https://www.npmjs.com/package/zhanglu-net" target="_blank" rel="noopener" class="font-mono text-[var(--color-accent)] hover:underline">zhanglu-net</a>
-      is published on npm (currently <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">v{cliVersion}</code>), with <strong class="text-[var(--color-ink)]">zero runtime dependencies</strong>, Node 18+.
-      Just <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">npx zhanglu-net &lt;command&gt;</code> — no install needed; or <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">npm i -g zhanglu-net</code>.
-      Offline / air-gapped: run the source directly with <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded wrap-anywhere">node cli/bin/zhanglu-net.mjs &lt;command&gt;</code>.
-      Pass <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">--lang en</code> for English payloads.
+      A thin wrapper over the endpoints. <strong class="text-[var(--color-ink)]">Zero runtime dependencies</strong>, Node 18+, a single {cliLines}-line file.
+    </p>
+
+    <!-- official / verify -->
+    <div class="rounded-lg border border-[var(--color-rule)] bg-[var(--color-paper-2)] p-5 mb-6">
+      <div class="flex items-baseline flex-wrap gap-x-3 gap-y-1 mb-3">
+        <a href="https://www.npmjs.com/package/zhanglu-net" target="_blank" rel="noopener" class="font-mono text-base font-semibold text-[var(--color-accent)] hover:underline">zhanglu-net</a>
+        <span class="font-mono text-xs px-2 py-0.5 rounded bg-white/70 border border-[var(--color-rule)]">v{cliVersion}</span>
+        <span class="text-xs px-2 py-0.5 rounded bg-[var(--color-accent)] text-white">official · first-party</span>
+        <span class="font-mono text-xs text-[var(--color-muted)]">MIT · 0 dependencies</span>
+      </div>
+      <p class="text-sm text-[var(--color-muted)] leading-relaxed mb-3">
+        "Official" here means: <strong class="text-[var(--color-ink)]">this package is maintained by the author of this site, and its source
+        lives in the <code class="font-mono text-xs bg-white/60 px-1 rounded">cli/</code> directory of this very repo</strong> — changed and shipped
+        alongside the endpoints. The version shown on this page is read from
+        <code class="font-mono text-xs bg-white/60 px-1 rounded">cli/package.json</code> at build time, same source as npm.
+      </p>
+      <p class="text-xs font-mono tracking-wider text-[var(--color-muted)] mb-1.5">Verify it yourself (don't trust me, trust the registry)</p>
+      <pre class="bg-[#1a1a1a] text-[#f3f1ea] p-3 rounded text-xs leading-relaxed overflow-x-auto"><code>npm view zhanglu-net repository.url   # → github.com/zhanglunet/zhanglu.net
+npm view zhanglu-net dependencies     # → empty (zero deps)
+npm view zhanglu-net version          # → should match this page</code></pre>
+      <p class="text-xs text-[var(--color-muted)] mt-3">
+        ⚠️ The package name is <code class="font-mono text-xs bg-white/60 px-1 rounded">zhanglu-net</code> (with <code class="font-mono text-xs">-net</code>).
+        The <code class="font-mono text-xs bg-white/60 px-1 rounded">zhanglu</code> package on npm is <strong class="text-[var(--color-ink)]">an empty placeholder someone else published in 2021</strong> — unrelated to this site. Don't install that one.
+      </p>
+    </div>
+
+    <h3 class="font-serif text-lg font-semibold mb-3">Three ways to run it</h3>
+    <div class="overflow-x-auto mb-6">
+      <table class="w-full text-sm border-collapse">
+        <thead>
+          <tr class="border-b border-[var(--color-rule)] text-left">
+            <th class="py-2 pr-4 font-medium whitespace-nowrap">Mode</th>
+            <th class="py-2 pr-4 font-medium whitespace-nowrap">Command</th>
+            <th class="py-2 pr-4 font-medium whitespace-nowrap">Install?</th>
+            <th class="py-2 font-medium">When to use it</th>
+          </tr>
+        </thead>
+        <tbody class="text-[var(--color-muted)]">
+          <tr class="border-b border-[var(--color-rule)] align-top">
+            <td class="py-3 pr-4 font-medium text-[var(--color-ink)] whitespace-nowrap">npx</td>
+            <td class="py-3 pr-4 font-mono text-xs wrap-anywhere">npx zhanglu-net &lt;cmd&gt;</td>
+            <td class="py-3 pr-4 whitespace-nowrap">No</td>
+            <td class="py-3 leading-relaxed">The default choice. Always pulls the latest version; simplest for occasional use. Costs a few seconds on first download.</td>
+          </tr>
+          <tr class="border-b border-[var(--color-rule)] align-top">
+            <td class="py-3 pr-4 font-medium text-[var(--color-ink)] whitespace-nowrap">global install</td>
+            <td class="py-3 pr-4 font-mono text-xs wrap-anywhere">npm i -g zhanglu-net<br />zhanglu-net &lt;cmd&gt;</td>
+            <td class="py-3 pr-4 whitespace-nowrap">Once</td>
+            <td class="py-3 leading-relaxed">You'll use it often. No download latency; works offline once installed (data still needs the network). Upgrade with <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">npm up -g</code>.</td>
+          </tr>
+          <tr class="align-top">
+            <td class="py-3 pr-4 font-medium text-[var(--color-ink)] whitespace-nowrap">from source</td>
+            <td class="py-3 pr-4 font-mono text-xs wrap-anywhere">node cli/bin/zhanglu-net.mjs &lt;cmd&gt;</td>
+            <td class="py-3 pr-4 whitespace-nowrap">clone the repo</td>
+            <td class="py-3 leading-relaxed">Air-gapped / no npm access, or you want to modify it. Zero deps — no <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">install</code> step after cloning.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="text-sm text-[var(--color-muted)] mb-5">
+      All three behave identically — same commands, same flags. The command table below applies to any of them.
+    </p>
     </p>
 
     <h3 class="font-serif text-lg font-semibold mt-6 mb-3">Commands</h3>

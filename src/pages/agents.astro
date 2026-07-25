@@ -54,6 +54,86 @@ const desc = '给 AI agent (Claude Code / Codex / Hermes / OpenClaw) 一个统�
     </div>
   </section>
 
+  <!-- How it fits together -->
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-2">整体是怎么接的</h2>
+    <p class="text-[var(--color-muted)] text-sm mb-6 max-w-2xl">
+      内容在仓库里是 markdown / JSON，build 时落成静态文件。<strong class="text-[var(--color-ink)]">端点是唯一的事实源</strong>，
+      CLI 只是它的一层薄包装 —— 所以下面四条路拿到的数据完全一样，区别只在你手上有什么。
+    </p>
+
+    <!-- diagram -->
+    <div class="border border-[var(--color-rule)] rounded-lg bg-[var(--color-paper-2)] p-5 sm:p-7">
+      <div class="flex flex-col items-center gap-1 text-center">
+        <div class="w-full max-w-xs rounded border border-[var(--color-rule)] bg-white/60 px-4 py-2.5">
+          <p class="text-sm font-medium">内容源</p>
+          <p class="font-mono text-[11px] text-[var(--color-muted)] mt-0.5 wrap-anywhere">src/content/**.md · src/data/*.json</p>
+        </div>
+        <p class="font-mono text-[11px] text-[var(--color-muted)] leading-tight py-1">│<br />pnpm build（Astro）</p>
+        <div class="w-full max-w-md rounded border-2 border-[var(--color-accent)] bg-white/70 px-4 py-3">
+          <p class="text-sm font-semibold text-[var(--color-ink)]">静态 JSON 端点 —— 事实源</p>
+          <p class="font-mono text-[11px] text-[var(--color-muted)] mt-1 wrap-anywhere">/api/*.json（中文）· /en/api/*.json（英文）</p>
+          <p class="font-mono text-[11px] text-[var(--color-muted)] mt-0.5 wrap-anywhere">自发现入口：/llms.txt → /api/index.json</p>
+        </div>
+        <p class="font-mono text-[11px] text-[var(--color-muted)] leading-tight py-1">│<br />HTTP GET（CORS 全开 · 无 token）</p>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-2">
+        {[
+          { k: 'curl + jq', d: '脚本 / CI', hint: '最少依赖' },
+          { k: 'CLI', d: 'npx zhanglu-net', hint: '人手最顺' },
+          { k: '浏览器 fetch', d: '前端 / 插件', hint: '无 preflight' },
+          { k: 'Claude Code', d: '/zhanglu skill', hint: '说人话触发' },
+        ].map((x) => (
+          <div class="rounded border border-[var(--color-rule)] bg-white/60 px-3 py-2.5 text-center">
+            <p class="text-xs font-semibold">{x.k}</p>
+            <p class="font-mono text-[10px] text-[var(--color-muted)] mt-1 wrap-anywhere">{x.d}</p>
+            <p class="text-[10px] text-[var(--color-accent)] mt-1">{x.hint}</p>
+          </div>
+        ))}
+      </div>
+      <p class="text-center font-mono text-[11px] text-[var(--color-muted)] mt-3">↓ 同一份数据 ↓<br />你的 agent</p>
+    </div>
+
+    <!-- which one -->
+    <h3 class="font-serif text-lg font-semibold mt-8 mb-3">选哪一条</h3>
+    <div class="border border-[var(--color-rule)] rounded overflow-hidden text-sm">
+      {[
+        {
+          name: 'curl + jq',
+          cmd: 'curl -s https://zhanglu.net/api/skills.json | jq',
+          when: '你是 agent、或在写脚本 / CI。**推荐给能直接发 HTTP 的 agent** —— 不用多一层 Node 进程。',
+        },
+        {
+          name: 'CLI（npx）',
+          cmd: 'npx zhanglu-net list skills --featured',
+          when: '你在终端里手动翻，或想要现成的过滤 / 搜索 / 只取正文（`--md`）。需要 Node 18+。',
+        },
+        {
+          name: '浏览器 / 任意语言 fetch',
+          cmd: "fetch('https://zhanglu.net/api/skills.json')",
+          when: '写网页、插件、或任何语言的客户端。CORS 全开，无 preflight，不需要代理。',
+        },
+        {
+          name: 'Claude Code skill',
+          cmd: '说「查张路的 skill」',
+          when: '你用 Claude Code。装上 /zhanglu skill 后用自然语言触发，它内部替你调 CLI。',
+        },
+      ].map((r, i, arr) => (
+        <div class:list={['p-4', i !== arr.length - 1 && 'border-b border-[var(--color-rule)]']}>
+          <div class="flex items-baseline justify-between gap-3 flex-wrap mb-1.5">
+            <p class="font-semibold">{r.name}</p>
+            <code class="font-mono text-xs text-[var(--color-accent)] wrap-anywhere">{r.cmd}</code>
+          </div>
+          <p class="text-[var(--color-muted)] text-sm leading-relaxed" set:html={r.when.replace(/\*\*(.+?)\*\*/g, '<strong class="text-[var(--color-ink)]">$1</strong>').replace(/`(.+?)`/g, '<code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">$1</code>')} />
+        </div>
+      ))}
+    </div>
+    <p class="text-xs text-[var(--color-muted)] mt-3">
+      拿不定就用 <strong class="text-[var(--color-ink)]">curl</strong> —— 端点永远在，CLI 只是方便。
+    </p>
+  </section>
+
   <!-- Quick start -->
   <section class="mb-12">
     <h2 class="font-serif text-2xl font-semibold mb-5">30 秒上手</h2>
@@ -114,11 +194,67 @@ npx zhanglu-net --lang en about --json</code></pre>
   <section class="mb-12">
     <h2 class="font-serif text-2xl font-semibold mb-2">CLI</h2>
     <p class="text-[var(--color-muted)] text-sm mb-5">
-      <a href="https://www.npmjs.com/package/zhanglu-net" target="_blank" rel="noopener" class="font-mono text-[var(--color-accent)] hover:underline">zhanglu-net</a>
-      已发布在 npm（当前 <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">v{cliVersion}</code>），<strong class="text-[var(--color-ink)]">零运行时依赖</strong>，Node 18+。
-      直接 <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">npx zhanglu-net &lt;command&gt;</code> 就能跑，不用装；
-      也可以 <code class="text-xs bg-[var(--color-paper-2)] px-1 rounded">npm i -g zhanglu-net</code>。
-      离线 / 内网环境可以直接跑源码：<code class="text-xs bg-[var(--color-paper-2)] px-1 rounded wrap-anywhere">node cli/bin/zhanglu-net.mjs &lt;command&gt;</code>。
+      端点的薄包装。<strong class="text-[var(--color-ink)]">零运行时依赖</strong>，Node 18+，单文件 {cliLines} 行。
+    </p>
+
+    <!-- 官方标注 / 验真 -->
+    <div class="rounded-lg border border-[var(--color-rule)] bg-[var(--color-paper-2)] p-5 mb-6">
+      <div class="flex items-baseline flex-wrap gap-x-3 gap-y-1 mb-3">
+        <a href="https://www.npmjs.com/package/zhanglu-net" target="_blank" rel="noopener" class="font-mono text-base font-semibold text-[var(--color-accent)] hover:underline">zhanglu-net</a>
+        <span class="font-mono text-xs px-2 py-0.5 rounded bg-white/70 border border-[var(--color-rule)]">v{cliVersion}</span>
+        <span class="text-xs px-2 py-0.5 rounded bg-[var(--color-accent)] text-white">官方 · first-party</span>
+        <span class="font-mono text-xs text-[var(--color-muted)]">MIT · 0 dependencies</span>
+      </div>
+      <p class="text-sm text-[var(--color-muted)] leading-relaxed mb-3">
+        「官方」的意思是：<strong class="text-[var(--color-ink)]">这个包由本站作者维护，源码就在本站同一个仓库的
+        <code class="font-mono text-xs bg-white/60 px-1 rounded">cli/</code> 目录</strong>，和端点一起改、一起发。
+        本页显示的版本号是 build 时从 <code class="font-mono text-xs bg-white/60 px-1 rounded">cli/package.json</code> 读的，与 npm 上同源。
+      </p>
+      <p class="text-xs font-mono tracking-wider text-[var(--color-muted)] mb-1.5">自己验一下（别信我，信 registry）</p>
+      <pre class="bg-[#1a1a1a] text-[#f3f1ea] p-3 rounded text-xs leading-relaxed overflow-x-auto"><code>npm view zhanglu-net repository.url   # → github.com/zhanglunet/zhanglu.net
+npm view zhanglu-net dependencies     # → 空（零依赖）
+npm view zhanglu-net version          # → 应与本页一致</code></pre>
+      <p class="text-xs text-[var(--color-muted)] mt-3">
+        ⚠️ 注意包名是 <code class="font-mono text-xs bg-white/60 px-1 rounded">zhanglu-net</code>（带 <code class="font-mono text-xs">-net</code>）。
+        npm 上的 <code class="font-mono text-xs bg-white/60 px-1 rounded">zhanglu</code> 是<strong class="text-[var(--color-ink)]">别人 2021 年占的空包</strong>，与本站无关，别装错。
+      </p>
+    </div>
+
+    <h3 class="font-serif text-lg font-semibold mb-3">三种跑法，选一个</h3>
+    <div class="overflow-x-auto mb-6">
+      <table class="w-full text-sm border-collapse">
+        <thead>
+          <tr class="border-b border-[var(--color-rule)] text-left">
+            <th class="py-2 pr-4 font-medium whitespace-nowrap">跑法</th>
+            <th class="py-2 pr-4 font-medium whitespace-nowrap">命令</th>
+            <th class="py-2 pr-4 font-medium whitespace-nowrap">要不要装</th>
+            <th class="py-2 font-medium">什么时候用</th>
+          </tr>
+        </thead>
+        <tbody class="text-[var(--color-muted)]">
+          <tr class="border-b border-[var(--color-rule)] align-top">
+            <td class="py-3 pr-4 font-medium text-[var(--color-ink)] whitespace-nowrap">npx</td>
+            <td class="py-3 pr-4 font-mono text-xs wrap-anywhere">npx zhanglu-net &lt;cmd&gt;</td>
+            <td class="py-3 pr-4 whitespace-nowrap">不用</td>
+            <td class="py-3 leading-relaxed">默认选这个。每次自动拉最新版，偶尔用最省事；代价是首次要下载几秒。</td>
+          </tr>
+          <tr class="border-b border-[var(--color-rule)] align-top">
+            <td class="py-3 pr-4 font-medium text-[var(--color-ink)] whitespace-nowrap">全局装</td>
+            <td class="py-3 pr-4 font-mono text-xs wrap-anywhere">npm i -g zhanglu-net<br />zhanglu-net &lt;cmd&gt;</td>
+            <td class="py-3 pr-4 whitespace-nowrap">一次</td>
+            <td class="py-3 leading-relaxed">你会经常用。启动没有下载延迟，装完离线也能跑（数据仍需联网）。要手动 <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">npm up -g</code> 升级。</td>
+          </tr>
+          <tr class="align-top">
+            <td class="py-3 pr-4 font-medium text-[var(--color-ink)] whitespace-nowrap">跑源码</td>
+            <td class="py-3 pr-4 font-mono text-xs wrap-anywhere">node cli/bin/zhanglu-net.mjs &lt;cmd&gt;</td>
+            <td class="py-3 pr-4 whitespace-nowrap">clone 仓库</td>
+            <td class="py-3 leading-relaxed">内网 / 无 npm 访问，或你想改它。零依赖，clone 完不用 <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">install</code> 直接跑。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="text-sm text-[var(--color-muted)] mb-5">
+      三种跑法的命令、flags、行为完全一致 —— 下面的命令表对三者都适用。
     </p>
 
     <h3 class="font-serif text-lg font-semibold mt-6 mb-3">命令</h3>
