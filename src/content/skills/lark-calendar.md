@@ -1,0 +1,15 @@
+---
+name: "lark-calendar"
+description: |
+  飞书日历：管理日历日程和会议室。查看/搜索日程、创建/更新日程、管理参会人、查询忙闲和推荐时段、预定会议室。当用户需要查看日程安排、创建/修改会议、查询/预定会议室时使用。不负责：查询过去的视频会议记录（走 lark-vc）、待办任务（走 lark-task）。
+source: local
+featured: false
+handwritten: false
+synced_at: "2026-07-26"
+---
+
+本 skill 来源于本机 `~/.claude/skills/lark-calendar/SKILL.md`，由 `pnpm run sync:skills` 自动同步。
+
+## 描述
+
+飞书日历：管理日历日程和会议室。查看/搜索日程、创建/更新日程、管理参会人、查询忙闲和推荐时段、预定会议室。当用户需要查看日程安排、创建/修改会议、查询/预定会议室时使用。不负责：查询过去的视频会议记录（走 lark-vc）、待办任务（走 lark-task）。
