@@ -280,3 +280,73 @@ AGENTS §9.13 已按这个结论重写：把「purge 就能修」改成「purge 
 - **有两个入口的时候先做 A/B**（`pages.dev` vs 自定义域），别在单一入口上反复读 header 猜机制。
 - purge 完必须**复验**才能说修好了。这次如果只报「已 purge」就收工，等于把一个仍在外泄的状态
   当成已解决 —— 而 12 个 `/skills/crm-*/` 页面此刻仍能读到内部服务的完整 description。
+
+---
+
+## 追加 3（收尾）：两轮「还在外泄」的报告都是我测错了 —— 容器代理在缓存
+
+用户关掉 Always Online 又 purge 了一次。复验：**还是同样的 38 条 200，一条没变。**
+到这里三次结果完全一致（purge 前 38、purge 后 38、关 Always Online 后 38），
+说明变量根本不在 Cloudflare 侧 —— 我一直在动错的旋钮。
+
+于是换了两个真正能判定的测试：
+
+```
+测试 A：cf-ray 每次请求是否变      → 变（a21c7a5d…/a21c7a61…/a21c7a62…）
+测试 B：绕过本地 agent 代理         → 经代理 200，--noproxy '*' 404   ← 决定性
+```
+
+**根因是远程会话的 agent 代理（`HTTPS_PROXY`）在缓存响应。** 它 MITM TLS
+（环境里那个 `/root/.ccr/ca-bundle.crt` 就是为此），所以能缓存 HTTPS body。
+它的缓存副本几乎完美地伪装成了「CDN 旧副本」：
+
+| 观察到的现象 | 我当时的（错误）解读 | 实际 |
+|---|---|---|
+| 已删 URL 返回 200，正文完整 | CF 在服务存档副本 | 代理缓存命中 |
+| `?cb=1` → 404 | 源站干净，CDN 有旧副本 | **代理**的 cache key 变了 |
+| `age` 跟真实时间涨 | CDN 对象在老化 | 代理对象在老化 |
+| 扛过 Purge Everything | 不是普通缓存 → 猜 Always Online | 压根不在 CF |
+| 扛过关 Always Online | 继续往下猜 | 同上 |
+| `cf-cache-status: DYNAMIC` | （权重给得不够） | **这条早就排除了 CF 边缘缓存** |
+| `cf-ray` 每次都变 | 每次都真到了 CF | 代理条件回源：头是新的，body 是旧的 |
+
+`pages.dev` 那次 A/B 也被这层污染了 —— 它显示 404 不是因为「Pages 源干净」，
+而是因为**代理没缓存过 `pages.dev` 那几条 URL**。结论碰巧对了一半，推理过程是错的。
+
+### 直连复验的真实结果
+
+```
+124 条已删 URL（17 个 aic-* × 4 路径 + 14 个旧 skill × 4 路径）
+  经代理：38 条 200
+  直连：   1 条 200          ← 37 条是幻觉
+```
+
+| 检查（全部 `--noproxy '*'`） | 结果 |
+|---|---|
+| 17 个 `aic-*` × 4 条路径（zh/en × 页面/端点） | **全部 404** ✓ 敏感内容彻底下线 |
+| 14 个旧 skill × 4 条路径 | 13 个全 404；仅 `/api/skills/mba.json` 仍 200 |
+| `/api/skills.json` · `/en/api/skills.json` | `count=41`，`aic-` 命中 0，含 `zhanglu` ✓ |
+| `/api/search.json` · `/en/api/search.json` | `count=60`，`aic-` 命中 0 ✓ |
+| `/api/index.json` counts | `{projects:8, articles:5, presentations:4, skills:41, weekly:1}` ✓ |
+| `sitemap-0.xml` | 130 条 URL，其中 skill URL **82 条 = 41 × 2** ✓，无已删 slug |
+| `/skills/zhanglu/`、`/en/skills/zhanglu/`、两语 `api/skills/zhanglu.json`、`boss.json`、两语 `/agents/` | 全 200 ✓ |
+
+唯一残留 `/api/skills/mba.json`：`age` ≈ 2.6 天，`s-maxage=604800` + `x-robots-tag: noindex` +
+`cf-cache-status: DYNAMIC`，`?cb=` 和 `pages.dev` 都是 404，**扛过 Purge Everything 也扛过
+`Cache-Control: no-cache` 请求头**。内容是个人的 MBA 品牌速读 skill，非敏感；7 天 `s-maxage`
+到期自然消失，急就按单 URL purge。
+
+### 代价与教训
+
+**代价**：让用户白做了两件事 —— Purge Everything（无害）和**关掉 Always Online（需要恢复）**。
+敏感内容其实在第一次 push + 部署完成时就已经下线了。
+
+**教训**：
+1. **容器里核验线上状态一律 `--noproxy '*'`。** 不加就是在读十几小时前的快照。已写成 AGENTS §9.13
+   并列了那张「现象 → 误判」对照表，因为每一条单独看都很像 CDN 行为。
+2. **三次改动、三次同样的结果 = 变量不在你动的那一侧。** 我第二次拿到「38 条一条没变」时就该
+   停下来质疑测量方法，而不是换个 CF 旋钮再试。「改了没变化」是关于**因果链**的信息，不是噪声。
+3. **`cf-cache-status: DYNAMIC` 时不要谈边缘缓存。** 这条证据从第一轮就在手里，我给的权重太低，
+   反而去追 `s-maxage=604800` 这个更显眼但更弱的信号。
+4. **报「还在外泄」的门槛要和报「已修好」一样高。** 误报外泄不是安全的一侧 ——
+   它会让人去改生产配置。

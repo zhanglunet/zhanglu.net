@@ -640,65 +640,67 @@ skill-creator 之类），跟用户 Mac 上那套完全不同。在容器里跑 
 提交前 `git status --porcelain src/content/skills` 必须只剩你真正要改的那几个。
 真正的同步只在有那套 skill 的机器上跑（见 §5.4）。
 
-### 9.13 删内容 ≠ 下线：Cloudflare 会继续服务已删除 URL 的旧副本
+### 9.13 核验线上状态：容器里必须 `curl --noproxy '*'`，否则代理缓存会骗你
 
-**症状**：把某个 `.md` 删掉、build 过、push 上 main、CF Pages 部署成功、
-`/api/<列表>.json` 里也确实没有它了 —— 但 `https://zhanglu.net/skills/<被删的 slug>/`
-**照样返回 200，正文完整可读**。
+**这条是 2026-07-27 撤回 17 个内部 skill 时踩的最大的坑，代价是让用户白改了两轮
+Cloudflare 设置。** 症状是：内容删了、build 过了、push 上 main、CF Pages 部署成功，
+但在**远程 agent 会话（容器）里** curl 已删 URL 仍返回 200，正文完整可读。
 
-**怎么确认是缓存而不是没部署成功**：给同一个 URL 加个 cache-buster query。
+**根因：远程会话的出网走 agent 代理（`HTTPS_PROXY`），它 MITM TLS（所以有
+`/root/.ccr/ca-bundle.crt`）并且会缓存响应。** 缓存副本的表现极具误导性：
 
-```bash
-curl -s -o /dev/null -w '%{http_code}\n' https://zhanglu.net/skills/<slug>/
-curl -s -o /dev/null -w '%{http_code}\n' 'https://zhanglu.net/skills/<slug>/?cb=1'
-```
+| 现象 | 为什么会让人误判 |
+|---|---|
+| 已删 URL 返回 200，正文完整 | 看着像「没部署成功」或「CF 在服务旧副本」 |
+| 加 `?cb=1` 就 404 | 看着像「源站干净、CDN 有旧副本」—— 其实是**代理**的 cache key 变了 |
+| `age` 跟着真实时间往上涨 | 看着像「CDN 里的对象在老化」 |
+| **免疫 CF Purge Everything** | 看着像「purge 没生效 / 是 Always Online」 |
+| **免疫关掉 Always Online** | 于是继续往下猜，越猜越偏 |
+| `cf-cache-status: DYNAMIC` | 这条其实已经排除了「CF 边缘缓存」，但容易被忽略 |
+| `cf-ray` 每次都变 | 看着像「每次都真到了 CF」（代理做条件回源，头是新的、body 是旧的）|
 
-前者 200、后者 404 = **源站已经干净，是 Cloudflare 侧在服务旧副本**。旧副本的响应头有两个特征：
-
-```
-cache-control: public, s-maxage=604800     ← 7 天，而现役页面是 max-age=0, must-revalidate
-x-robots-tag: noindex                      ← CF 给「非当前版本」内容打的标记
-age: 43875                                 ← 副本的年龄
-```
-
-对照组：**从来没存在过的** URL 返回 `404` + `cache-control: no-store`。所以 200 + `noindex` +
-长 `s-maxage` 这组合专属于「曾经存在、现在被删」的路径。
-
-**另外它按 PoP 命中**：同一个 URL 连着查几次可能一会儿 404 一会儿 200，不同机器上查结果也不同。
-**不要用「我这里查是 404」判定已经下线** —— 要么加 cache-buster 对照，要么直接 purge 完再验。
-
-**⚠️ Purge Everything 治不了这个** —— 2026-07-27 实测过：purge 完 124 条已删 URL 里
-**仍有 38 条返回 200**，一条没少，而且 `age` 从 43875 涨到 46481（跟着真实时间走，purge 没重置它）。
-原因在响应头里写着：`cf-cache-status: DYNAMIC` = **压根不是缓存命中**，所以清缓存碰不到它。
-
-**真凶是 Always Online**（存档副本存在普通缓存之外，源站返错/404 时顶上）。**开关：
-CF dashboard → 选 `zhanglu.net` 域 → Caching → Configuration → Always Online → 关掉。**
-关掉后再 purge 一次，然后复验。
-
-**怎么确认是 zone 层而不是 Pages 层**（一步定位，别猜）：拿 Pages 的默认域做对照。
+**一行拆穿它：**
 
 ```bash
-curl -s -o /dev/null -w 'pages.dev: %{http_code}\n' https://zhanglu-net.pages.dev/skills/<slug>/
-curl -s -o /dev/null -w 'zhanglu.net: %{http_code}\n' https://zhanglu.net/skills/<slug>/
+curl -s -o /dev/null -w '经代理: %{http_code}\n'      https://zhanglu.net/<path>
+curl -s -o /dev/null -w '直连:   %{http_code}\n' --noproxy '*' https://zhanglu.net/<path>
 ```
 
-`pages.dev` 404 + `zhanglu.net` 200 = **构建产物是干净的，问题全在 zone 层**（Always Online /
-缓存），仓库里怎么改都没用。两个都 200 才是构建里真的还有这个文件。
+那次实测：经代理 38 条已删 URL 返回 200，**直连只有 1 条** —— 37 条是代理缓存的幻觉。
 
-purge 的 API 写法（token 需要 Zone → Cache Purge → Purge 权限，Zone ID 在域名 Overview 页）——
-**记住它只清普通缓存，不清 Always Online 存档**：
+**规矩：在容器里核验任何线上状态（部署是否生效、内容是否下线、header 是什么），
+一律加 `--noproxy '*'`。** 不加就等于在读一个十几个小时前的快照。
+（正常抓取外部内容不用管这个；只有「核验线上当前状态」才必须直连。）
+
+#### 配套：两个便宜的对照实验
+
+**① `pages.dev` vs 自定义域** —— 一步分开「构建产物有问题」和「托管层有问题」：
 
 ```bash
-curl -X POST "https://api.cloudflare.com/client/v4/zones/<ZONE_ID>/purge_cache" \
-  -H "Authorization: Bearer <TOKEN>" -H "Content-Type: application/json" \
-  --data '{"purge_everything":true}'
+curl -s --noproxy '*' -o /dev/null -w 'pages.dev:   %{http_code}\n' https://zhanglu-net.pages.dev/<path>
+curl -s --noproxy '*' -o /dev/null -w 'zhanglu.net: %{http_code}\n' https://zhanglu.net/<path>
 ```
 
-**规矩：凡是「下线/撤回内容」的改动，push 之后必须 purge 一次再验收。**
-新增和修改不用管（现役页面是 `max-age=0, must-revalidate`，部署即生效）——
-**只有删除会卡在这上面**。这条 2026-07-27 撤回 17 个内部 skill 时踩到：
-push 成功、`/api/skills.json` 已经是 41 条干净数据，但 12 个 `/skills/crm-*/` 页面
-还能读到内部服务的完整 description。
+两个都 404 = 真下线了。`pages.dev` 404 而自定义域 200 = 构建是干净的，问题在 zone 层。
+
+**② cache-buster query** —— `<path>?cb=1` 与 `<path>` 对照，两者不同说明中间有按 URL 缓存的一层
+（但**先排除代理**再用这条，否则结论会指错方向）。
+
+#### CF 侧确实存在少量旧副本，但影响很小
+
+直连复验后只剩 1 条：`/api/skills/mba.json`，`age` ≈ 2.6 天，头是
+`cache-control: public, s-maxage=604800` + `x-robots-tag: noindex` + `cf-cache-status: DYNAMIC`，
+`?cb=` 与 `pages.dev` 都是 404。它**扛过了 Purge Everything 也扛过了 `Cache-Control: no-cache` 请求头**，
+但会在 `s-maxage`（7 天）到期后自然消失；急的话在 dashboard 按单 URL purge。
+
+**不要为了这个去关 Always Online** —— 07-27 我据错误判断建议过一次，实测与它无关，关了没有任何变化。
+
+#### 撤回内容的验收清单
+
+1. `pnpm build` 过、push、等 CF Pages 部署完成
+2. **`curl --noproxy '*'`** 逐条核验已删 URL 返回 404（zh 页 / en 页 / zh 端点 / en 端点四条路径都查）
+3. 核验列表类端点已经不含它（`/api/<coll>.json`、`/api/search.json`、`sitemap-0.xml`）
+4. 还有 200 的，先做 `pages.dev` 对照再决定要不要 purge —— 别一上来就改 CF 设置
 
 ### 9.8 手机端横向溢出的三个惯犯
 
