@@ -5,6 +5,40 @@
 > 版本号说明：本文件记的是**站点**版本（`package.json`）。CLI 是独立发布的 npm 包，
 > 版本号在 `cli/package.json`，与站点版本不同步（当前 `zhanglu-net@0.2.0`）。
 
+## [未发布]
+
+修 skills 自动同步造成的三起事故（详见 `docs/dev-log/2026-07-27-skills-sync-incident.md`）。
+
+### 修复
+
+- **`sync:skills --prune` 会误删还存在的 skill**。断链 symlink / 读不到 `SKILL.md` /
+  frontmatter 解析失败 / 缺 `description` 这四种情况以前都被当成「本机已删除」删掉，
+  07-27 一次丢了 15 个（含 `featured: true` 的 `zhanglu`，导致 `/skills/zhanglu` 与
+  `/api/skills/zhanglu.json` 线上 404，而 `/agents` 和 README 还链着它）。
+  现在只要源目录还在就永不删，只报告为「⚠️ 不可读」；`featured` / `handwritten` 的孤儿也永不自动删。
+- **`sync:auto` 遇到中英不对齐会照样推上线**。07-26/27 两次同步把 zh 从 30 推到 57、en 还是 30，
+  `/en/skills` 静默少 27 条且构建不报错。现在直接 `exit 1` 不推送。
+- **恢复 `zhanglu` skill**（改 `handwritten: true` 以免再被自动删），内容更新到当前端点集，
+  并删掉「CDN cache 友好」这句与线上响应头不符的说法。
+- **21 处文档和页面引用了已删除的 `mba` skill**（`/agents`、`/posts/agent-cli`、`llms.txt`、
+  README、CLI 帮助里的 curl 与 `get skill` 示例），统一换成 `boss`。
+- **README 的「装 skill」配方产出的是非法 skill**：`jq -r .body_md` 没有 frontmatter，
+  Claude Code 认不了。
+
+### 新增
+
+- `/api/skills/{slug}.json` 与 `/en/api/skills/{slug}.json` 增加 **`skill_md`** 字段 ——
+  拼好 frontmatter 的完整 `SKILL.md`，一行 `jq -r .skill_md` 即可落盘安装。
+- `sync-skills.mjs` 增加 **`EXCLUDE`** 名单（glob，同时匹目录 slug 和 frontmatter `name`）。
+  07-27 那次把 17 个 `aic-*` 内部服务 skill（企业 CRM / 差旅 / 考勤后端）推上了公开站，
+  现已下线并由此拦住。25 个 `lark-*` 保留。
+- `src/content/skillsEn/lark-*.md` —— 25 个英文平行版，`/skills` 与 `/en/skills` 恢复 1:1（各 41 个）。
+
+### 变更
+
+- 页面数 109 → **131**；JSON 端点文件 96 → **118**（端点类型仍 24）。
+  `/how-it-works` 与 `/agents` 上的数字是 build 时算的，自动跟上，无需手改。
+
 ## [0.3.0] - 2026-07-25
 
 站点最大的一次改动：**全站中英双语**，外加把 agent 接入层补成双语、CLI 正式发到 npm。

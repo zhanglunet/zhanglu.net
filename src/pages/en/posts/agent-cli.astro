@@ -83,7 +83,7 @@ HTML pages    /api/*.json     /llms.txt
       <h3>Layer two: the CLI</h3>
 
       <pre><code>{`npx zhanglu-net list skills --featured
-npx zhanglu-net get skill mba --md
+npx zhanglu-net get skill boss --md
 npx zhanglu-net search "brand judgment" --type skill
 npx zhanglu-net about --json`}</code></pre>
 
@@ -127,8 +127,8 @@ npx zhanglu-net --help`}</code></pre>
 curl -s https://zhanglu.net/api/skills.json \\
   | jq '.items[] | select(.featured)'
 
-# Get the full text of the mba skill
-curl -s https://zhanglu.net/api/skills/mba.json \\
+# Get the full text of the boss skill
+curl -s https://zhanglu.net/api/skills/boss.json \\
   | jq -r .body_md
 
 # Full-text search
@@ -138,7 +138,7 @@ curl -s https://zhanglu.net/api/search.json \\
       <p>Or just:</p>
 
       <pre><code>{`npx zhanglu-net list skills --featured --json
-npx zhanglu-net get skill mba --md
+npx zhanglu-net get skill boss --md
 npx zhanglu-net search "brand"`}</code></pre>
 
       <h2>Time to build</h2>

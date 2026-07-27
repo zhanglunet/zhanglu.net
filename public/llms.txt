@@ -51,7 +51,7 @@ npx zhanglu-net list skills
 npx zhanglu-net list projects --featured
 npx zhanglu-net list presentations
 npx zhanglu-net list weekly
-npx zhanglu-net get skill mba --md
+npx zhanglu-net get skill boss --md
 npx zhanglu-net search "品牌判断"
 npx zhanglu-net about
 npx zhanglu-net endpoints

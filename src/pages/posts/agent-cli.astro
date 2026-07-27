@@ -82,7 +82,7 @@ HTML 页面     /api/*.json     /llms.txt
       <h3>第二层：CLI</h3>
 
       <pre><code>{`npx zhanglu-net list skills --featured
-npx zhanglu-net get skill mba --md
+npx zhanglu-net get skill boss --md
 npx zhanglu-net search "品牌判断" --type skill
 npx zhanglu-net about --json`}</code></pre>
 
@@ -126,8 +126,8 @@ npx zhanglu-net --help`}</code></pre>
 curl -s https://zhanglu.net/api/skills.json \\
   | jq '.items[] | select(.featured)'
 
-# 拿 mba skill 的全文
-curl -s https://zhanglu.net/api/skills/mba.json \\
+# 拿 boss skill 的全文
+curl -s https://zhanglu.net/api/skills/boss.json \\
   | jq -r .body_md
 
 # 全文搜
@@ -137,7 +137,7 @@ curl -s https://zhanglu.net/api/search.json \\
       <p>或者直接：</p>
 
       <pre><code>{`npx zhanglu-net list skills --featured --json
-npx zhanglu-net get skill mba --md
+npx zhanglu-net get skill boss --md
 npx zhanglu-net search "品牌"`}</code></pre>
 
       <h2>实施时间</h2>

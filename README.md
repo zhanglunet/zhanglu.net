@@ -91,7 +91,7 @@ zhanglu.net 是 agent-friendly 站点 —— 所有内容在 build 时落成静�
 |---|---|
 | agent 第一跳，自发现 | `curl https://zhanglu.net/llms.txt` |
 | 列出所有 skill | `curl -s https://zhanglu.net/api/skills.json \| jq '.items[].name'` |
-| 拿单个 skill 全文（含 body） | `curl -s https://zhanglu.net/api/skills/mba.json \| jq -r .body_md` |
+| 拿单个 skill 全文（含 body） | `curl -s https://zhanglu.net/api/skills/boss.json \| jq -r .body_md` |
 | 只看 featured | `curl -s https://zhanglu.net/api/skills.json \| jq '.items[] \| select(.featured)'` |
 | 搜关键词（含全文） | `curl -s https://zhanglu.net/api/search.json \| jq '.items[] \| select(.text \| test("品牌"; "i"))'` |
 | 列项目 / 文章 / 简介 | `curl https://zhanglu.net/api/{projects,articles,about}.json` |
@@ -103,7 +103,7 @@ zhanglu.net 是 agent-friendly 站点 —— 所有内容在 build 时落成静�
 ```bash
 npx zhanglu-net endpoints                          # 看 manifest + counts
 npx zhanglu-net list skills --featured             # 列 featured skill
-npx zhanglu-net get skill mba --md                 # 拿 mba skill 全文 markdown
+npx zhanglu-net get skill boss --md                # 拿 boss skill 全文 markdown
 npx zhanglu-net search "品牌判断" --type skill     # 在 skill 里搜
 npx zhanglu-net list projects --status live --json # 列 live 项目，出 JSON
 npx zhanglu-net list weekly                        # 周报
@@ -126,7 +126,7 @@ skills / projects / articles / presentations / weekly 五类。
 |---|---|---|
 | [`/api/index.json`](https://zhanglu.net/api/index.json) | manifest（agent 进站第一跳） | `counts`, `endpoints`, `languages`, `lang` |
 | [`/api/skills.json`](https://zhanglu.net/api/skills.json) | 全部 Claude Skill 索引 | `items[].name/description/source/featured/handwritten` |
-| `/api/skills/{slug}.json` | 单 skill（含正文） | 上述 + `body_md` |
+| `/api/skills/{slug}.json` | 单 skill（含正文） | 上述 + `body_md`、`skill_md`（拼好 frontmatter，可直接落盘） |
 | [`/api/projects.json`](https://zhanglu.net/api/projects.json) | 项目列表 | `items[].slug/title/tagline/tech/year/status/loc/persona/cover` |
 | `/api/projects/{slug}.json` | 单项目（含正文） | 上述 + `body_md` |
 | [`/api/articles.json`](https://zhanglu.net/api/articles.json) | 写作索引（站内 + 外链） | `items[].title/source/url/date/summary/tags` |
@@ -144,8 +144,10 @@ skills / projects / articles / presentations / weekly 五类。
 
 ```bash
 mkdir -p ~/.claude/skills/zhanglu
-curl -s https://zhanglu.net/api/skills/zhanglu.json | jq -r .body_md > ~/.claude/skills/zhanglu/SKILL.md
+curl -s https://zhanglu.net/api/skills/zhanglu.json | jq -r .skill_md > ~/.claude/skills/zhanglu/SKILL.md
 ```
+
+（用 `skill_md` 而不是 `body_md` —— 后者只有正文，写出来的 SKILL.md 缺 frontmatter，Claude Code 认不了。）
 
 之后说「查张路的 skill」「zhanglu 上的 X」「张路在做什么项目」，Claude Code 自动调 `npx zhanglu-net`。
 

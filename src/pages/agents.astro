@@ -145,14 +145,14 @@ const desc = '给 AI agent (Claude Code / Codex / Hermes / OpenClaw) 一个统�
 curl -s https://zhanglu.net/api/skills.json \
   | jq '.items[] | select(.featured) | .name'
 
-curl -s https://zhanglu.net/api/skills/mba.json \
+curl -s https://zhanglu.net/api/skills/boss.json \
   | jq -r .body_md</code></pre>
       </div>
       <div>
         <p class="text-xs font-mono text-[var(--color-muted)] mb-2 tracking-wider">CLI</p>
         <pre class="bg-[#1a1a1a] text-[#f3f1ea] p-4 rounded text-xs leading-relaxed overflow-x-auto"><code>npx zhanglu-net endpoints
 npx zhanglu-net list skills --featured
-npx zhanglu-net get skill mba --md
+npx zhanglu-net get skill boss --md
 npx zhanglu-net search "品牌判断" --type skill
 
 # 英文数据

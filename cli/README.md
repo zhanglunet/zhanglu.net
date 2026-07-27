@@ -8,7 +8,7 @@ npx zhanglu-net --help
 npx zhanglu-net list skills
 npx zhanglu-net list projects --featured
 npx zhanglu-net list presentations
-npx zhanglu-net get skill mba --md
+npx zhanglu-net get skill boss --md
 npx zhanglu-net search "品牌判断" --type skill
 npx zhanglu-net --lang en search "brand judgment"
 ```
@@ -80,7 +80,7 @@ CLI 是 `https://zhanglu.net/api/*.json` 的薄包装。直接 `curl` 也行：
 ```bash
 curl -s https://zhanglu.net/api/index.json | jq
 curl -s https://zhanglu.net/api/skills.json | jq '.items[].name'
-curl -s https://zhanglu.net/api/skills/mba.json | jq .body_md -r
+curl -s https://zhanglu.net/api/skills/boss.json | jq .body_md -r
 
 # 英文
 curl -s https://zhanglu.net/en/api/projects.json | jq '.items[].title'

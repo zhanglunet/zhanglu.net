@@ -86,7 +86,7 @@ ${c.bold('EXAMPLES')}
   npx zhanglu-net list skills --featured
   npx zhanglu-net list projects --status live --json
   npx zhanglu-net list presentations
-  npx zhanglu-net get skill mba --md
+  npx zhanglu-net get skill boss --md
   npx zhanglu-net search "品牌判断" --type skill
   npx zhanglu-net --lang en search "brand judgment"
   npx zhanglu-net --lang en about --json
@@ -130,7 +130,7 @@ const CMD_HELP = {
     --lang <zh|en>       语言
 
   例:
-    npx zhanglu-net get skill mba --md
+    npx zhanglu-net get skill boss --md
     npx zhanglu-net get project qcc-agent
     npx zhanglu-net --lang en get project boss --md`,
 

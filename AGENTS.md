@@ -384,23 +384,37 @@ pnpm run sync:auto     # 确认后一条龙
 **`--ff-only` 拉取**（遇到分叉停下来让人处理）、**只 `git add src/content/skills`**（不会顺手提交你工作区里的半成品）。
 仓库路径默认 `$HOME/zhanglu`，可用 `ZHANGLU_REPO` 覆盖。
 
-### 5.4.2 sync 的两个坑（脚本现在会报，但要知道为什么）
+### 5.4.2 sync 的四个坑（前三个 2026-07-27 真出过事故，见 dev-log）
 
-1. **孤儿**：本机删掉一个 skill，`sync:skills` **不会**删掉仓库里对应的 md —— 它只新增/更新。
-   结果是站上永远留着一个已经不存在的 skill。现在脚本会列出孤儿，加 `--prune` 删除
-   （`handwritten: true` 的孤儿只报告不删，因为那是你手写的中文版，去留得你定）。
-2. **中英不对齐**：`sync` **只写中文侧**（`src/content/skills/`）。新同步进来的 skill 在
+1. **孤儿**：本机删掉一个 skill，`sync:skills` 默认**不会**删掉仓库里对应的 md —— 它只新增/更新。
+   结果是站上永远留着一个已经不存在的 skill。脚本会列出孤儿，加 `--prune` 删除（zh + en 一起删）。
+   **`featured: true` 或 `handwritten: true` 的孤儿只报告、永不自动删** —— 那是人工策展过的内容。
+2. **「读不出来」≠「已删除」**（原来是**破坏性 bug**）：断链 symlink、SKILL.md 缺失、frontmatter
+   解析失败、缺 description —— 这四种情况旧版都静默归入「本次没见到」，于是被 `--prune` 当成
+   已删除**真的删掉**。07-27 那次一口气丢了 15 个（含 `featured: true` 的 `zhanglu`，导致
+   `/agents` 上的链接和 README 的安装配方双双 404）。现在只要**目录还在**就永不 prune，
+   只报告为「⚠️ 不可读」。改这段逻辑时别把 `present` 这个 Set 合回 `seen`。
+3. **中英不对齐**：`sync` **只写中文侧**（`src/content/skills/`）。新同步进来的 skill 在
    `src/content/skillsEn/` 里没有对应文件 → `/en/skills` 会少内容，而且**不会构建失败**（没有 1:1 的强制约束）。
-   脚本现在会打印「⚠️ 英文版缺失」清单，补完再 push。
+   脚本打印「⚠️ 英文版缺失」清单；**`sync:auto` 现在遇到不对齐直接 exit 1 不推送**
+   （07-26/27 两次只警告不拦，结果 zh 从 30 涨到 57、en 还是 30，静默少了 27 条上线）。
+4. **工作向 skill 会被无脑同步上公开站**：`~/.claude/skills` 里混着内部系统的 skill，
+   description 写清了各服务职责与模块划分。07-27 那次把 17 个 `aic-*`（企业 CRM / 差旅 / 考勤后端）
+   推上了 `/skills` 和 `/api/skills.json`。挡它的是 `sync-skills.mjs` 顶部的 `EXCLUDE`
+   （glob，同时匹目录 slug 和 frontmatter 的 `name` —— 目录叫 `crm-saf`、name 才是 `aic-crm-saf`）。
+   命中的既不写入，也会把仓库里已有的残留删掉（**不需要 `--prune`**：留着就等于留在公开站上）。
+   **新增一类工作向 skill 就往 `EXCLUDE` 里加一条**，别指望每次同步都靠肉眼扫。
 
-**首页精选**: `featured: true` 上首页 "Skills" 精选区。  
-**当前 30 个 skill 状态**:
-- 16 个自动同步（中文版 SKILL.md 直接拿过来）
-- 14 个手动翻译成中文（`handwritten: true`）：
+**首页精选**: `featured: true` 上首页 "Skills" 精选区（当前只有 `zhanglu` 一个）。  
+**当前 41 个 skill 状态**（zh 41 / en 41，1:1 对齐）:
+- 26 个自动同步（中文版 SKILL.md 直接拿过来），其中 25 个是 `lark-*` 飞书 OpenAPI 封装
+- 15 个手写（`handwritten: true`，`sync` 不覆盖）：
   - agent-browser, agents-sdk, cloudflare, cloudflare-email-service,
   - demo-day-dossier, durable-objects, frontend-design, musk-perspective,
   - research, sandbox-sdk, turnstile-spin, web-perf,
-  - workers-best-practices, wrangler
+  - workers-best-practices, wrangler,
+  - **zhanglu**（`featured: true`，站点自己的 agent 接入说明；07-27 被误 prune 后
+    改成 handwritten 以免再被自动删 —— 本机已无对应源目录，仓库就是它的事实源）
 
 ### 5.5 改首页 / about / socials
 
@@ -613,6 +627,19 @@ plist 里的脚本路径被写成 `/scripts/auto-sync-skills.sh`，服务装上�
 块内实在要注释，先加一行 `setopt interactive_comments`。
 排查线索：`zsh: command not found: #` 出现 = 有人把带行内注释的块粘进了 zsh。
 
+### 9.12 远程会话（容器）里只能跑 `sync:skills --check`，绝不能跑写模式
+
+远程 agent 会话的容器**自己也有一个 `~/.claude/skills/`**（里面是容器的 docx / pdf / pptx /
+skill-creator 之类），跟用户 Mac 上那套完全不同。在容器里跑 `pnpm run sync:skills`（写模式）
+会把这十来个容器本地 skill 当成"新 skill"创建进 `src/content/skills/`，而且**看起来一切正常**
+—— build 照过、`git status` 里只是多出一堆未跟踪文件，不留神就一起提交了。实际踩过一次
+（07-27 验证 prune 修复时）。
+
+规矩：容器里**只跑 `--check`**（只读，有漂移 exit 1）。要验证写路径的行为，用临时夹具
+（在容器 `~/.claude/skills` 里造 `zz-*` 目录）**并在验证完立刻删掉夹具和被创建的文件**，
+提交前 `git status --porcelain src/content/skills` 必须只剩你真正要改的那几个。
+真正的同步只在有那套 skill 的机器上跑（见 §5.4）。
+
 ### 9.8 手机端横向溢出的三个惯犯
 
 390px 视口下把页面撑破的三类元素（已修，新增内容别再犯）：
@@ -639,7 +666,7 @@ plist 里的脚本路径被写成 `/scripts/auto-sync-skills.sh`，服务装上�
 
 ---
 
-## 11. 当前内容快照（截至 2026-07-25，站点 v0.3.0）
+## 11. 当前内容快照（截至 2026-07-27，站点 v0.3.0）
 
 > **每个集合都有平行的英文版**（`src/content/<coll>En/`，同 slug、同数量）。下表是中文侧；
 > 英文侧数量 1:1 对齐（见 §16）。改内容时**两边都要动**。
@@ -650,13 +677,15 @@ plist 里的脚本路径被写成 `/scripts/auto-sync-skills.sh`，服务装上�
 | articles | 5 | agent-cli, qiji-56-projects-one-night, qcc-agent-origin, c-suite-design (站内 /posts/), weekly-2026-w29 (站内 /weekly/) |
 | presentations | 4 | mbabrand (slides), boss-handbook (slides), oaf (slides), openagent (site) |
 | weekly | 1 | 2026-w29 (脱敏公开周报, 集合 src/content/weekly + /weekly 索引 + [slug] 页) |
-| skills | 30 | zhanglu（14 个 handwritten:true） |
+| skills | 41 | zhanglu（15 个 handwritten:true；25 个 `lark-*` 自动同步；`aic-*` 走 EXCLUDE 不上站，见 §5.4.2） |
 
 `src/data/about.json` 当前 hero / bio 是基于公开项目信息撰写的占位描述，可随时替换为本人定义版
 （英文版在 `about.en.json`）。
 
-**页面规模**：`pnpm build` 产出 107 页 —— 中文 53 + 英文 53 + 404。
-**机读层**：24 个端点类型（12 类 × 2 语言），`[slug]` 展开后共 96 个 JSON 文件 + 双语 `llms.txt` + 分语言 RSS。
+**页面规模**：`pnpm build` 产出 131 页 —— 中文 65 + 英文 65 + 404。
+**机读层**：24 个端点类型（12 类 × 2 语言），`[slug]` 展开后共 118 个 JSON 文件 + 双语 `llms.txt` + 分语言 RSS。
+> 这两个数字会随内容涨。**`/how-it-works` 与 `/agents` 上的对应数字是 build 时算出来的，
+> 不用手改**（07-27 skills 30→41 那次，页面上 96→118 自己就跟上了）；只有本文这份快照要手动同步。
 **CLI**：`zhanglu-net` 已发布 npm（版本号在 `cli/package.json`，与站点版本独立）。
 
 ---
@@ -701,7 +730,7 @@ plist 里的脚本路径被写成 `/scripts/auto-sync-skills.sh`，服务装上�
 | `/api/articles.json` | `src/pages/api/articles.json.ts` | 公众号 / blog 入口 |
 | `/api/presentations.json` | `src/pages/api/presentations.json.ts` | 网页 PPT / 站点入口 |
 | `/api/skills.json` | `src/pages/api/skills.json.ts` | Skill 索引 |
-| `/api/skills/{slug}.json` | `src/pages/api/skills/[slug].json.ts` | 单 skill（含 `body_md`）|
+| `/api/skills/{slug}.json` | `src/pages/api/skills/[slug].json.ts` | 单 skill（含 `body_md`，以及 `skill_md` —— 拼好 frontmatter 的完整 SKILL.md，装 skill 的配方用它，别用 `body_md`）|
 | `/api/weekly.json` | `src/pages/api/weekly.json.ts` | 公开周报列表 |
 | `/api/weekly/{slug}.json` | `src/pages/api/weekly/[slug].json.ts` | 单篇周报（含 `body_md`）|
 | `/api/about.json` | `src/pages/api/about.json.ts` | 简介 |

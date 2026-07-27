@@ -189,12 +189,35 @@ export function buildSkillList(entries: SkillEntry[], base: string, lang: Lang) 
   return { version: '1', lang, count: items.length, items };
 }
 
+/**
+ * 拼一份可直接落盘的 SKILL.md —— frontmatter（name + description）+ body。
+ * 为什么需要它：`body_md` 只有正文，写进 ~/.claude/skills/<x>/SKILL.md 会缺 frontmatter，
+ * 不是合法 skill。装 skill 的配方（README / skills/zhanglu）用这个字段，一行 jq 就够。
+ */
+function skillMd(entry: SkillEntry) {
+  const desc = (entry.data.description ?? '').trim();
+  const indented = desc
+    .split('\n')
+    .map((l) => (l.length ? `  ${l}` : ''))
+    .join('\n');
+  const fm = [
+    '---',
+    `name: ${JSON.stringify(entry.data.name)}`,
+    'description: |',
+    indented,
+    ...(entry.data.category ? [`category: ${JSON.stringify(entry.data.category)}`] : []),
+    '---',
+  ].join('\n');
+  return `${fm}\n${entry.body.startsWith('\n') ? '' : '\n'}${entry.body}`;
+}
+
 export function buildSkillDetail(entry: SkillEntry, base: string, lang: Lang) {
   return {
     version: '1',
     lang,
     ...skillCore(entry, base, lang),
     body_md: entry.body,
+    skill_md: skillMd(entry),
   };
 }
 

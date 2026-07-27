@@ -52,11 +52,17 @@ fi
 CHANGED=$(git diff --name-only -- src/content/skills | wc -l | tr -d ' ')
 log "检测到 ${CHANGED} 个 skill 文件变化"
 
-# 中英对齐提醒：sync 只写中文侧，新 skill 的英文版要人工补
+# 中英对齐：sync 只写中文侧，新 skill 的英文版要人工补。
+# 这里**硬停**而不是只警告 —— 2026-07-26/27 两次自动同步只 log 了一行警告就照样推上线，
+# 结果 zh 从 30 涨到 57、en 还是 30，/en/skills 静默少了 27 条，构建也不会失败。
+# 宁可让定时任务停下来等人补翻译，也别再推一次半边的内容上线。
 ZH=$(ls src/content/skills/*.md 2>/dev/null | wc -l | tr -d ' ')
 EN=$(ls src/content/skillsEn/*.md 2>/dev/null | wc -l | tr -d ' ')
 if [[ "$ZH" != "$EN" ]]; then
-  log "⚠️ 中英不对齐：zh=${ZH} en=${EN} —— /en/skills 会少内容，记得补 src/content/skillsEn/"
+  log "❌ 中英不对齐：zh=${ZH} en=${EN} —— 本次不推送。"
+  log "   缺哪些：pnpm run sync:check（看「英文版缺失」清单）"
+  log "   补完 src/content/skillsEn/<slug>.md 再跑一次即可。中文侧的改动已留在工作区。"
+  exit 1
 fi
 
 if [[ "$DRY_RUN" == "1" ]]; then
