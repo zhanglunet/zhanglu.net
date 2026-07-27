@@ -640,6 +640,52 @@ skill-creator 之类），跟用户 Mac 上那套完全不同。在容器里跑 
 提交前 `git status --porcelain src/content/skills` 必须只剩你真正要改的那几个。
 真正的同步只在有那套 skill 的机器上跑（见 §5.4）。
 
+### 9.13 删内容 ≠ 下线：Cloudflare 会继续服务已删除 URL 的旧副本
+
+**症状**：把某个 `.md` 删掉、build 过、push 上 main、CF Pages 部署成功、
+`/api/<列表>.json` 里也确实没有它了 —— 但 `https://zhanglu.net/skills/<被删的 slug>/`
+**照样返回 200，正文完整可读**。
+
+**怎么确认是缓存而不是没部署成功**：给同一个 URL 加个 cache-buster query。
+
+```bash
+curl -s -o /dev/null -w '%{http_code}\n' https://zhanglu.net/skills/<slug>/
+curl -s -o /dev/null -w '%{http_code}\n' 'https://zhanglu.net/skills/<slug>/?cb=1'
+```
+
+前者 200、后者 404 = **源站已经干净，是 Cloudflare 侧在服务旧副本**。旧副本的响应头有两个特征：
+
+```
+cache-control: public, s-maxage=604800     ← 7 天，而现役页面是 max-age=0, must-revalidate
+x-robots-tag: noindex                      ← CF 给「非当前版本」内容打的标记
+age: 43875                                 ← 副本的年龄
+```
+
+对照组：**从来没存在过的** URL 返回 `404` + `cache-control: no-store`。所以 200 + `noindex` +
+长 `s-maxage` 这组合专属于「曾经存在、现在被删」的路径。
+
+**另外它按 PoP 命中**：同一个 URL 连着查几次可能一会儿 404 一会儿 200，不同机器上查结果也不同。
+**不要用「我这里查是 404」判定已经下线** —— 要么加 cache-buster 对照，要么直接 purge 完再验。
+
+**怎么修**：只能 purge，仓库里做不了。CF dashboard → 选 `zhanglu.net` 域 →
+**Caching → Configuration → Purge Everything**（最省事，静态站无副作用）。
+同一页上顺手确认 **Always Online 是关的** —— 它开着就会在源站报错/404 时继续吐存档副本，
+purge 完也可能被重新填回来。
+
+或者用 API（token 需要 Zone → Cache Purge → Purge 权限，Zone ID 在域名 Overview 页）：
+
+```bash
+curl -X POST "https://api.cloudflare.com/client/v4/zones/<ZONE_ID>/purge_cache" \
+  -H "Authorization: Bearer <TOKEN>" -H "Content-Type: application/json" \
+  --data '{"purge_everything":true}'
+```
+
+**规矩：凡是「下线/撤回内容」的改动，push 之后必须 purge 一次再验收。**
+新增和修改不用管（现役页面是 `max-age=0, must-revalidate`，部署即生效）——
+**只有删除会卡在这上面**。这条 2026-07-27 撤回 17 个内部 skill 时踩到：
+push 成功、`/api/skills.json` 已经是 41 条干净数据，但 12 个 `/skills/crm-*/` 页面
+还能读到内部服务的完整 description。
+
 ### 9.8 手机端横向溢出的三个惯犯
 
 390px 视口下把页面撑破的三类元素（已修，新增内容别再犯）：

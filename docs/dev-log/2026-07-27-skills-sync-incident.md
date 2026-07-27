@@ -166,3 +166,73 @@ curl -s https://zhanglu.net/api/skills/zhanglu.json | jq -r .skill_md > ~/.claud
 
 注意这样装回去之后它在本机是 `handwritten: false` 的普通 skill，但仓库里那份是
 `handwritten: true` —— **sync 不会用本机版覆盖仓库版**，这是故意的（仓库是这个 skill 的事实源）。
+
+---
+
+## 追加：上线后核验发现「删了但还在」—— CF 在服务旧副本
+
+push 上 main、CF Pages 部署成功后逐条核验，结果**只有一半是好的**。
+
+### 好的部分（源站已干净）
+
+| 检查 | 结果 |
+|---|---|
+| `/api/skills.json` | `lang=zh count=41`，`aic-` 命中 **0**，含 `zhanglu` ✓ |
+| `/en/api/skills.json` | `lang=en count=41`，`aic-` 命中 **0**，含 `zhanglu` ✓ |
+| `/api/index.json` counts | `{projects:8, articles:5, presentations:4, skills:41, weekly:1}` ✓ |
+| `/api/search.json`、`/en/api/search.json`、`/llms.txt` | `aic-` 命中 0 ✓ |
+| `/api/skills/zhanglu.json`、`/en/api/skills/zhanglu.json`、`boss.json` 双语 | 200 ✓ |
+
+### 坏的部分：13+ 个已删 URL 仍返回 200 且内容完整可读
+
+```
+https://zhanglu.net/skills/crm-saf/        → 200
+  正文可读：「crm-saf 服务 CLI skill：该服务用于企业CRM中的销售预测管理，
+            支持销售预测实例的新增、变更、合并、版本生成、审批流转以及批量导入…」
+https://zhanglu.net/api/skills/bt.json     → 200（完整 JSON，含美团/高德/滴滴对接那句）
+```
+
+**判定为缓存而非部署失败的证据** —— 同 URL 加 cache-buster：
+
+```
+/skills/crm-saf/       → 200
+/skills/crm-saf/?cb=1  → 404      ← 源站干净
+/api/skills/bt.json    → 200
+/api/skills/bt.json?cb=zzz1 → 404
+```
+
+旧副本的响应头特征，和现役页面/从未存在过的 URL 三方对照：
+
+| URL 类型 | 状态 | cache-control | 其它 |
+|---|---|---|---|
+| 现役（`/skills/`、`/api/skills.json`） | 200 | `public, max-age=0, must-revalidate` | `cf-cache-status: DYNAMIC` |
+| **已删**（`/skills/crm-saf/`） | **200** | **`public, s-maxage=604800`** | **`x-robots-tag: noindex`**, `age: 43875` |
+| 从未存在（`/api/skills/never-existed-xyz.json`） | 404 | `no-store` | — |
+
+`x-robots-tag: noindex` + 7 天 `s-maxage` 这组合专属于「曾经存在、现在被删」的路径。
+`age: 43875`（≈12.2 小时）对得上 07-27 那次自动同步部署的时间。
+
+**而且按 PoP 命中，结果不稳定**：第一轮扫描 `crm-saf` 页面是 404、第二轮同一条是 200；
+`bt` / `checkin-paas` / `crm-agent` / `crm-contract` / `crm-linker` 的页面这轮 404、别的轮次可能 200。
+**所以「我这里查是 404」不能当成已下线的证据**，必须加 cache-buster 对照，或 purge 完再验。
+
+穷举 17 个 `aic-*` × 4 条路径 + 14 个已删 skill × 4 条路径（共 124 次请求），
+本轮抓到 **38 条仍返回 200**，其中 **13 条含内部内容**（12 个 `/skills/crm-*/` 页面 + `/api/skills/bt.json`），
+另 25 条是非敏感的旧 skill 页面。
+
+### 结论：这不是仓库能修的
+
+purge 只能在 Cloudflare 侧做，本会话无 CF 凭据。已把机制、判定方法和 purge 步骤写进
+**AGENTS §9.13**，并定下规矩：**凡是「下线 / 撤回内容」的改动，push 之后必须 purge 一次再验收**。
+新增和修改不受影响（现役页面 `max-age=0, must-revalidate`，部署即生效），**只有删除会卡住**。
+
+需要 purge 的敏感 URL（34 条，17 个 slug × 页面 + 端点）：
+
+```
+https://zhanglu.net/skills/{bt,checkin-paas,crm-agent,crm-contract,crm-cust,crm-customer,
+  crm-customer2,crm-home,crm-linker,crm-log,crm-prf,crm-report,crm-saf,crm-saf2,
+  crm-search,crm-tab,crm-third}/
+https://zhanglu.net/api/skills/{同上 17 个}.json
+```
+
+实际建议直接 **Purge Everything**（静态站无副作用，也顺手清掉 25 条非敏感残留）。
