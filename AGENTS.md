@@ -667,12 +667,26 @@ age: 43875                                 ← 副本的年龄
 **另外它按 PoP 命中**：同一个 URL 连着查几次可能一会儿 404 一会儿 200，不同机器上查结果也不同。
 **不要用「我这里查是 404」判定已经下线** —— 要么加 cache-buster 对照，要么直接 purge 完再验。
 
-**怎么修**：只能 purge，仓库里做不了。CF dashboard → 选 `zhanglu.net` 域 →
-**Caching → Configuration → Purge Everything**（最省事，静态站无副作用）。
-同一页上顺手确认 **Always Online 是关的** —— 它开着就会在源站报错/404 时继续吐存档副本，
-purge 完也可能被重新填回来。
+**⚠️ Purge Everything 治不了这个** —— 2026-07-27 实测过：purge 完 124 条已删 URL 里
+**仍有 38 条返回 200**，一条没少，而且 `age` 从 43875 涨到 46481（跟着真实时间走，purge 没重置它）。
+原因在响应头里写着：`cf-cache-status: DYNAMIC` = **压根不是缓存命中**，所以清缓存碰不到它。
 
-或者用 API（token 需要 Zone → Cache Purge → Purge 权限，Zone ID 在域名 Overview 页）：
+**真凶是 Always Online**（存档副本存在普通缓存之外，源站返错/404 时顶上）。**开关：
+CF dashboard → 选 `zhanglu.net` 域 → Caching → Configuration → Always Online → 关掉。**
+关掉后再 purge 一次，然后复验。
+
+**怎么确认是 zone 层而不是 Pages 层**（一步定位，别猜）：拿 Pages 的默认域做对照。
+
+```bash
+curl -s -o /dev/null -w 'pages.dev: %{http_code}\n' https://zhanglu-net.pages.dev/skills/<slug>/
+curl -s -o /dev/null -w 'zhanglu.net: %{http_code}\n' https://zhanglu.net/skills/<slug>/
+```
+
+`pages.dev` 404 + `zhanglu.net` 200 = **构建产物是干净的，问题全在 zone 层**（Always Online /
+缓存），仓库里怎么改都没用。两个都 200 才是构建里真的还有这个文件。
+
+purge 的 API 写法（token 需要 Zone → Cache Purge → Purge 权限，Zone ID 在域名 Overview 页）——
+**记住它只清普通缓存，不清 Always Online 存档**：
 
 ```bash
 curl -X POST "https://api.cloudflare.com/client/v4/zones/<ZONE_ID>/purge_cache" \

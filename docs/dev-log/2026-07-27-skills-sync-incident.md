@@ -236,3 +236,47 @@ https://zhanglu.net/api/skills/{同上 17 个}.json
 ```
 
 实际建议直接 **Purge Everything**（静态站无副作用，也顺手清掉 25 条非敏感残留）。
+
+---
+
+## 追加 2：purge 完全没用 —— 真凶是 Always Online，不是缓存
+
+用户执行了 Purge Everything。复验 124 条已删 URL：**仍然 38 条返回 200，一条没少**。
+
+`age` 从 `43875` 涨到 `46481`（+2606s ≈ 43 分钟，正好是两次核验的间隔）——
+**purge 没有重置它**，说明这个副本压根不在被 purge 的那个存储里。响应头早就写着答案：
+
+```
+cf-cache-status: DYNAMIC      ← 不是缓存命中，所以清缓存当然没用
+cache-control: public, s-maxage=604800
+x-robots-tag: noindex
+age: 46481
+```
+
+我上一轮把 `s-maxage=604800` 当成边缘缓存的证据，**这是误判** ——
+`DYNAMIC` 明摆着不是 HIT，我当时没给这条足够权重，导致给用户的第一版修法（purge）是错的。
+
+### 一步定位：拿 Pages 默认域做对照
+
+| URL | `zhanglu-net.pages.dev`（Pages 源） | `zhanglu.net`（走 zone） |
+|---|---|---|
+| `/skills/crm-saf/` | **404** | **200** |
+| `/api/skills/bt.json` | **404** | **200** |
+| `/skills/`（现役） | 200 | 200 |
+
+**Pages 源是干净的，问题 100% 在 zone 层。** 这个对照应该是第一步就做的 ——
+它一次就把「构建产物有问题」和「托管层有问题」分开了，比反复猜 header 语义快得多。
+
+结论：**Always Online**（Caching → Configuration → Always Online）。它把快照存在普通缓存之外，
+源站返 404 时顶上去，并打 `noindex` 免得存档副本被搜索引擎收录。**关掉它，再 purge 一次，再复验。**
+
+AGENTS §9.13 已按这个结论重写：把「purge 就能修」改成「purge 治不了，先关 Always Online」，
+并把 `pages.dev` 对照法写成定位第一步。
+
+### 教训
+
+- **`cf-cache-status: DYNAMIC` 时不要谈缓存。** 它直接排除了「边缘缓存」这个解释，
+  剩下的可能性（Always Online / WAF / Workers / 存档）都不受 purge 影响。
+- **有两个入口的时候先做 A/B**（`pages.dev` vs 自定义域），别在单一入口上反复读 header 猜机制。
+- purge 完必须**复验**才能说修好了。这次如果只报「已 purge」就收工，等于把一个仍在外泄的状态
+  当成已解决 —— 而 12 个 `/skills/crm-*/` 页面此刻仍能读到内部服务的完整 description。

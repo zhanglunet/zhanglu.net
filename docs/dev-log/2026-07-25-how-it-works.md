@@ -119,5 +119,6 @@ plist 里脚本路径写成 `/scripts/auto-sync-skills.sh`（`launchctl print` �
 `plutil -lint` 全程报 OK —— XML 合法、路径错误，静默得很。
 
 修复：§5.4.1 的命令块去掉全部行内注释（说明移到块外散文），`launchctl print` 改 grep arguments
-以便一眼核对路径；新增 §9.11 记这个坑。另外提醒了用户：`launchctl print` 会打印继承环境变量，
-这次粘贴把 CLIPROXY_API_KEY 的值带进了对话，建议轮换。
+以便一眼核对路径；新增 §9.11 记这个坑。另外提醒了用户：**`launchctl print` 会连继承的环境变量
+一起打印**，这次粘贴因此把一个 API key 的明文带进了对话（值没进过仓库，已建议轮换）。
+以后要贴 `launchctl print` 的输出，先 `grep` 出你要看的那几行，别整段贴。
