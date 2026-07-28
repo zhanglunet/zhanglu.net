@@ -5,7 +5,7 @@ description: |
 source: local
 featured: false
 handwritten: false
-synced_at: "2026-07-27"
+synced_at: "2026-07-28"
 ---
 
 本 skill 来源于本机 `~/.claude/skills/lark-contact/SKILL.md`，由 `pnpm run sync:skills` 自动同步。
