@@ -728,14 +728,14 @@ curl -s --noproxy '*' -o /dev/null -w 'zhanglu.net: %{http_code}\n' https://zhan
 
 ---
 
-## 11. 当前内容快照（截至 2026-07-27，站点 v0.3.0）
+## 11. 当前内容快照（截至 2026-08-01，站点 v0.3.0）
 
 > **每个集合都有平行的英文版**（`src/content/<coll>En/`，同 slug、同数量）。下表是中文侧；
 > 英文侧数量 1:1 对齐（见 §16）。改内容时**两边都要动**。
 
 | collection | 数量 | featured |
 |---|---|---|
-| projects | 8 | mbabrand, boss, oaf, aip（第二大脑）, qiji-roadshow-2026, qcc-agent, shanghai（order 1→7, featured）+ tui3（网站存档, order 9, archived, 非 featured） |
+| projects | 12 | mbabrand, boss, oaf, aip（第二大脑）, qiji-roadshow-2026, qcc-agent, shanghai（order 1→7）+ siliconforge, excel-ai-analyst, ai-interview, brain-radar（order 8→11，08-01 新增）—— 以上均 featured；tui3（网站存档, order 99, archived, 非 featured） |
 | articles | 5 | agent-cli, qiji-56-projects-one-night, qcc-agent-origin, c-suite-design (站内 /posts/), weekly-2026-w29 (站内 /weekly/) |
 | presentations | 4 | mbabrand (slides), boss-handbook (slides), oaf (slides), openagent (site) |
 | weekly | 1 | 2026-w29 (脱敏公开周报, 集合 src/content/weekly + /weekly 索引 + [slug] 页) |
@@ -744,10 +744,10 @@ curl -s --noproxy '*' -o /dev/null -w 'zhanglu.net: %{http_code}\n' https://zhan
 `src/data/about.json` 当前 hero / bio 是基于公开项目信息撰写的占位描述，可随时替换为本人定义版
 （英文版在 `about.en.json`）。
 
-**页面规模**：`pnpm build` 产出 131 页 —— 中文 65 + 英文 65 + 404。
-**机读层**：24 个端点类型（12 类 × 2 语言），`[slug]` 展开后共 118 个 JSON 文件 + 双语 `llms.txt` + 分语言 RSS。
+**页面规模**：`pnpm build` 产出 139 页 —— 中文 69 + 英文 69 + 404。
+**机读层**：24 个端点类型（12 类 × 2 语言），`[slug]` 展开后共 126 个 JSON 文件 + 双语 `llms.txt` + 分语言 RSS。
 > 这两个数字会随内容涨。**`/how-it-works` 与 `/agents` 上的对应数字是 build 时算出来的，
-> 不用手改**（07-27 skills 30→41 那次，页面上 96→118 自己就跟上了）；只有本文这份快照要手动同步。
+> 不用手改**（07-27 skills 30→41、08-01 projects 8→12 两次，页面上 96→118→126 全自动跟上）；只有本文这份快照要手动同步。
 **CLI**：`zhanglu-net` 已发布 npm（版本号在 `cli/package.json`，与站点版本独立）。
 
 ---
