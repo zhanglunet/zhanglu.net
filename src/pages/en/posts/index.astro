@@ -1,20 +1,18 @@
 ---
+import { getCollection } from 'astro:content';
 import Base from '../../../layouts/Base.astro';
 
-const posts = [
-  {
-    slug: 'c-suite-design',
-    title: 'The C-suite an AI-native org needs: what kind of decision agents?',
-    date: '2026-07-18',
-    summary: 'Boss / MBA Brand / OAF are really one skeleton: research → deliberation → scoring → attribution. Why an AI-native org’s C-suite needs it.',
-  },
-  {
-    slug: 'agent-cli',
-    title: 'I built a CLI for agents: one `npx zhanglu-net` instead of scraping HTML',
-    date: '2026-06-09',
-    summary: 'No MCP, no SDK — just 9 static JSON endpoints and a 270-line CLI. Shipped in 1.5 hours.',
-  },
-];
+/** 同 zh 侧：从 articlesEn 集合按 url 前缀筛出站内长文，不再手维护数组。 */
+const POST_PREFIX = 'https://zhanglu.net/en/posts/';
+const posts = (await getCollection('articlesEn'))
+  .filter((a) => a.data.url.startsWith(POST_PREFIX))
+  .map((a) => ({
+    slug: a.data.url.slice(POST_PREFIX.length).replace(/\/$/, ''),
+    title: a.data.title,
+    date: a.data.date.toISOString().slice(0, 10),
+    summary: a.data.summary,
+  }))
+  .sort((a, b) => b.date.localeCompare(a.date));
 ---
 <Base title="Posts" description="Long-form posts on this site">
   <h1 class="font-serif text-3xl font-semibold mb-2">Posts</h1>

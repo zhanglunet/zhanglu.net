@@ -1,0 +1,72 @@
+---
+layout: ../../../layouts/Post.astro
+title: "Making the people who don't present well visible"
+description: "Achievement reviews fail two ways — the smooth talker wins, and plans get counted as results. This one uses a 1-2 minute voice interview, adaptive follow-ups and one scoring ruler to remove both."
+date: 2026-08-01
+lead: "Two distortions are almost guaranteed in an achievement review: the smooth talker wins, and plans get counted as results. Neither should be decided by who presents best."
+readingTime: 6
+---
+
+## What actually happens in the room
+
+Any cross-team review covering a few dozen projects ends in the same argument: **was the winner the best work, or the best pitch?**
+
+Nobody's at fault. A judge sitting through thirty presentations in a day has finite attention, so whoever is clear, well-paced and quotable gets an edge. And there's a subtler layer: **presenting rewards talking about plans**. There's only one thing you actually finished, and infinite things you might do next — filling the last three slides with a roadmap simply looks better than saying "we got one scenario working".
+
+[AI Achievement Interview](/en/projects/ai-interview) ([openagent.world](https://openagent.world)) is aimed at exactly those two failure modes.
+
+## Three hard rules
+
+The site puts them in the most prominent spot on the page:
+
+- **don't grade eloquence**
+- **don't count plans as results**
+- **score with one model, one ruler**
+
+The full version of the third: every project is scored with the same model, the same prompt and the same weights, with no manual adjustment this round.
+
+"No manual adjustment this round" reads like a self-imposed limitation. It's actually the only point the whole method can stand on — because **manual adjustment is precisely the door through which subjective variance walks back in**.
+
+## One interview, 1–2 minutes
+
+Three steps:
+
+```
+01 voice confirmation    02 highlight extraction    03 unified scoring
+name·dept·project        facts·artefacts·open       six-dim total·ranking
+```
+
+**One question at a time.** The AI decides from your answer whether to clarify, chase the event, chase the change or chase the boundary, rather than mechanically working through a question bank. This isn't a fixed set of questions; it's a method for talking about outcomes, taking the shortest path to three things:
+
+- one **real event**
+- one **inspectable piece of evidence**
+- one **question still open**
+
+The last one gets overlooked, and it's the strongest authenticity signal there is: anyone who actually did the work can tell you what they haven't cracked yet.
+
+Also: **facts, judgements and plans are recorded separately**, and anything thin is explicitly marked "to be confirmed" — so vague statements can't drift into the finished column.
+
+## Two routes, one ruler
+
+On-site and remote run in parallel, but the standard doesn't change with the route:
+
+- **On site** — staff record from a desktop dashboard while ChatGPT Voice on a phone handles questions and adaptive follow-ups
+- **Remote, self-serve** — start from the web, no admin-issued link and no ChatGPT client; if the realtime service falters it falls back to a standard six-question mode
+
+Both end up in the same candidate queue, the same transcription pipeline and the same six-dimension scoring.
+
+Recording, transcript, highlights, score and report all **share one candidate-project identifier**. That reads like an implementation detail, but anyone who has run a review knows that the moment one person's recording gets attached to another person's project, the credibility of the whole round is gone.
+
+## Letting people redo it lowers the weight on eloquence
+
+You can re-record as many times as you like before submitting, at no cost. After a formal submission you can still redo the interview, up to 3 times total — the latest recording, transcript and score count, while every previous recording, realtime Q&A log and action record is kept.
+
+This is the other face of "don't grade eloquence": **with only one shot, nervous people lose**. Once you can redo it, "spoke fluently" naturally stops carrying weight, and what's left is what you actually did.
+
+Keeping the earlier attempts serves a different goal — traceability. Scoring the latest one is a rule about which number counts, not a reason to erase the rest.
+
+## Where it fits
+
+Organisations that need to compare dozens or hundreds of projects in a short window, and don't want the outcome to hinge on who presents best.
+
+Worth reading the preparation checklist on the site first: knowing what it will ask is what lets you make those 1–2 minutes concrete.

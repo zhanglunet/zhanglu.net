@@ -1,0 +1,63 @@
+---
+layout: ../../../layouts/Post.astro
+title: "Requirements in, software out — putting a software line on the homepage"
+description: "Most \"AI writes your code\" products assume the user is a developer. SiliconForge drops the entry cost to nine multiple-choice questions, and pays for it by splitting \"the AI says it's done\" from \"the tests actually ran\"."
+date: 2026-08-01
+lead: "Most \"AI writes your code\" products assume the user is a developer — you have to describe a technical solution to get anything back. But the people suffering through bad interfaces every day are business users. They can describe the pain precisely and the fix not at all."
+readingTime: 6
+---
+
+## The question that gets skipped: who files the request
+
+Over the past two years "AI writes code" has been proven many times over. Copilot, Cursor, Claude Code — the gains are real, but they serve **people who already know how to code**. You have to know which architecture, which framework, which API before you can get value out of the model.
+
+Inside a company, though, the people most tortured by software usually aren't the engineers. It's the accountant reconciling three systems by hand every month, the ops person clicking forty times to export one dataset, the salesperson losing two hours because one field can't be filtered on. They can describe **where it hurts** with great precision, and **how to fix it** not at all.
+
+That gap is normally absorbed by the request → backlog → review → build pipeline. Nothing is wrong with the pipeline; the problem is that its minimum unit is too large. A "add one filter" request costs about as much to push through the full process as a medium-sized feature — so it never makes the cut.
+
+[SiliconForge](/en/projects/siliconforge) ([anp.pub](https://anp.pub)) exists to test exactly one thing: **what happens to that pipeline if filing a request costs two or three minutes.**
+
+## The homepage is the console
+
+Open anp.pub and you don't get a product brochure. You get two boxes.
+
+Submit a request on the left, look one up on the right. Both hit real data — this is not a demo.
+
+**Step one is nine questions**, mostly multiple choice, two or three minutes. Their job isn't to collect prose; it's to translate "the thing that hurts every day" into a **machine-readable PRD** — a structured, executable requirement. You never need to know what a PRD is. You answer things like "how many times a day do you do this", "how many clicks is it now", "what would you want instead".
+
+You come away with a **ticket number**, and the request enters the FDE review queue.
+
+**Step two is waiting.** Use the ticket to see where it is: pending review → approved → in development → delivered.
+
+What happens in between isn't your problem: once an FDE reviews and approves it, Cloudflare schedules parallel AI squads to build, verify and deliver under engineering discipline.
+
+Already have a requirements doc? *PRD direct submit* takes a PRD JSON plus reference material (API docs, field mappings) and skips the nine questions straight into the same queue.
+
+## The design decision that matters: two delivery grades
+
+The part of this line worth talking about isn't "AI can write code". It's that **it admits it might have got it wrong**.
+
+Output has two states:
+
+- **model-reviewed** — the AI thinks it's done and has reviewed its own work
+- **verified** — an executor actually ran the generated tests and returned evidence
+
+And the second one has a sibling: **execution failed**.
+
+That distinction looks like one more process step. It's really the load-bearing point of the whole thing. The distance between "the AI says it's done" and "the code actually runs" is the shared soft spot of every AI coding product today. Most products handle it by hiding the gap — you get something that looks complete and discover the problems yourself.
+
+Modelling it as two explicit states has a cost: **you will see some requests stall at "execution failed"**. That doesn't look good, but it's honest, and it's what makes the word "delivered" mean something.
+
+## Where it is today
+
+The site says v0.9.0 and I list it as `beta` here, for exactly the reason above — not every request makes it to "verified" on the first pass.
+
+To watch the whole line run without filing a real request, there's a **pipeline demo** (animated simulation, writes no data). To find out which machine generates the code and who actually runs the tests, see the **system architecture** page. There are also usage docs, an agent guide and progress weeklies.
+
+## The question it's really asking
+
+For me this product is mostly an experiment: **when filing a request costs two minutes instead of two weeks, does the shape of requests change?**
+
+My guess is yes. When a request means a fortnight of process, people only file the big important ones. When it costs two minutes, the small pain points nobody would ever justify scheduling — the ones actually eating the day — finally surface.
+
+Whether that guess is right has to come from real submissions. Which is why the homepage is a console, not a brochure.

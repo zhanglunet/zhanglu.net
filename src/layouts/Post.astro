@@ -1,0 +1,62 @@
+---
+/**
+ * 站内长文的壳。给 `src/pages/posts/*.mdx`（和 `src/pages/en/posts/*.mdx`）用：
+ * 在 mdx frontmatter 里写 `layout: ../../layouts/Post.astro`，正文直接写 markdown。
+ *
+ * 为什么不是 content collection：现有两篇长文（agent-cli / c-suite-design）是手写
+ * `.astro` 页面，正文里有定制排版。改集合要把它们迁过去，收益不抵风险。
+ * MDX 页面能和它们共存在同一个目录下，新文章直接写 markdown 就行。
+ */
+import Base from './Base.astro';
+import { getLangFromUrl } from '../i18n/utils';
+
+interface Props {
+  frontmatter: {
+    title: string;
+    description: string;
+    /** YAML 里写 `date: 2026-08-01` 会被解析成 Date 对象，所以两种都收。 */
+    date: string | Date;
+    lead?: string;
+    readingTime?: string | number;
+    image?: string;
+  };
+}
+
+const { frontmatter: fm } = Astro.props;
+/** 统一成 YYYY-MM-DD —— 直接渲染 Date 会输出 2026-08-01T00:00:00.000Z。 */
+const dateStr =
+  fm.date instanceof Date ? fm.date.toISOString().slice(0, 10) : String(fm.date).slice(0, 10);
+const lang = getLangFromUrl(Astro.url);
+const t = {
+  zh: { back: 'POSTS', read: (m: string | number) => `${m} 分钟阅读` },
+  en: { back: 'POSTS', read: (m: string | number) => `${m} min read` },
+}[lang];
+const postsHref = lang === 'en' ? '/en/posts' : '/posts';
+---
+<Base title={fm.title} description={fm.description} image={fm.image}>
+  <article class="max-w-2xl mx-auto">
+    <div class="mb-6 flex items-center gap-3 text-xs font-mono text-[var(--color-muted)] tracking-wider">
+      <a href={postsHref} class="hover:text-[var(--color-accent)]">{t.back}</a>
+      <span>·</span>
+      <time datetime={dateStr}>{dateStr}</time>
+      {fm.readingTime && (
+        <>
+          <span>·</span>
+          <span>{t.read(fm.readingTime)}</span>
+        </>
+      )}
+    </div>
+
+    <h1 class="font-serif text-3xl sm:text-4xl font-semibold leading-tight mb-3">{fm.title}</h1>
+
+    {fm.lead && (
+      <p class="text-lg text-[var(--color-muted)] leading-relaxed mb-10 border-l-2 border-[var(--color-accent)] pl-4">
+        {fm.lead}
+      </p>
+    )}
+
+    <div class="prose-zh max-w-none">
+      <slot />
+    </div>
+  </article>
+</Base>

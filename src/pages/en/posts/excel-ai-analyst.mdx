@@ -1,0 +1,78 @@
+---
+layout: ../../../layouts/Post.astro
+title: "A spreadsheet that's been running for years is a legacy codebase with no docs"
+description: "The first obstacle to putting a manual Excel process on AI rails isn't compute, it's trust — you won't upload your real cost sheet to a website. So step 0 is pure front-end."
+date: 2026-08-01
+lead: "You are not going to upload your company's real cost or payroll sheet to some website. So this step doesn't upload anything — the analysis runs in your browser, and works with the network off."
+readingTime: 6
+---
+
+## Start by admitting it's code
+
+That cost-allocation sheet finance has been running for six years has 14 sheets, 200-odd columns, `IF` statements nested seven deep, and one cell where `+0.03` is there because of a reason only the colleague who left in 2023 ever knew.
+
+That isn't a document. It's a codebase with **no documentation, no tests, no version control — running in production**. And it's worse than most legacy code, because code at least has syntactic structure. Excel flattens logic and data onto one plane, so you can't tell at a glance which cell is an input, which is an intermediate, and which is the answer.
+
+Which makes "put this manual Excel process on AI rails" fundamentally a **reverse-engineering** job. And reverse engineering always starts the same way: see clearly what you're looking at.
+
+That's the step [excel-ai-analyst](/en/projects/excel-ai-analyst) ([anp.asia](https://anp.asia)) does.
+
+## The first obstacle isn't compute, it's trust
+
+The first wall wasn't technical.
+
+You drag a real payroll sheet into a web page, it says "uploading for analysis" — and you hesitate for one second before pressing enter. That hesitation is correct, and it's fatal: a tool that requires you to override your instincts before using it doesn't get used.
+
+So step 0 is deliberately **pure front-end**:
+
+- everything runs in this page's memory — **no server ever receives your data**
+- it works with the network disconnected
+- results vanish on refresh; download if you want to keep them, and the report stays on your device too
+- the page makes **no external requests at all** — the engine is a function-by-function port of `excel_ai.py`, and the file-format layer is same-origin SheetJS
+
+"Your file is never uploaded" only carries weight when you can pull the network cable and check.
+
+(The site still recommends redacting first — names, ID numbers, phone numbers. The file doesn't leave your browser, but it's a good habit.)
+
+## What detection actually finds
+
+Drop a sheet in and it answers four questions:
+
+1. **What shape** the sheet is, and how many header rows
+2. **Which columns are inputs and which are results** — the most useful one, because it finally separates data from logic
+3. **What the real formulas look like** — the expressions, not the displayed values
+4. **Which cell has been edited by hand** — a position that should hold a formula and now holds a hard-coded constant
+
+Number 4 is my favourite. The dangerous thing in a business spreadsheet isn't the complicated formula; it's that **at some point somebody deleted a formula and typed a number in to hit a deadline**. It throws no error, affects no neighbouring cell, recomputes to the same wrong value every time, and just sits there.
+
+Supports `.xlsx` / `.xls` / `.csv`, up to 20MB, multi-sheet workbooks analysed one sheet at a time. Reports download as Markdown, HTML or JSON.
+
+## After detection: why AI is still needed
+
+One thing has to be stated plainly, and the site states it too: **detection only tells you roughly what the sheet is.**
+
+Confirming that an AI genuinely understood the calculation logic requires recomputing every row against the full real dataset — 100% row-level pass rate and zero sheet-level anomalies, or it doesn't count. That's step 4 of the six-step method, it needs AI in the loop (writing the field ontology, formula chains and `spec.json`), a plain web page can't do it, and the site doesn't pretend otherwise.
+
+The full six steps:
+
+```
+0 detect  ← what the web page does
+1 structure to Markdown
+2 field ontology
+3 formula chains and lineage
+4 full-data validation  ★ the actual test of "understood"
+4b ontology graph
+5 delivery and what-if
+6 web dashboard
+```
+
+Pulling step 0 out into a page that needs no signup, no upload, and works offline has a simple rationale: **it's the only step that can be completed while you still don't trust me at all.** Use it to confirm the method can read your sheet, then decide whether the other five steps are worth it.
+
+## Known limits
+
+Straight from the site:
+
+- date columns are treated as numbers
+- formula extraction from `.xls` is best-effort — save as `.xlsx` first for better results
+
+No suitable sheet to hand? There's a built-in demo file.

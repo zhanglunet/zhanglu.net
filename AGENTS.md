@@ -742,7 +742,7 @@ curl -s --noproxy '*' -o /dev/null -w 'zhanglu.net: %{http_code}\n' https://zhan
 | collection | 数量 | featured |
 |---|---|---|
 | projects | 12 | mbabrand, boss, oaf, aip（第二大脑）, qiji-roadshow-2026, qcc-agent, shanghai（order 1→7）+ siliconforge, excel-ai-analyst, ai-interview, brain-radar（order 8→11，08-01 新增）—— 以上均 featured；tui3（网站存档, order 99, archived, 非 featured） |
-| articles | 5 | agent-cli, qiji-56-projects-one-night, qcc-agent-origin, c-suite-design (站内 /posts/), weekly-2026-w29 (站内 /weekly/) |
+| articles | 9 | agent-cli, qiji-56-projects-one-night, qcc-agent-origin, c-suite-design, weekly-2026-w29 + siliconforge, excel-ai-analyst, ai-interview, brain-radar（08-01 新增，均为站内 `/posts/<slug>` 长文）|
 | presentations | 4 | mbabrand (slides), boss-handbook (slides), oaf (slides), openagent (site) |
 | weekly | 1 | 2026-w29 (脱敏公开周报, 集合 src/content/weekly + /weekly 索引 + [slug] 页) |
 | skills | 42 | zhanglu（15 个 handwritten:true；25 个 `lark-*` 自动同步；`aic-*` 走 EXCLUDE 不上站，见 §5.4.2） |
@@ -750,7 +750,7 @@ curl -s --noproxy '*' -o /dev/null -w 'zhanglu.net: %{http_code}\n' https://zhan
 `src/data/about.json` 当前 hero / bio 是基于公开项目信息撰写的占位描述，可随时替换为本人定义版
 （英文版在 `about.en.json`）。
 
-**页面规模**：`pnpm build` 产出 141 页 —— 中文 70 + 英文 70 + 404。
+**页面规模**：`pnpm build` 产出 149 页 —— 中文 74 + 英文 74 + 404。
 **机读层**：24 个端点类型（12 类 × 2 语言），`[slug]` 展开后共 128 个 JSON 文件 + 双语 `llms.txt` + 分语言 RSS。
 > 这两个数字会随内容涨。**`/how-it-works` 与 `/agents` 上的对应数字是 build 时算出来的，
 > 不用手改**（07-27 skills 30→41、08-01 projects 8→12 两次，页面上 96→118→126 全自动跟上）；只有本文这份快照要手动同步。
@@ -918,7 +918,28 @@ CLI 与站点端点松耦合 —— 改端点 schema 时若不破坏向下兼容
 这样 `/articles/` 就是完整的写作索引，`/posts/` 是站内长文列表，两者互补。
 `ArticleCard` 自动识别站内 URL，用同 tab 而非新 tab 打开。
 
-如果未来 posts 多了，把 `src/pages/posts/*.astro` 改成 `src/content/posts/*.md` 集合 + `[slug].astro` 渲染，schema 加进 `config.ts`。
+**新长文直接写 `.mdx`，不要再手写 `.astro`**（2026-08-01 起）：
+
+```
+src/pages/posts/<slug>.mdx        frontmatter 里 layout: ../../layouts/Post.astro
+src/pages/en/posts/<slug>.mdx     en 深一层，layout: ../../../layouts/Post.astro
+```
+
+`src/layouts/Post.astro` 是长文的壳（meta 行 / h1 / lead / `.prose-zh`），正文直接写 markdown。
+frontmatter 字段：`title` / `description` / `date` / `lead?` / `readingTime?` / `image?`。
+
+**`/posts` 与 `/en/posts` 的列表是从 articles 集合派生的**（按 url 前缀 `https://zhanglu.net/posts/`
+筛），不再手维护数组 —— 所以加一篇长文只要两个文件：`<slug>.mdx` + `articles/<slug>.md`，
+列表页自动跟上。
+
+MDX 的两个坑（都踩过）：
+1. **frontmatter 里的英文散文含半角 `: `** 会让 YAML 解析失败（`review: the …`）。
+   `title` / `description` / `lead` 一律加双引号。
+2. **正文里的裸尖括号会被当成 JSX 标签**（`<date>` → `Expected a closing tag`）。
+   要写占位符就包进反引号。
+
+早先的 `agent-cli` / `c-suite-design` 仍是手写 `.astro`（正文里有定制排版），保持原样，
+和 mdx 页面共存在同一个目录下。
 
 ---
 
