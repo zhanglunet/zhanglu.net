@@ -33,11 +33,26 @@ command -v pnpm >/dev/null || { log "❌ PATH 里没有 pnpm"; exit 1; }
 
 log "▶ 开始同步 skills"
 
+SELF="$REPO/scripts/auto-sync-skills.sh"
+self_sum() { command md5sum "$SELF" 2>/dev/null | awk '{print $1}' || command md5 -q "$SELF" 2>/dev/null; }
+BEFORE=$(self_sum)
+
 # 1) 拉到最新，避免和远端分叉
 git fetch --quiet origin main
 if ! git merge --ff-only origin/main --quiet 2>/dev/null; then
   log "⚠️ 本地与 origin/main 分叉，先人工处理再跑（本次中止）"
   exit 1
+fi
+
+# 1.5) ⚠️ 上面那个 merge 可能把**这个脚本自己**换掉。
+# bash 是按字节偏移增量读脚本的：文件在执行途中被替换，后续读取会落到新文件的
+# 错误位置上 —— 轻则跑到别的分支，重则语法碎掉。2026-07-28 那次就是这样：
+# 07-27 加的「中英不对齐就 exit 1」明明已经在树里，那一跑却照样 push 了一个
+# zh=42 / en=41 的状态上线（ego-browser 没有英文版）。
+# 所以：检测到自身变化就用新版本重新 exec，且只 exec 一次防打转。
+if [[ "${ZHANGLU_REEXEC:-0}" != "1" && "$(self_sum)" != "$BEFORE" ]]; then
+  log "↻ 拉取更新了本脚本，用新版本重新执行"
+  ZHANGLU_REEXEC=1 exec bash "$SELF" "$@"
 fi
 
 # 2) 同步（--prune 会删掉本机已经不存在的 skill；不想删就去掉这个 flag）

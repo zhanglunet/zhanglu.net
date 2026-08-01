@@ -384,7 +384,7 @@ pnpm run sync:auto     # 确认后一条龙
 **`--ff-only` 拉取**（遇到分叉停下来让人处理）、**只 `git add src/content/skills`**（不会顺手提交你工作区里的半成品）。
 仓库路径默认 `$HOME/zhanglu`，可用 `ZHANGLU_REPO` 覆盖。
 
-### 5.4.2 sync 的四个坑（前三个 2026-07-27 真出过事故，见 dev-log）
+### 5.4.2 sync 的五个坑（1–3 出过 07-27 事故，5 出过 07-28 事故，见 dev-log）
 
 1. **孤儿**：本机删掉一个 skill，`sync:skills` 默认**不会**删掉仓库里对应的 md —— 它只新增/更新。
    结果是站上永远留着一个已经不存在的 skill。脚本会列出孤儿，加 `--prune` 删除（zh + en 一起删）。
@@ -404,10 +404,16 @@ pnpm run sync:auto     # 确认后一条龙
    （glob，同时匹目录 slug 和 frontmatter 的 `name` —— 目录叫 `crm-saf`、name 才是 `aic-crm-saf`）。
    命中的既不写入，也会把仓库里已有的残留删掉（**不需要 `--prune`**：留着就等于留在公开站上）。
    **新增一类工作向 skill 就往 `EXCLUDE` 里加一条**，别指望每次同步都靠肉眼扫。
+5. **`auto-sync-skills.sh` 会在执行途中把自己换掉**：它第一步就 `git merge --ff-only origin/main`，
+   而 bash 是**按字节偏移增量读脚本**的 —— 脚本文件在运行中被替换，后续读取会落到新文件的错误位置，
+   轻则跑到别的分支、重则语法碎掉。2026-07-28 那次实锤：07-27 加的「中英不对齐就 `exit 1`」明明
+   已经在树里，那一跑却照样把 zh=42 / en=41 的状态推上线（`ego-browser` 没有英文版）。
+   现在脚本在 merge 前后比对自身 md5，变了就带 `ZHANGLU_REEXEC=1` 重新 `exec` 自己（只重入一次）。
+   **改这个脚本后的第一次自动跑，行为以旧版本为准** —— 想立刻生效就手动跑一次，或者先在本机 `git pull`。
 
 **首页精选**: `featured: true` 上首页 "Skills" 精选区（当前只有 `zhanglu` 一个）。  
-**当前 41 个 skill 状态**（zh 41 / en 41，1:1 对齐）:
-- 26 个自动同步（中文版 SKILL.md 直接拿过来），其中 25 个是 `lark-*` 飞书 OpenAPI 封装
+**当前 42 个 skill 状态**（zh 42 / en 42，1:1 对齐）:
+- 27 个自动同步（中文版 SKILL.md 直接拿过来），其中 25 个是 `lark-*` 飞书 OpenAPI 封装
 - 15 个手写（`handwritten: true`，`sync` 不覆盖）：
   - agent-browser, agents-sdk, cloudflare, cloudflare-email-service,
   - demo-day-dossier, durable-objects, frontend-design, musk-perspective,
@@ -739,13 +745,13 @@ curl -s --noproxy '*' -o /dev/null -w 'zhanglu.net: %{http_code}\n' https://zhan
 | articles | 5 | agent-cli, qiji-56-projects-one-night, qcc-agent-origin, c-suite-design (站内 /posts/), weekly-2026-w29 (站内 /weekly/) |
 | presentations | 4 | mbabrand (slides), boss-handbook (slides), oaf (slides), openagent (site) |
 | weekly | 1 | 2026-w29 (脱敏公开周报, 集合 src/content/weekly + /weekly 索引 + [slug] 页) |
-| skills | 41 | zhanglu（15 个 handwritten:true；25 个 `lark-*` 自动同步；`aic-*` 走 EXCLUDE 不上站，见 §5.4.2） |
+| skills | 42 | zhanglu（15 个 handwritten:true；25 个 `lark-*` 自动同步；`aic-*` 走 EXCLUDE 不上站，见 §5.4.2） |
 
 `src/data/about.json` 当前 hero / bio 是基于公开项目信息撰写的占位描述，可随时替换为本人定义版
 （英文版在 `about.en.json`）。
 
-**页面规模**：`pnpm build` 产出 139 页 —— 中文 69 + 英文 69 + 404。
-**机读层**：24 个端点类型（12 类 × 2 语言），`[slug]` 展开后共 126 个 JSON 文件 + 双语 `llms.txt` + 分语言 RSS。
+**页面规模**：`pnpm build` 产出 141 页 —— 中文 70 + 英文 70 + 404。
+**机读层**：24 个端点类型（12 类 × 2 语言），`[slug]` 展开后共 128 个 JSON 文件 + 双语 `llms.txt` + 分语言 RSS。
 > 这两个数字会随内容涨。**`/how-it-works` 与 `/agents` 上的对应数字是 build 时算出来的，
 > 不用手改**（07-27 skills 30→41、08-01 projects 8→12 两次，页面上 96→118→126 全自动跟上）；只有本文这份快照要手动同步。
 **CLI**：`zhanglu-net` 已发布 npm（版本号在 `cli/package.json`，与站点版本独立）。

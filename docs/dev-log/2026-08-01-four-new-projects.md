@@ -80,3 +80,61 @@ slug 用英文可读标识而不是域名：`anp.pub`、`anp.asia` 这种域名�
 
 （`src/content/articles/` 没动 —— 这四个是站点本身，不是写作。将来要写它们的文章，
 按 §14.7 再补 `articles/` 索引条目。）
+
+---
+
+## 追加：rebase 时撞上 7-28 的自动同步，暴露了 auto-sync 的自我更新 bug
+
+推 main 被拒（非快进）。fetch 后发现远端多了一个提交：
+
+```
+8de5f0f chore: 同步本机 Claude Skills（26 个文件）   Tue Jul 28 09:00:11 2026 +0900
+```
+
+是 07-27 修完之后 launchd 的第一次真跑。先验修复有没有生效：
+
+| 检查 | 结果 |
+|---|---|
+| `aic-*` 有没有回来 | **0 个** ✓ `EXCLUDE` 生效 |
+| frontmatter 带 `aic-` 的 | **0 个** ✓（目录名不带前缀那批也挡住了） |
+| `zhanglu` 还在不在 | **在**，且 `handwritten: true` ✓ 策展保护生效 |
+| 中英对齐 | **zh=42 / en=41** ✗ —— `ego-browser` 只有中文侧 |
+
+前三条都对，第四条没拦住 —— 而 07-27 我明明加了「中英不对齐就 `exit 1` 不推送」。
+`git show 8de5f0f:scripts/auto-sync-skills.sh` 确认那段代码当时**就在树里**（第 62–65 行）。
+
+### 根因：脚本在执行途中把自己换掉了
+
+`auto-sync-skills.sh` 第一步就是 `git merge --ff-only origin/main` —— 这一步会把
+`scripts/auto-sync-skills.sh` 自己也更新掉。而 **bash 是按字节偏移增量读脚本**的：
+文件在运行中被替换，bash 继续从原偏移读**新文件**，落点是错的。所以那一跑执行的
+根本不是树里那份逻辑。
+
+「改了脚本，下一次自动跑却像没改」这个现象特别难查 —— `git show` 看代码是对的，
+`bash -n` 也过，只有真跑才露馅。
+
+### 修
+
+merge 前后比对自身 md5，变了就带 `ZHANGLU_REEXEC=1` 重新 `exec` 自己，且只重入一次：
+
+```bash
+BEFORE=$(self_sum)
+git fetch/merge ...
+if [[ "${ZHANGLU_REEXEC:-0}" != "1" && "$(self_sum)" != "$BEFORE" ]]; then
+  ZHANGLU_REEXEC=1 exec bash "$SELF" "$@"
+fi
+```
+
+夹具实测：脚本第一步改自己 → 打印「↻ 检测到自身变化，重新 exec」→ 第二次带
+`ZHANGLU_REEXEC=1` 进来 → 到达主体逻辑，**不打转**。`bash -n` 通过。
+
+**推论（已写进 AGENTS §5.4.2 第 5 条）：改完这个脚本后的第一次自动跑，行为仍以旧版本为准。**
+想立刻生效就手动跑一次，或先在本机 `git pull`。
+
+### 顺带
+
+- 补 `src/content/skillsEn/ego-browser.md` → zh=42 / en=42 重新对齐
+- `ego-browser`（ego-lite，Chromium 浏览器）与手写的 `agent-browser`（浏览器自动化 CLI）
+  是两件事，两个都留
+- build 141 页（139 → +2），JSON 126 → 128，`index.json` counts `skills:42`
+- AGENTS §5.4.2 四个坑 → **五个坑**；§11 快照同步
