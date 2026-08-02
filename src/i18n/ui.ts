@@ -11,6 +11,7 @@ export const ui = {
     'nav.weekly': '周报',
     'nav.skills': 'Skills',
     'nav.agents': 'Agents',
+    'nav.npm': 'npm',
     'nav.arch': '架构',
     'nav.about': '关于',
 
@@ -58,6 +59,7 @@ export const ui = {
     'nav.weekly': 'Weekly',
     'nav.skills': 'Skills',
     'nav.agents': 'Agents',
+    'nav.npm': 'npm',
     'nav.arch': 'Architecture',
     'nav.about': 'About',
 

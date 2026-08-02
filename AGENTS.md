@@ -116,6 +116,7 @@ zhanglu/
 │   │   ├── weekly/{index,[slug]}.astro
 │   │   ├── posts/                 ← 站内长文
 │   │   ├── agents.astro           ← agent 接入指南
+│   │   ├── npm.astro              ← ★ npm / CLI 专门说明页（双语镜像在 en/npm）
 │   │   ├── how-it-works.astro     ← ★ 站点架构说明（双语，图示；文档版 docs/architecture.md）
 │   │   ├── about.astro
 │   │   ├── brand.astro            ← 本站 logo 品牌页「一条路，一个句点」(Footer 有入口)
@@ -734,24 +735,24 @@ curl -s --noproxy '*' -o /dev/null -w 'zhanglu.net: %{http_code}\n' https://zhan
 
 ---
 
-## 11. 当前内容快照（截至 2026-08-01，站点 v0.3.0）
+## 11. 当前内容快照（截至 2026-08-03，站点 v0.3.0）
 
 > **每个集合都有平行的英文版**（`src/content/<coll>En/`，同 slug、同数量）。下表是中文侧；
 > 英文侧数量 1:1 对齐（见 §16）。改内容时**两边都要动**。
 
 | collection | 数量 | featured |
 |---|---|---|
-| projects | 12 | mbabrand, boss, oaf, aip（第二大脑）, qiji-roadshow-2026, qcc-agent, shanghai（order 1→7）+ siliconforge, excel-ai-analyst, ai-interview, brain-radar（order 8→11，08-01 新增）—— 以上均 featured；tui3（网站存档, order 99, archived, 非 featured） |
-| articles | 9 | agent-cli, qiji-56-projects-one-night, qcc-agent-origin, c-suite-design, weekly-2026-w29 + siliconforge, excel-ai-analyst, ai-interview, brain-radar（08-01 新增，均为站内 `/posts/<slug>` 长文）|
+| projects | 13 | mbabrand, boss, oaf, aip（第二大脑）, qiji-roadshow-2026, qcc-agent, shanghai（order 1→7）+ siliconforge, excel-ai-analyst, ai-interview, brain-radar, free-model-port（order 8→12）—— 以上均 featured；tui3（网站存档, order 99, archived, 非 featured） |
+| articles | 10 | agent-cli, qiji-56-projects-one-night, qcc-agent-origin, c-suite-design, weekly-2026-w29 + siliconforge, excel-ai-analyst, ai-interview, brain-radar, free-model-port（均为站内 `/posts/<slug>` 长文）|
 | presentations | 4 | mbabrand (slides), boss-handbook (slides), oaf (slides), openagent (site) |
-| weekly | 1 | 2026-w29 (脱敏公开周报, 集合 src/content/weekly + /weekly 索引 + [slug] 页) |
+| weekly | 3 | 2026-w29 / 2026-w30 / 2026-w31 (脱敏公开周报, 集合 src/content/weekly + /weekly 索引 + [slug] 页) |
 | skills | 42 | zhanglu（15 个 handwritten:true；25 个 `lark-*` 自动同步；`aic-*` 走 EXCLUDE 不上站，见 §5.4.2） |
 
 `src/data/about.json` 当前 hero / bio 是基于公开项目信息撰写的占位描述，可随时替换为本人定义版
 （英文版在 `about.en.json`）。
 
-**页面规模**：`pnpm build` 产出 149 页 —— 中文 74 + 英文 74 + 404。
-**机读层**：24 个端点类型（12 类 × 2 语言），`[slug]` 展开后共 128 个 JSON 文件 + 双语 `llms.txt` + 分语言 RSS。
+**页面规模**：干净发布树 `pnpm build` 产出 157 页（含双语 `/npm` 页面；本地脏工作区可能因未提交内容略高）。
+**机读层**：24 个端点类型（12 类 × 2 语言），干净发布树 `[slug]` 展开后共 134 个 JSON 文件 + 双语 `llms.txt` + 分语言 RSS。
 > 这两个数字会随内容涨。**`/how-it-works` 与 `/agents` 上的对应数字是 build 时算出来的，
 > 不用手改**（07-27 skills 30→41、08-01 projects 8→12 两次，页面上 96→118→126 全自动跟上）；只有本文这份快照要手动同步。
 **CLI**：`zhanglu-net` 已发布 npm（版本号在 `cli/package.json`，与站点版本独立）。
@@ -808,6 +809,7 @@ curl -s --noproxy '*' -o /dev/null -w 'zhanglu.net: %{http_code}\n' https://zhan
 | `/robots.txt` | `public/robots.txt` | sitemap + allow all + 指向 `/api/`、`/en/api/` |
 | `/404` | `src/pages/404.astro` | **双语** 404（CF Pages 只服务一个根 404.html）；让不存在路径返回真 404 |
 | `/agents` · `/en/agents` | `src/pages/agents.astro` · `src/pages/en/agents.astro` | 人类向接入指南（端点表 + CLI + curl + Claude Code）|
+| `/npm` · `/en/npm` | `src/pages/npm.astro` · `src/pages/en/npm.astro` | npm / CLI 专门说明页（npx、全局安装、本地运行、命令、flags）|
 | `/posts/agent-cli` | `src/pages/posts/agent-cli.astro` | 设计文章（在站站内长文版本）|
 | `/posts` | `src/pages/posts/index.astro` | 长文索引 |
 
@@ -900,6 +902,7 @@ CLI 与站点端点松耦合 —— 改端点 schema 时若不破坏向下兼容
 站上（给读者看的）：
 
 - `/agents` —— 人类向接入指南，含端点表 / CLI / curl / Claude Code 集成 / 其他 agent 接入思路
+- `/npm` —— npm / CLI 专门说明页，面向终端用户和 agent 操作者解释 `npx zhanglu-net`
 - `/posts/agent-cli` —— 设计文章站内版本（公众号也会发一份）
 - `/posts` —— 长文索引
 

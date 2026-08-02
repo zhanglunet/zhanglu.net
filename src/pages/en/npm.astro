@@ -1,0 +1,242 @@
+---
+import { readFileSync } from 'node:fs';
+import Base from '../../layouts/Base.astro';
+
+const pkg = JSON.parse(readFileSync(new URL('../../../cli/package.json', import.meta.url), 'utf-8'));
+const cliSource = readFileSync(new URL('../../../cli/bin/zhanglu-net.mjs', import.meta.url), 'utf-8');
+const cliLines = cliSource.trimEnd().split('\n').length;
+
+const commands = [
+  ['endpoints', 'Show the manifest: content counts, all API URLs, and language links.'],
+  ['list <kind>', 'List skills / projects / articles / presentations / weekly.'],
+  ['get <kind> <slug>', 'Read one skill / project / weekly; articles and presentations are taken from their list endpoints.'],
+  ['search <keyword>', 'Substring search across the full corpus, optionally narrowed with --type.'],
+  ['about', 'Read the author bio, tagline and tags.'],
+  ['social', 'Read public social links; email is scrubbed.'],
+  ['help <command>', 'Show detailed help for one command.'],
+  ['version', 'Print the CLI version.'],
+];
+
+const flags = [
+  ['--lang <zh|en>', 'Choose Chinese or English payloads; default is zh.'],
+  ['--json', 'Output raw JSON for agents, scripts and jq pipelines.'],
+  ['--md', 'On get, output only body_md; best for feeding a model.'],
+  ['--featured', 'Only featured items.'],
+  ['--source <s>', 'Filter skills / articles by source.'],
+  ['--status <s>', 'Filter projects by status.'],
+  ['--type <t>', 'For search: skill / project / article / presentation / weekly / about.'],
+  ['--since <YYYY-MM-DD>', 'For list articles: filter by date.'],
+  ['--limit <N>', 'Return at most N items.'],
+  ['--base <url>', 'Override the site root; use http://localhost:4321 for local dev.'],
+];
+
+const recipes = [
+  ['See what the site exposes', 'npx zhanglu-net --lang en endpoints'],
+  ['List live projects as JSON', 'npx zhanglu-net --lang en list projects --status live --json'],
+  ['Get a skill body as markdown', 'npx zhanglu-net --lang en get skill boss --md'],
+  ['Search for brand-judgment material', 'npx zhanglu-net --lang en search "brand judgment" --type skill'],
+  ['Read recent weekly notes', 'npx zhanglu-net --lang en list weekly'],
+  ['Switch to Chinese corpus', 'npx zhanglu-net search "品牌判断"'],
+  ['Point the CLI at a local dev server', 'ZHANGLU_BASE_URL=http://localhost:4321 npx zhanglu-net --lang en endpoints'],
+];
+
+const title = 'npm / CLI';
+const desc = 'Detailed usage guide for the zhanglu-net npm package: npx, global install, local source runs, commands, flags, endpoint model and agent usage.';
+---
+<Base title={title} description={desc}>
+  <section class="pb-8 border-b border-[var(--color-rule)] mb-10">
+    <p class="text-xs font-mono text-[var(--color-accent)] mb-3 tracking-wider">NPM PACKAGE</p>
+    <h1 class="font-serif text-3xl sm:text-4xl font-semibold mb-4">Read this site with one line of <code class="font-mono text-[0.9em]">npx zhanglu-net</code>.</h1>
+    <p class="text-[var(--color-muted)] leading-relaxed max-w-2xl mb-5">
+      <code class="font-mono text-sm bg-[var(--color-paper-2)] px-1.5 py-0.5 rounded">zhanglu-net</code>
+      is this site's official npm CLI. It is not a second data source; it is a thin wrapper around
+      <a href="/en/agents" class="text-[var(--color-accent)] hover:underline">/api/*.json</a>.
+      By default it is human-readable. Add <code class="font-mono text-sm bg-[var(--color-paper-2)] px-1.5 py-0.5 rounded">--json</code>
+      when an agent or script wants raw payloads.
+    </p>
+    <div class="flex flex-wrap gap-2 text-xs font-mono">
+      <span class="px-2 py-1 rounded bg-[var(--color-paper-2)]">package: {pkg.name}</span>
+      <span class="px-2 py-1 rounded bg-[var(--color-paper-2)]">version: {pkg.version}</span>
+      <span class="px-2 py-1 rounded bg-[var(--color-paper-2)]">Node &gt;= 18</span>
+      <span class="px-2 py-1 rounded bg-[var(--color-paper-2)]">0 dependencies</span>
+      <span class="px-2 py-1 rounded bg-[var(--color-paper-2)]">MIT</span>
+      <span class="px-2 py-1 rounded bg-[var(--color-paper-2)]">{cliLines} lines</span>
+    </div>
+  </section>
+
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-2">First: npm vs npx</h2>
+    <div class="grid sm:grid-cols-2 gap-4 text-sm leading-relaxed">
+      <div class="border border-[var(--color-rule)] rounded p-4">
+        <h3 class="font-serif text-lg font-semibold mb-2">npm package</h3>
+        <p class="text-[var(--color-muted)]">
+          npm is the JavaScript package registry. This site's package is
+          <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">zhanglu-net</code>.
+          It contains the CLI source, README and package.json. Once installed, it exposes the
+          <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">zhanglu-net</code> command.
+        </p>
+      </div>
+      <div class="border border-[var(--color-rule)] rounded p-4">
+        <h3 class="font-serif text-lg font-semibold mb-2">npx command</h3>
+        <p class="text-[var(--color-muted)]">
+          npx runs an npm package temporarily. You do not install first; just run
+          <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">npx zhanglu-net --lang en list projects</code>
+          and it downloads and executes the latest package. For occasional use, npx is the easiest path.
+        </p>
+      </div>
+    </div>
+    <p class="text-xs text-[var(--color-muted)] mt-3">
+      The package name is <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">zhanglu-net</code>.
+      The npm package <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">zhanglu</code>
+      is someone else's empty package from 2021. Do not install that one.
+    </p>
+  </section>
+
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-4">Three ways to run it</h2>
+    <div class="space-y-4">
+      <div class="border border-[var(--color-rule)] rounded p-4">
+        <p class="font-semibold mb-2">1. No install: npx</p>
+        <pre class="bg-[#1a1a1a] text-[#f3f1ea] p-4 rounded text-xs overflow-x-auto"><code>npx zhanglu-net --help
+npx zhanglu-net --lang en endpoints
+npx zhanglu-net --lang en list skills --featured</code></pre>
+        <p class="text-sm text-[var(--color-muted)] mt-2">Recommended. Good for one-off lookup, agent calls, or keeping your global environment clean.</p>
+      </div>
+      <div class="border border-[var(--color-rule)] rounded p-4">
+        <p class="font-semibold mb-2">2. Global install</p>
+        <pre class="bg-[#1a1a1a] text-[#f3f1ea] p-4 rounded text-xs overflow-x-auto"><code>npm i -g zhanglu-net
+zhanglu-net --lang en list projects
+zhanglu-net --lang en search "weekly"</code></pre>
+        <p class="text-sm text-[var(--color-muted)] mt-2">Good if you use it often. Faster startup; upgrade manually with <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">npm up -g zhanglu-net</code>.</p>
+      </div>
+      <div class="border border-[var(--color-rule)] rounded p-4">
+        <p class="font-semibold mb-2">3. Run from source</p>
+        <pre class="bg-[#1a1a1a] text-[#f3f1ea] p-4 rounded text-xs overflow-x-auto"><code>git clone https://github.com/zhanglunet/zhanglu.net
+node zhanglu.net/cli/bin/zhanglu-net.mjs --lang en list skills</code></pre>
+        <p class="text-sm text-[var(--color-muted)] mt-2">Good when npm is unavailable, or when you want to inspect or modify the CLI. Zero dependencies; no install step needed.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-4">Recipes</h2>
+    <div class="border border-[var(--color-rule)] rounded overflow-hidden">
+      {recipes.map(([label, cmd], i) => (
+        <div class:list={['p-4', i !== recipes.length - 1 && 'border-b border-[var(--color-rule)]']}>
+          <p class="text-sm text-[var(--color-muted)] mb-1">{label}</p>
+          <code class="font-mono text-sm text-[var(--color-accent)] wrap-anywhere">{cmd}</code>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-2">Commands</h2>
+    <p class="text-sm text-[var(--color-muted)] mb-4">
+      Content types are called kinds. Use plural kinds with <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">list</code>:
+      <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">skills</code>,
+      <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">projects</code>,
+      <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">articles</code>,
+      <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">presentations</code>,
+      <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">weekly</code>.
+      Use singular kinds with <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">get</code>.
+    </p>
+    <div class="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-sm font-mono wrap-anywhere">
+      {commands.map(([cmd, note]) => (
+        <>
+          <code class="text-[var(--color-accent)]">{cmd}</code>
+          <span class="text-[var(--color-muted)]">{note}</span>
+        </>
+      ))}
+    </div>
+  </section>
+
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-4">Flags</h2>
+    <div class="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-sm font-mono wrap-anywhere">
+      {flags.map(([flag, note]) => (
+        <>
+          <code class="text-[var(--color-accent)]">{flag}</code>
+          <span class="text-[var(--color-muted)]">{note}</span>
+        </>
+      ))}
+    </div>
+  </section>
+
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-2">Where it reads from</h2>
+    <p class="text-sm text-[var(--color-muted)] leading-relaxed mb-4">
+      The CLI stores no data and talks to no database. Every command is just one or a few HTTP GET requests:
+      Chinese data lives at <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">https://zhanglu.net/api/*.json</code>;
+      English data lives at <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">https://zhanglu.net/en/api/*.json</code>.
+      curl, browser fetch and the CLI all read the same build artifact.
+    </p>
+    <pre class="bg-[#1a1a1a] text-[#f3f1ea] p-4 rounded text-xs overflow-x-auto"><code># These two read the same project list
+curl -s https://zhanglu.net/en/api/projects.json | jq '.items[].slug'
+npx zhanglu-net --lang en list projects --json | jq '.items[].slug'
+
+# Chinese is the same endpoint family without /en
+curl -s https://zhanglu.net/api/projects.json | jq '.lang'
+npx zhanglu-net list projects --json | jq '.lang'</code></pre>
+  </section>
+
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-4">Using it from an agent</h2>
+    <div class="grid sm:grid-cols-2 gap-4 text-sm leading-relaxed">
+      <div class="border border-[var(--color-rule)] rounded p-4">
+        <h3 class="font-serif text-lg font-semibold mb-2">Need structured data</h3>
+        <pre class="bg-[#1a1a1a] text-[#f3f1ea] p-3 rounded text-xs overflow-x-auto"><code>npx zhanglu-net --lang en list projects --json</code></pre>
+        <p class="text-[var(--color-muted)] mt-2">Use <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">--json</code>; output is ready for jq, scripts or model input.</p>
+      </div>
+      <div class="border border-[var(--color-rule)] rounded p-4">
+        <h3 class="font-serif text-lg font-semibold mb-2">Need body text for a model</h3>
+        <pre class="bg-[#1a1a1a] text-[#f3f1ea] p-3 rounded text-xs overflow-x-auto"><code>npx zhanglu-net --lang en get project boss --md</code></pre>
+        <p class="text-[var(--color-muted)] mt-2">Use <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">--md</code>; it strips the wrapper and returns body markdown.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-4">Environment variables</h2>
+    <div class="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-sm font-mono wrap-anywhere">
+      <code class="text-[var(--color-accent)]">ZHANGLU_BASE_URL</code>
+      <span class="text-[var(--color-muted)]">Default https://zhanglu.net; set to http://localhost:4321 for local dev.</span>
+      <code class="text-[var(--color-accent)]">ZHANGLU_LANG</code>
+      <span class="text-[var(--color-muted)]">Default language, equivalent to adding --lang each time.</span>
+      <code class="text-[var(--color-accent)]">NO_COLOR=1</code>
+      <span class="text-[var(--color-muted)]">Turn off ANSI colors; non-TTY pipes avoid colors automatically too.</span>
+    </div>
+  </section>
+
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-4">FAQ</h2>
+    <div class="space-y-4 text-sm leading-relaxed">
+      <div>
+        <p class="font-semibold">Do I need an API key?</p>
+        <p class="text-[var(--color-muted)]">No. The site content is public; endpoints are CORS-open and tokenless.</p>
+      </div>
+      <div>
+        <p class="font-semibold">Does npx hit the network every time?</p>
+        <p class="text-[var(--color-muted)]">It normally checks / uses its cache. Use global install if you want less startup latency.</p>
+      </div>
+      <div>
+        <p class="font-semibold">Why does English search not find Chinese content?</p>
+        <p class="text-[var(--color-muted)]">The corpora are language-separated. English uses <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">--lang en</code>; Chinese is the default.</p>
+      </div>
+      <div>
+        <p class="font-semibold">When should I skip the CLI?</p>
+        <p class="text-[var(--color-muted)]">If your agent can already make HTTP calls, read <a href="/en/api/index.json" class="text-[var(--color-accent)] hover:underline">/en/api/index.json</a> directly. The CLI is for terminals and agents without HTTP tooling.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="pt-8 border-t border-[var(--color-rule)]">
+    <h2 class="font-serif text-2xl font-semibold mb-4">Next</h2>
+    <div class="space-y-3 text-sm">
+      <a href="/en/agents" class="block hover:text-[var(--color-accent)] transition-colors">Agent integration guide →</a>
+      <a href="/en/posts/agent-cli" class="block hover:text-[var(--color-accent)] transition-colors">Design essay: one npx command instead of HTML scraping →</a>
+      <a href="https://www.npmjs.com/package/zhanglu-net" target="_blank" rel="noopener" class="block hover:text-[var(--color-accent)] transition-colors">npm registry: zhanglu-net →</a>
+      <a href="https://github.com/zhanglunet/zhanglu.net/tree/main/cli" target="_blank" rel="noopener" class="block hover:text-[var(--color-accent)] transition-colors">GitHub source: cli/ →</a>
+    </div>
+  </section>
+</Base>

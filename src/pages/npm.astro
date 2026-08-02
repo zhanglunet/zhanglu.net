@@ -1,0 +1,242 @@
+---
+import { readFileSync } from 'node:fs';
+import Base from '../layouts/Base.astro';
+
+const pkg = JSON.parse(readFileSync(new URL('../../cli/package.json', import.meta.url), 'utf-8'));
+const cliSource = readFileSync(new URL('../../cli/bin/zhanglu-net.mjs', import.meta.url), 'utf-8');
+const cliLines = cliSource.trimEnd().split('\n').length;
+
+const commands = [
+  ['endpoints', '查看 manifest：内容计数、全部 API URL、双语入口。'],
+  ['list <kind>', '列出 skills / projects / articles / presentations / weekly。'],
+  ['get <kind> <slug>', '读取单条 skill / project / weekly；article / presentation 从列表里取。'],
+  ['search <keyword>', '在全语料里做关键词搜索，可用 --type 限定类型。'],
+  ['about', '读取作者简介、tagline、bio 和 tags。'],
+  ['social', '读取公开社交链接，邮箱已脱敏。'],
+  ['help <command>', '查看某个命令的详细帮助。'],
+  ['version', '打印 CLI 版本。'],
+];
+
+const flags = [
+  ['--lang <zh|en>', '选择中文或英文数据；默认 zh。'],
+  ['--json', '输出原始 JSON，适合 agent、脚本和 jq 管道。'],
+  ['--md', 'get 时只输出 body_md；最适合直接喂给模型。'],
+  ['--featured', '只看 featured 内容。'],
+  ['--source <s>', '按 source 过滤 skills / articles。'],
+  ['--status <s>', '按 status 过滤 projects。'],
+  ['--type <t>', 'search 时限定 skill / project / article / presentation / weekly / about。'],
+  ['--since <YYYY-MM-DD>', 'list articles 时按日期过滤。'],
+  ['--limit <N>', '最多返回 N 项。'],
+  ['--base <url>', '覆盖站点根地址，本地开发用 http://localhost:4321。'],
+];
+
+const recipes = [
+  ['先看这个站有什么', 'npx zhanglu-net endpoints'],
+  ['列出 live 项目，给程序继续处理', 'npx zhanglu-net list projects --status live --json'],
+  ['拿一个 skill 的完整正文', 'npx zhanglu-net get skill boss --md'],
+  ['搜索品牌判断相关内容', 'npx zhanglu-net search "品牌判断" --type skill'],
+  ['读取最近周报列表', 'npx zhanglu-net list weekly'],
+  ['切到英文语料', 'npx zhanglu-net --lang en search "brand judgment"'],
+  ['本地开发时连本机 dev server', 'ZHANGLU_BASE_URL=http://localhost:4321 npx zhanglu-net endpoints'],
+];
+
+const title = 'npm / CLI';
+const desc = 'zhanglu-net npm 包的详细使用说明：npx、全局安装、本地运行、命令、flags、端点关系和 agent 接入方式。';
+---
+<Base title={title} description={desc}>
+  <section class="pb-8 border-b border-[var(--color-rule)] mb-10">
+    <p class="text-xs font-mono text-[var(--color-accent)] mb-3 tracking-wider">NPM PACKAGE</p>
+    <h1 class="font-serif text-3xl sm:text-4xl font-semibold mb-4">用一行 <code class="font-mono text-[0.9em]">npx zhanglu-net</code> 读本站。</h1>
+    <p class="text-[var(--color-muted)] leading-relaxed max-w-2xl mb-5">
+      <code class="font-mono text-sm bg-[var(--color-paper-2)] px-1.5 py-0.5 rounded">zhanglu-net</code>
+      是本站的官方 npm CLI。它不是另一套数据源，而是
+      <a href="/agents" class="text-[var(--color-accent)] hover:underline">/api/*.json</a>
+      的薄包装：默认给人看，加 <code class="font-mono text-sm bg-[var(--color-paper-2)] px-1.5 py-0.5 rounded">--json</code>
+      就给 agent 和脚本用。
+    </p>
+    <div class="flex flex-wrap gap-2 text-xs font-mono">
+      <span class="px-2 py-1 rounded bg-[var(--color-paper-2)]">package: {pkg.name}</span>
+      <span class="px-2 py-1 rounded bg-[var(--color-paper-2)]">version: {pkg.version}</span>
+      <span class="px-2 py-1 rounded bg-[var(--color-paper-2)]">Node &gt;= 18</span>
+      <span class="px-2 py-1 rounded bg-[var(--color-paper-2)]">0 dependencies</span>
+      <span class="px-2 py-1 rounded bg-[var(--color-paper-2)]">MIT</span>
+      <span class="px-2 py-1 rounded bg-[var(--color-paper-2)]">{cliLines} lines</span>
+    </div>
+  </section>
+
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-2">先说清楚：npm 和 npx 分别是什么</h2>
+    <div class="grid sm:grid-cols-2 gap-4 text-sm leading-relaxed">
+      <div class="border border-[var(--color-rule)] rounded p-4">
+        <h3 class="font-serif text-lg font-semibold mb-2">npm 包</h3>
+        <p class="text-[var(--color-muted)]">
+          npm 是 JavaScript 包注册表。本站发布的包名是
+          <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">zhanglu-net</code>，
+          包里只有 CLI 源码、README 和 package.json。安装后得到一个同名命令
+          <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">zhanglu-net</code>。
+        </p>
+      </div>
+      <div class="border border-[var(--color-rule)] rounded p-4">
+        <h3 class="font-serif text-lg font-semibold mb-2">npx 命令</h3>
+        <p class="text-[var(--color-muted)]">
+          npx 是“临时运行 npm 包”的方式。你不用先安装，直接
+          <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">npx zhanglu-net list projects</code>，
+          它会下载并执行最新版。偶尔用，npx 最省心。
+        </p>
+      </div>
+    </div>
+    <p class="text-xs text-[var(--color-muted)] mt-3">
+      注意：npm 上 <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">zhanglu</code>
+      是别人 2021 年发的空包，和本站无关。请安装
+      <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">zhanglu-net</code>。
+    </p>
+  </section>
+
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-4">三种运行方式</h2>
+    <div class="space-y-4">
+      <div class="border border-[var(--color-rule)] rounded p-4">
+        <p class="font-semibold mb-2">1. 不安装，直接 npx</p>
+        <pre class="bg-[#1a1a1a] text-[#f3f1ea] p-4 rounded text-xs overflow-x-auto"><code>npx zhanglu-net --help
+npx zhanglu-net endpoints
+npx zhanglu-net list skills --featured</code></pre>
+        <p class="text-sm text-[var(--color-muted)] mt-2">推荐方式。适合偶尔查一次、给 agent 临时调用、或者不想污染全局环境。</p>
+      </div>
+      <div class="border border-[var(--color-rule)] rounded p-4">
+        <p class="font-semibold mb-2">2. 全局安装</p>
+        <pre class="bg-[#1a1a1a] text-[#f3f1ea] p-4 rounded text-xs overflow-x-auto"><code>npm i -g zhanglu-net
+zhanglu-net list projects
+zhanglu-net search "周报"</code></pre>
+        <p class="text-sm text-[var(--color-muted)] mt-2">适合经常用。启动更快，但升级要自己跑 <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">npm up -g zhanglu-net</code>。</p>
+      </div>
+      <div class="border border-[var(--color-rule)] rounded p-4">
+        <p class="font-semibold mb-2">3. 从源码运行</p>
+        <pre class="bg-[#1a1a1a] text-[#f3f1ea] p-4 rounded text-xs overflow-x-auto"><code>git clone https://github.com/zhanglunet/zhanglu.net
+node zhanglu.net/cli/bin/zhanglu-net.mjs list skills</code></pre>
+        <p class="text-sm text-[var(--color-muted)] mt-2">适合 npm 访问受限、想审源码、或准备改 CLI。它零依赖，不需要先 install。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-4">常用配方</h2>
+    <div class="border border-[var(--color-rule)] rounded overflow-hidden">
+      {recipes.map(([label, cmd], i) => (
+        <div class:list={['p-4', i !== recipes.length - 1 && 'border-b border-[var(--color-rule)]']}>
+          <p class="text-sm text-[var(--color-muted)] mb-1">{label}</p>
+          <code class="font-mono text-sm text-[var(--color-accent)] wrap-anywhere">{cmd}</code>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-2">命令</h2>
+    <p class="text-sm text-[var(--color-muted)] mb-4">
+      支持的内容类型叫 kind。复数用于 <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">list</code>：
+      <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">skills</code>、
+      <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">projects</code>、
+      <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">articles</code>、
+      <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">presentations</code>、
+      <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">weekly</code>。
+      单数用于 <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">get</code>。
+    </p>
+    <div class="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-sm font-mono wrap-anywhere">
+      {commands.map(([cmd, note]) => (
+        <>
+          <code class="text-[var(--color-accent)]">{cmd}</code>
+          <span class="text-[var(--color-muted)]">{note}</span>
+        </>
+      ))}
+    </div>
+  </section>
+
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-4">Flags</h2>
+    <div class="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-sm font-mono wrap-anywhere">
+      {flags.map(([flag, note]) => (
+        <>
+          <code class="text-[var(--color-accent)]">{flag}</code>
+          <span class="text-[var(--color-muted)]">{note}</span>
+        </>
+      ))}
+    </div>
+  </section>
+
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-2">它到底读哪里</h2>
+    <p class="text-sm text-[var(--color-muted)] leading-relaxed mb-4">
+      CLI 不保存数据，也不连数据库。每个命令都是一次或几次 HTTP GET：
+      中文读 <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">https://zhanglu.net/api/*.json</code>，
+      英文读 <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">https://zhanglu.net/en/api/*.json</code>。
+      所以 curl、浏览器 fetch、CLI 拿到的是同一份构建产物。
+    </p>
+    <pre class="bg-[#1a1a1a] text-[#f3f1ea] p-4 rounded text-xs overflow-x-auto"><code># 这两条读的是同一个列表
+curl -s https://zhanglu.net/api/projects.json | jq '.items[].slug'
+npx zhanglu-net list projects --json | jq '.items[].slug'
+
+# 英文版只是路径多了 /en，CLI 用 --lang en 帮你切
+curl -s https://zhanglu.net/en/api/projects.json | jq '.lang'
+npx zhanglu-net --lang en list projects --json | jq '.lang'</code></pre>
+  </section>
+
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-4">给 agent 用时怎么写</h2>
+    <div class="grid sm:grid-cols-2 gap-4 text-sm leading-relaxed">
+      <div class="border border-[var(--color-rule)] rounded p-4">
+        <h3 class="font-serif text-lg font-semibold mb-2">要结构化数据</h3>
+        <pre class="bg-[#1a1a1a] text-[#f3f1ea] p-3 rounded text-xs overflow-x-auto"><code>npx zhanglu-net list projects --json</code></pre>
+        <p class="text-[var(--color-muted)] mt-2">用 <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">--json</code>，输出可直接 pipe 给 jq、脚本或模型。</p>
+      </div>
+      <div class="border border-[var(--color-rule)] rounded p-4">
+        <h3 class="font-serif text-lg font-semibold mb-2">要正文给模型读</h3>
+        <pre class="bg-[#1a1a1a] text-[#f3f1ea] p-3 rounded text-xs overflow-x-auto"><code>npx zhanglu-net get project boss --md</code></pre>
+        <p class="text-[var(--color-muted)] mt-2">用 <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">--md</code>，只输出正文 markdown，少一点包装噪声。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-4">环境变量</h2>
+    <div class="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-sm font-mono wrap-anywhere">
+      <code class="text-[var(--color-accent)]">ZHANGLU_BASE_URL</code>
+      <span class="text-[var(--color-muted)]">默认 https://zhanglu.net；本地开发改成 http://localhost:4321。</span>
+      <code class="text-[var(--color-accent)]">ZHANGLU_LANG</code>
+      <span class="text-[var(--color-muted)]">默认语言，等价于每次加 --lang。</span>
+      <code class="text-[var(--color-accent)]">NO_COLOR=1</code>
+      <span class="text-[var(--color-muted)]">关闭 ANSI 颜色；非 TTY 管道里也会自动少用颜色。</span>
+    </div>
+  </section>
+
+  <section class="mb-12">
+    <h2 class="font-serif text-2xl font-semibold mb-4">常见问题</h2>
+    <div class="space-y-4 text-sm leading-relaxed">
+      <div>
+        <p class="font-semibold">需要 API key 吗？</p>
+        <p class="text-[var(--color-muted)]">不需要。本站内容公开，端点 CORS 全开，无 token。</p>
+      </div>
+      <div>
+        <p class="font-semibold">npx 每次都会联网吗？</p>
+        <p class="text-[var(--color-muted)]">通常会检查 / 使用缓存。想减少下载延迟，就全局安装。</p>
+      </div>
+      <div>
+        <p class="font-semibold">为什么搜英文搜不到中文内容？</p>
+        <p class="text-[var(--color-muted)]">语料按语言分开。中文默认，英文加 <code class="font-mono text-xs bg-[var(--color-paper-2)] px-1 rounded">--lang en</code>。</p>
+      </div>
+      <div>
+        <p class="font-semibold">什么时候不用 CLI？</p>
+        <p class="text-[var(--color-muted)]">如果你的 agent 已经能发 HTTP，直接读 <a href="/api/index.json" class="text-[var(--color-accent)] hover:underline">/api/index.json</a> 更直接。CLI 是给终端和没有 HTTP tool 的场景准备的。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="pt-8 border-t border-[var(--color-rule)]">
+    <h2 class="font-serif text-2xl font-semibold mb-4">继续看</h2>
+    <div class="space-y-3 text-sm">
+      <a href="/agents" class="block hover:text-[var(--color-accent)] transition-colors">Agents 接入指南 →</a>
+      <a href="/posts/agent-cli" class="block hover:text-[var(--color-accent)] transition-colors">设计文章：给 agent 写了个 CLI →</a>
+      <a href="https://www.npmjs.com/package/zhanglu-net" target="_blank" rel="noopener" class="block hover:text-[var(--color-accent)] transition-colors">npm registry：zhanglu-net →</a>
+      <a href="https://github.com/zhanglunet/zhanglu.net/tree/main/cli" target="_blank" rel="noopener" class="block hover:text-[var(--color-accent)] transition-colors">GitHub 源码：cli/ →</a>
+    </div>
+  </section>
+</Base>

@@ -5,7 +5,7 @@
 - **线上**: https://zhanglu.net · 英文 https://zhanglu.net/en/
 - **备用**: https://zhanglu-net.pages.dev
 - **仓库**: https://github.com/zhanglunet/zhanglu.net
-- **给 agent**: [`/llms.txt`](https://zhanglu.net/llms.txt) · [`/agents`](https://zhanglu.net/agents) · `npx zhanglu-net`
+- **给 agent**: [`/llms.txt`](https://zhanglu.net/llms.txt) · [`/agents`](https://zhanglu.net/agents) · [`/npm`](https://zhanglu.net/npm) · `npx zhanglu-net`
 
 ## 预览
 
@@ -112,6 +112,7 @@ npx zhanglu-net help search                        # 看某个命令的详细帮
 ```
 
 已发布在 npm（[`zhanglu-net`](https://www.npmjs.com/package/zhanglu-net)），零运行时依赖。
+站上有专门说明页：[`/npm`](https://zhanglu.net/npm) · 英文 [`/en/npm`](https://zhanglu.net/en/npm)。
 CLI 是端点的薄包装：`--json` 出原始 JSON 给 agent pipe，`--lang zh|en` 切语言，
 默认人类可读带颜色（非 TTY / `NO_COLOR` 自动关）。`list` / `get` 覆盖
 skills / projects / articles / presentations / weekly 五类。

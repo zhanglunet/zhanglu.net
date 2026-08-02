@@ -16,6 +16,8 @@ This site is bilingual: Chinese at the root, English under /en/ — for both pag
 
 - /agents — 接入指南（端点表 + CLI 用法 + curl 示例 + Claude Code 集成）
 - /en/agents — the same guide in English
+- /npm — npm / CLI 专门说明页（npx、全局安装、本地运行、命令、flags）
+- /en/npm — the same npm / CLI guide in English
 - /posts/agent-cli — 设计文章（为什么这么做，1.5 小时上线的全过程）
 - /en/posts/agent-cli — English version
 
@@ -55,10 +57,12 @@ npx zhanglu-net get skill boss --md
 npx zhanglu-net search "品牌判断"
 npx zhanglu-net about
 npx zhanglu-net endpoints
+npx zhanglu-net help search
 
 # 英文数据 / English payloads:
 npx zhanglu-net --lang en list projects
 npx zhanglu-net --lang en search "brand judgment"
+npx zhanglu-net --lang en endpoints
 ```
 
 未发布到 npm 时的替代跑法 / if the npm package is unavailable:
