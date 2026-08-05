@@ -742,7 +742,7 @@ curl -s --noproxy '*' -o /dev/null -w 'zhanglu.net: %{http_code}\n' https://zhan
 
 | collection | 数量 | featured |
 |---|---|---|
-| projects | 14 | mbabrand(1), boss(2), oaf(3), aip(4), free-model-port(4 ⚠️ 与 aip 撞号), qiji-roadshow-2026(5), qcc-agent(6), shanghai(7), siliconforge(8), excel-ai-analyst(9), ai-interview(10), brain-radar(11), openworker-zh(12) —— 以上均 featured；tui3（网站存档, order 99, archived, 非 featured） |
+| projects | 14 | mbabrand(1), boss(2), oaf(3), aip(4), qiji-roadshow-2026(5), qcc-agent(6), shanghai(7), siliconforge(8), excel-ai-analyst(9), ai-interview(10), brain-radar(11), free-model-port(12), openworker-zh(13) —— 以上均 featured；tui3（网站存档, order 99, archived, 非 featured） |
 | articles | 10 | agent-cli, qiji-56-projects-one-night, qcc-agent-origin, c-suite-design, weekly-2026-w29 + siliconforge, excel-ai-analyst, ai-interview, brain-radar, free-model-port（均为站内 `/posts/<slug>` 长文）|
 | presentations | 4 | mbabrand (slides), boss-handbook (slides), oaf (slides), openagent (site) |
 | weekly | 3 | 2026-w29 / 2026-w30 / 2026-w31 (脱敏公开周报, 集合 src/content/weekly + /weekly 索引 + [slug] 页) |

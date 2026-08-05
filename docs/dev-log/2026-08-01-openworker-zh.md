@@ -89,3 +89,14 @@ projects 13 → **14**、页面 → **159**、JSON → **136**、search → **74
 顺手把 §11 的 projects 行改成**逐项标 order**（`mbabrand(1)…openworker-zh(12)`），
 因为原来那种「order 8→12」的区间写法在多人并行加项目时**必然对不上**，
 也正是它掩盖了 `aip` / `free-model-port` 的 4/4 撞号。
+
+## 追加：按用户要求消掉 4/4 撞号
+
+用户：「把 free-model-port 挪到 12，openworker-zh 排 13」。
+
+`free-model-port` 4 → **12**、`openworker-zh` 12 → **13**（zh / en 四个文件一起改）。
+先挪 openworker-zh 到 13、再挪 free-model-port 到 12，避免中途两者同时落在 12 上。
+
+改后 order 序列 `1..13, 99` **无任何重复**，`aip` 独占 4。
+两语 `/api/projects.json` 的 items 顺序完全一致，末位仍是 `tui3`（archived）。
+§11 的逐项 order 标注同步更新，⚠️ 撞号标记撤掉。

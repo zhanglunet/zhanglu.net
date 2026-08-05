@@ -8,7 +8,7 @@ tech: [Python, FastAPI, Model Routing, Local-first, AI CLI, Cloudflare Pages]
 year: 2026
 featured: true
 status: live
-order: 4
+order: 12
 persona: AI 开发者
 ---
 

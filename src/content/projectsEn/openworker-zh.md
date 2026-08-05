@@ -8,7 +8,7 @@ tech: [Tauri 2, React, FastAPI, MCP, local-first]
 year: 2026
 featured: true
 status: beta
-order: 12
+order: 13
 ---
 
 ## What it is
