@@ -1,0 +1,91 @@
+---
+layout: ../../../layouts/Post.astro
+title: "Localisation isn't translation: shipping a Chinese build of an agent runtime"
+description: "The hardest part of making a Chinese OpenWorker wasn't the strings — before 0.1.7, one auto-update turned it back into English. And reading the source changed what I think an AI coworker is."
+date: 2026-08-04
+lead: "Swapping the UI strings is day-one work. The real trap: a user installs the Chinese build, uses it for two weeks, and after one auto-update it's in English again."
+readingTime: 7
+---
+
+## Whose project this is
+
+[OpenWorker](https://github.com/andrewyng/openworker) is an open-source desktop AI coworker from Andrew Ng's team, MIT licensed. It isn't mine.
+
+What I built is its Chinese side — [the Chinese site oaosf.cn](/en/projects/openworker-zh), a localised macOS build, and a source-code deep dive. This post is about two things worth reporting from that work.
+
+## Finding one: auto-update wipes out localisation
+
+When you localise a desktop app, the strings are the easy part. The trap is in the distribution path.
+
+A user installs the Chinese build, uses it happily, and then one auto-update later — it's English again. Because the update feed points at the upstream repo, and upstream's builds don't contain your localisation.
+
+This bug has several nasty properties:
+
+- **It doesn't show up immediately** — you have to wait for upstream to ship a release
+- **Users won't blame the update**, they'll just think "why did this suddenly turn English"
+- **Reinstalling fixes it**, so it gets written off as a one-off
+
+0.1.7 pointed the auto-update feed at the Chinese repo, which finally closed it. In hindsight, "localising an app" means at least three things: translation, a separate build artefact (its own bundle ID, so it can coexist with the English version), and **its own update channel**. Skip the third and the first two have a shelf life.
+
+Incidentally: the current build is **not notarised**. If macOS blocks the first launch, right-click the app and choose Open once.
+
+## Finding two: it isn't a chat wrapper
+
+Localisation means reading the source, and reading it changed my read on the project.
+
+I'd assumed it was "a desktop chat window with tool calls bolted on". It isn't — it's **a local agent runtime**, and its moat comes from the tool loop, the permission system, the connectors and persistence, not from which model it happens to call.
+
+Three layers: a React + Tauri 2 desktop shell handling windows, tray and process lifecycle; a FastAPI + WebSocket Python sidecar exposing the local API and event stream; and `SessionManager` coordinating sessions, Inbox, automations, auditing and persistence.
+
+Two design details I'd steal.
+
+### Concurrent reads, sequential writes
+
+`TurnEngine` authorises tool calls one at a time, then **runs explicitly low-risk reads concurrently**, while writes, shell and unlabelled tools **stay strictly sequential**.
+
+A plain but correct trade-off. Most agent tool calls are reads that don't interfere with each other, and running them serially is pure waste; writes and shell, once concurrent, produce races and side effects that cost enormously to debug — and typically don't reproduce. Gating on "is this explicitly marked a low-risk read" rather than on the model's own judgement turns safety from a probability into a rule.
+
+Note the direction of the default: **unlabelled tools go sequential**. Conservative by default, concurrency must be declared — get that direction backwards and it's a disaster.
+
+### Four permission levels, not one switch
+
+```
+READ          read and search        runs directly
+WRITE_LOCAL   local file writes      mode-based approval, confined to writable dirs
+EXEC          run commands           explicit confirmation; complex shell can't auto-match the allowlist
+EXTERNAL      messages / external    per-target authorisation
+```
+
+"Complex shell can't auto-match the allowlist" is the important one. The classic way to defeat an allowlist is to hide the dangerous command inside a pipe, a subshell or a variable expansion; admitting "if I can't parse it, I won't auto-approve it" is far more honest than pretending the allowlist is complete.
+
+## The analysis found problems too
+
+Not all praise. Two worth recording:
+
+- `server/manager.py` is past 4,000 lines and the connector execution layer approaches 5,000. The feature loop is complete, but **the central modules are getting heavy** and maintenance will need further boundary splitting
+- Upstream still labels it **Open Beta**. Start with low-risk workflows and check connector permissions, approval modes and model data policies one at a time
+
+Figures are from `main@01b6f83`, and they count **code assets — not tests I ran**.
+
+## "Local-first" is a boundary, not a promise
+
+I repeat this on the project page and here, because it's the easiest thing to misread.
+
+Sessions, memory, keys and the main runtime state do stay on the device. But **the moment you pick a cloud model or enable an external connector, the data needed to finish the task goes to that service**. For fully local operation, use Ollama and don't enable external connectors.
+
+"Local-first" describes defaults and where control lives — not "data never leaves the machine". Read it as the latter and you will eventually get burned.
+
+## If you want to look yourself
+
+To install: download the DMG from the site, drag it into Applications; it coexists with the English build and takes your own model key.
+
+To read the source:
+
+```bash
+git clone https://github.com/zhanglunet/openworker-zh-localized
+cd openworker-zh-localized
+bash packaging/setup_dev_env.sh
+.venv/bin/openworker-server --cwd ~/project --port 8765
+```
+
+Python 3.10+ for the backend, Node 20+ for the frontend, plus the Rust toolchain for the full desktop shell. If you want to study agent architecture, it's a reference implementation you can actually run — which may be worth more than its value as a product.

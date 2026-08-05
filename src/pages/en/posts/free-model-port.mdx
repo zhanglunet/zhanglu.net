@@ -1,0 +1,67 @@
+---
+layout: ../../../layouts/Post.astro
+title: "A list of free models is the wrong abstraction"
+description: "A list is a snapshot of claims; what you need is evidence. FreeModel Port splits candidates from runnable models, and the line between them is drawn by one real request."
+date: 2026-08-04
+lead: "A static list saying \"free\" doesn't mean your account can actually complete a request right now. That sentence is where the whole project starts."
+readingTime: 7
+---
+
+> This post is about the design trade-offs. For the full feature tour and install steps, read [the original piece on oaf.asia](https://oaf.asia/stories/free-model-port/).
+
+## Lists lie, and they mean well
+
+"Which LLMs can I use for free" has never been short of answers. GitHub has awesome-lists with five-figure star counts; the forums produce a fresh roundup every week.
+
+The problem is that those lists **record claims, not evidence**.
+
+A model appearing on a list means that at some point someone saw a page that said *free*. It tells you nothing about whether the allowance needs a particular region, a credit card or an invite; whether it's rate-limited today; whether the model ID and protocol are compatible with your client. You find out after registering, getting a key and rewriting your config — buried in an error message you can't parse.
+
+So the real cost of "free" becomes **time spent failing**, and the longer the list, the higher that cost.
+
+## Split one table into two
+
+The core design of [FreeModel Port](/en/projects/free-model-port) is one sentence: **the public catalogue only produces candidates; a real request produces runnable.**
+
+Two tables, with one actual call between them:
+
+- **Candidates** — a model radar periodically scans public catalogues for entries that are explicitly zero-price, publicly reachable over HTTPS, and not yet registered. They are **only candidates** — nothing enters the real router just for looking free
+- **Runnable** — Live Status sends a minimal request to the actual upstream and records success state, latency and redacted errors. The "available" you see comes from response evidence
+
+The split buys more than accuracy; it buys **explainability**. When something isn't available you know which layer it failed at — an unverified candidate, a verified model whose upstream is down right now, or a key/quota problem. A list can't tell you that, because a list has exactly one state.
+
+Promotion from candidate to runnable isn't automatic either. Public HTTPS, protocol compatibility, a dedicated environment variable and a real response all have to hold before anything enters the trusted route.
+
+## Second decision: a router is a high-privilege centre
+
+Unified routing has a side effect that's easy to miss — **it is inherently a high-privilege centre**.
+
+It has to hold API keys for several providers, and it rewrites your dev client's configuration. In other words, a "little tool that saves you money" ends up with more privilege than most SaaS you'd sign up for.
+
+So the control plane stays on your machine, listening on `127.0.0.1` by default. Clients get a local proxy token and **never touch an upstream key**. The public site publishes only redacted model metadata, candidate data and verification state; the local `registry.yaml`, API keys, proxy token and response bodies never reach the public catalogue.
+
+Usage analytics work the same way: success rate, p50/p95, fallback recoveries and token counts stay local; prompts, response bodies, tool arguments, API keys and raw request IDs never enter the database.
+
+This is a genuine trade-off — a centralised cloud router could be smarter (cross-user availability data is a great signal), at the price of handing over keys and usage. This project picked the other side.
+
+## Third detail: fallback only before the first byte
+
+Virtual models pick candidates by capability, health, success rate, latency, quota and evidence of being free, with three-layer isolation across provider, anonymous key slot and model.
+
+But degradation has one hard rule: **fall back only before the first byte; never replay once streaming has started.**
+
+That one deserves its own paragraph. Automatic retry is the cheapest way to raise a success rate — but once a response has started streaming, replaying means the user may see two spliced, mutually contradictory chunks, with no way to know it happened. Asked to choose between a higher success rate and not lying, this picks the latter.
+
+## Who it's for
+
+One port, nine client families: Codex, Claude Code, OpenCode, Kimi CLI, OpenClaw, WorkBuddy, Hermes, Pi and OMP, all syncing from the same registry. Responses, Anthropic Messages, OpenAI-compatible endpoints and an MCP channel all work at once.
+
+Good for anyone who wants to try different models cheaply without endlessly rewriting config: AI coding-tool users, indie developers and students, model evaluators, and teams that care where their keys live.
+
+## Boundaries worth stating
+
+- **Free allowances, account eligibility and model catalogues change with provider policy.** Anything production-critical still needs a paid path and a degradation plan — this project lowers the cost of trying, it doesn't promise availability
+- The maintained repo is currently private; installing from source needs read access to it
+- Automatic promotion of candidates is **not** the default
+
+Install steps, the full seven services and dashboard screenshots are all in [the original piece on oaf.asia](https://oaf.asia/stories/free-model-port/).

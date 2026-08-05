@@ -743,7 +743,7 @@ curl -s --noproxy '*' -o /dev/null -w 'zhanglu.net: %{http_code}\n' https://zhan
 | collection | 数量 | featured |
 |---|---|---|
 | projects | 14 | mbabrand(1), boss(2), oaf(3), aip(4), qiji-roadshow-2026(5), qcc-agent(6), shanghai(7), siliconforge(8), excel-ai-analyst(9), ai-interview(10), brain-radar(11), free-model-port(12), openworker-zh(13) —— 以上均 featured；tui3（网站存档, order 99, archived, 非 featured） |
-| articles | 10 | agent-cli, qiji-56-projects-one-night, qcc-agent-origin, c-suite-design, weekly-2026-w29 + siliconforge, excel-ai-analyst, ai-interview, brain-radar, free-model-port（均为站内 `/posts/<slug>` 长文）|
+| articles | 12 | 站内长文 8 篇（agent-cli, c-suite-design, siliconforge, excel-ai-analyst, ai-interview, brain-radar, free-model-port-design, openworker-zh → 均指向 `/posts/<slug>`）+ 外链 4 条（qiji-56-projects-one-night, qcc-agent-origin, free-model-port→oaf.asia, weekly-2026-w29→站内 /weekly/）|
 | presentations | 4 | mbabrand (slides), boss-handbook (slides), oaf (slides), openagent (site) |
 | weekly | 3 | 2026-w29 / 2026-w30 / 2026-w31 (脱敏公开周报, 集合 src/content/weekly + /weekly 索引 + [slug] 页) |
 | skills | 42 | zhanglu（15 个 handwritten:true；25 个 `lark-*` 自动同步；`aic-*` 走 EXCLUDE 不上站，见 §5.4.2） |
@@ -751,8 +751,8 @@ curl -s --noproxy '*' -o /dev/null -w 'zhanglu.net: %{http_code}\n' https://zhan
 `src/data/about.json` 当前 hero / bio 是基于公开项目信息撰写的占位描述，可随时替换为本人定义版
 （英文版在 `about.en.json`）。
 
-**页面规模**：`pnpm build` 产出 159 页 —— 中文 79 + 英文 79 + 404。
-**机读层**：24 个端点类型（12 类 × 2 语言），`[slug]` 展开后共 136 个 JSON 文件 + 双语 `llms.txt` + 分语言 RSS。
+**页面规模**：`pnpm build` 产出 163 页 —— 中文 81 + 英文 81 + 404。
+**机读层**：24 个端点类型（12 类 × 2 语言），`[slug]` 展开后共 136 个 JSON 文件（articles 没有 `[slug]` 详情端点，加文章不增 JSON） + 双语 `llms.txt` + 分语言 RSS。
 > 这两个数字会随内容涨。**`/how-it-works` 与 `/agents` 上的对应数字是 build 时算出来的，
 > 不用手改**（07-27 skills 30→41、08-01 projects 8→14 等多次，页面上 96→118→136 全自动跟上）；只有本文这份快照要手动同步。
 **CLI**：`zhanglu-net` 已发布 npm（版本号在 `cli/package.json`，与站点版本独立）。
