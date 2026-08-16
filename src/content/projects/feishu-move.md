@@ -2,6 +2,7 @@
 title: 飞书迁移助手
 tagline: 把个人飞书内容，安全迁到新账号
 url: https://openasf.space
+cover: /covers/feishu-move.webp
 tech: [Node.js, Python, SQLite, "@larksuite/cli"]
 year: 2026
 featured: true

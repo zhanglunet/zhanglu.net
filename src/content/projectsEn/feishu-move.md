@@ -2,6 +2,7 @@
 title: Feishu Move
 tagline: Safely migrate personal Feishu content to a new account
 url: https://openasf.space
+cover: /covers/feishu-move.webp
 tech: [Node.js, Python, SQLite, "@larksuite/cli"]
 year: 2026
 featured: true
