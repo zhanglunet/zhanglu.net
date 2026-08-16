@@ -413,8 +413,8 @@ pnpm run sync:auto     # 确认后一条龙
    **改这个脚本后的第一次自动跑，行为以旧版本为准** —— 想立刻生效就手动跑一次，或者先在本机 `git pull`。
 
 **首页精选**: `featured: true` 上首页 "Skills" 精选区（当前只有 `zhanglu` 一个）。  
-**当前 42 个 skill 状态**（zh 42 / en 42，1:1 对齐）:
-- 27 个自动同步（中文版 SKILL.md 直接拿过来），其中 25 个是 `lark-*` 飞书 OpenAPI 封装
+**当前 47 个 skill 状态**（zh 47 / en 47，1:1 对齐）:
+- 32 个自动同步（中文版 SKILL.md 直接拿过来），其中 25 个是 `lark-*` 飞书 OpenAPI 封装
 - 15 个手写（`handwritten: true`，`sync` 不覆盖）：
   - agent-browser, agents-sdk, cloudflare, cloudflare-email-service,
   - demo-day-dossier, durable-objects, frontend-design, musk-perspective,
@@ -746,7 +746,7 @@ curl -s --noproxy '*' -o /dev/null -w 'zhanglu.net: %{http_code}\n' https://zhan
 | articles | 12 | 站内长文 8 篇（agent-cli, c-suite-design, siliconforge, excel-ai-analyst, ai-interview, brain-radar, free-model-port-design, openworker-zh → 均指向 `/posts/<slug>`）+ 外链 4 条（qiji-56-projects-one-night, qcc-agent-origin, free-model-port→oaf.asia, weekly-2026-w29→站内 /weekly/）|
 | presentations | 4 | mbabrand (slides), boss-handbook (slides), oaf (slides), openagent (site) |
 | weekly | 3 | 2026-w29 / 2026-w30 / 2026-w31 (脱敏公开周报, 集合 src/content/weekly + /weekly 索引 + [slug] 页) |
-| skills | 42 | zhanglu（15 个 handwritten:true；25 个 `lark-*` 自动同步；`aic-*` 走 EXCLUDE 不上站，见 §5.4.2） |
+| skills | 47 | zhanglu（15 个 handwritten:true；32 个自动同步含 25 个 `lark-*`；`aic-*` 走 EXCLUDE 不上站，见 §5.4.2） |
 
 `src/data/about.json` 当前 hero / bio 是基于公开项目信息撰写的占位描述，可随时替换为本人定义版
 （英文版在 `about.en.json`）。
