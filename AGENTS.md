@@ -595,6 +595,19 @@ YAML `|` block 在 frontmatter 里保留 `\n`，但 HTML 默认折叠空白。`S
 2. Playwright 截 `file://<dir>/index.html`（本地渲染正常），截图时 `page.route` 把非 file:// / data: 的请求 abort 掉，避免它再去够外部资源。
 3. `sharp`（`node_modules/.pnpm/sharp@*/node_modules/sharp`，根目录 require 不到要用全路径）resize 到宽 1200 + 转 webp q78，12 张 3.1MB → 633KB。放 `public/covers/`（项目）或 `public/tui3/`（往期子站）。
 
+**纯 SPA 站点（服务端不渲染）要多一步**：`wget` 镜像下来后**不能截 `file://`** ——
+`type="module"` 的脚本按 CORS 规则加载，而 `file://` 的 origin 是 `null`，会被直接拦掉，
+页面渲染出空白（`document.body.innerText.length === 0`）。改成本地起个静态服务再渲染：
+
+```bash
+cd <镜像目录> && python3 -m http.server 8899 &
+# Playwright 访问 http://127.0.0.1:8899/index.html
+# page.route 只放行 127.0.0.1:8899 与 data:，掐掉 Google Fonts 等外域
+```
+
+另外 `wget -k` 会把带 query 的资源存成含 `?` 的文件名（`landing.css?v=1`），
+`file://` 与本地服务都取不到 —— 镜像后统一 `cp 'x.css?v=1' x.css`。
+
 项目 `cover` 字段现在**会渲染**（ProjectCard 顶部 banner + 详情页），不再是"暂未渲染"。presentations 的 cover 仍未渲染。
 
 ### 9.10 线上 robots.txt 可能和仓库不一致（Cloudflare 会注入）
@@ -735,26 +748,26 @@ curl -s --noproxy '*' -o /dev/null -w 'zhanglu.net: %{http_code}\n' https://zhan
 
 ---
 
-## 11. 当前内容快照（截至 2026-08-03，站点 v0.3.0）
+## 11. 当前内容快照（截至 2026-08-28，站点 v0.3.0）
 
 > **每个集合都有平行的英文版**（`src/content/<coll>En/`，同 slug、同数量）。下表是中文侧；
 > 英文侧数量 1:1 对齐（见 §16）。改内容时**两边都要动**。
 
 | collection | 数量 | featured |
 |---|---|---|
-| projects | 14 | mbabrand(1), boss(2), oaf(3), aip(4), qiji-roadshow-2026(5), qcc-agent(6), shanghai(7), siliconforge(8), excel-ai-analyst(9), ai-interview(10), brain-radar(11), free-model-port(12), openworker-zh(13) —— 以上均 featured；tui3（网站存档, order 99, archived, 非 featured） |
+| projects | 16 | mbabrand(1), boss(2), oaf(3), aip(4), qiji-roadshow-2026(5), qcc-agent(6), shanghai(7), siliconforge(8), excel-ai-analyst(9), ai-interview(10), brain-radar(11), free-model-port(12), openworker-zh(13), feishu-move(14), enterprise-agent-studio(15) —— 以上均 featured；tui3（网站存档, order 99, archived, 非 featured） |
 | articles | 12 | 站内长文 8 篇（agent-cli, c-suite-design, siliconforge, excel-ai-analyst, ai-interview, brain-radar, free-model-port-design, openworker-zh → 均指向 `/posts/<slug>`）+ 外链 4 条（qiji-56-projects-one-night, qcc-agent-origin, free-model-port→oaf.asia, weekly-2026-w29→站内 /weekly/）|
 | presentations | 4 | mbabrand (slides), boss-handbook (slides), oaf (slides), openagent (site) |
-| weekly | 3 | 2026-w29 / 2026-w30 / 2026-w31 (脱敏公开周报, 集合 src/content/weekly + /weekly 索引 + [slug] 页) |
+| weekly | 5 | 2026-w29 / w30 / w31 / w32 / w34（脱敏公开周报，集合 `src/content/weekly` + `/weekly` 索引 + `[slug]` 页）|
 | skills | 47 | zhanglu（15 个 handwritten:true；32 个自动同步含 25 个 `lark-*`；`aic-*` 走 EXCLUDE 不上站，见 §5.4.2） |
 
 `src/data/about.json` 当前 hero / bio 是基于公开项目信息撰写的占位描述，可随时替换为本人定义版
 （英文版在 `about.en.json`）。
 
-**页面规模**：`pnpm build` 产出 163 页 —— 中文 81 + 英文 81 + 404。
-**机读层**：24 个端点类型（12 类 × 2 语言），`[slug]` 展开后共 136 个 JSON 文件（articles 没有 `[slug]` 详情端点，加文章不增 JSON） + 双语 `llms.txt` + 分语言 RSS。
+**页面规模**：`pnpm build` 产出 181 页 —— 中文 90 + 英文 90 + 404。
+**机读层**：24 个端点类型（12 类 × 2 语言），`[slug]` 展开后共 154 个 JSON 文件（articles 没有 `[slug]` 详情端点，加文章不增 JSON） + 双语 `llms.txt` + 分语言 RSS。
 > 这两个数字会随内容涨。**`/how-it-works` 与 `/agents` 上的对应数字是 build 时算出来的，
-> 不用手改**（07-27 skills 30→41、08-01 projects 8→14 等多次，页面上 96→118→136 全自动跟上）；只有本文这份快照要手动同步。
+> 不用手改**（07-27 skills 30→41、08-01 projects 8→16 等多次，页面上 96→118→154 全自动跟上）；只有本文这份快照要手动同步。
 **CLI**：`zhanglu-net` 已发布 npm（版本号在 `cli/package.json`，与站点版本独立）。
 
 ---
