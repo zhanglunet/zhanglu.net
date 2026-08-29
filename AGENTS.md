@@ -722,6 +722,43 @@ curl -s --noproxy '*' -o /dev/null -w 'zhanglu.net: %{http_code}\n' https://zhan
 3. 核验列表类端点已经不含它（`/api/<coll>.json`、`/api/search.json`、`sitemap-0.xml`）
 4. 还有 200 的，先做 `pages.dev` 对照再决定要不要 purge —— 别一上来就改 CF 设置
 
+### 9.14 Shiki 主题和代码块背景色是绑定的（改一个必须验另一个）
+
+**症状**：markdown / MDX 里的代码块**几乎看不见** —— 深灰字压在近黑底上。
+手写 `.astro` 页面里的代码块却完全正常。
+
+**根因**：两处配置互相不知道对方存在。
+
+| 位置 | 内容 |
+|---|---|
+| `astro.config.mjs` 的 `shikiConfig.theme` | Shiki 给**每个 token 写内联 `style="color:…"`** |
+| `src/styles/global.css` 的 `.prose-zh pre` | 强制 `background: #1a1a1a !important` |
+
+内联样式优先级高于 class，所以 `.prose-zh pre code { color: inherit }` 根本盖不住 Shiki。
+主题一旦是浅色系（曾经是 `github-light`，前景 `#24292e`），落到近黑底上就是
+**1.2:1** —— 18 个页面的代码块全部读不出来。手写 `.astro` 的代码块不走 Shiki，所以看着没事，
+**正好掩盖了这个问题**。
+
+**规矩**：`shikiConfig.theme` 必须是暗色系，且改完要**实测对比度**，不能只看一眼截图。
+
+**为什么是 `github-dark-high-contrast` 而不是 `github-dark`**：普通版的注释色 `#6a737d`
+在 `#1a1a1a` 上只有 **3.61:1**，低于 WCAG AA 的 4.5（bash 里的 `# 注释` 首当其冲）。
+换 high-contrast 后实测 26 个代码块**最低 8.21:1**，AAA 也过。
+
+**实测办法**（起 preview 后遍历含代码块的页面，逐 token 算）：
+
+```js
+const lum = (c) => { const [r,g,b] = c.match(/\d+/g).slice(0,3).map(Number).map(v => {
+  v /= 255; return v <= 0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055, 2.4); });
+  return 0.2126*r + 0.7152*g + 0.0722*b; };
+const ratio = (a,b) => { const l1 = lum(a), l2 = lum(b);
+  return (Math.max(l1,l2) + 0.05) / (Math.min(l1,l2) + 0.05); };
+// 对每个 .prose-zh pre：取 getComputedStyle(pre).backgroundColor 与其中
+// 每个 <span> 的 color，算出最小 ratio；全部 ≥ 4.5 才算过。
+```
+
+哪些页面有代码块：`grep -rl 'astro-code' dist --include='index.html'`。
+
 ### 9.8 手机端横向溢出的三个惯犯
 
 390px 视口下把页面撑破的三类元素（已修，新增内容别再犯）：

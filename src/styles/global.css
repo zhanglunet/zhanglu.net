@@ -72,6 +72,9 @@ body {
   font-family: var(--font-mono);
 }
 
+/* 代码块固定暗底，与 /agents、/npm 里手写的 bg-[#1a1a1a] 保持一致。
+   ⚠️ 这里的背景色和 astro.config.mjs 的 shikiConfig.theme 是**绑定**的：
+   Shiki 会给每个 token 写内联 color，主题必须是暗色系，否则字和底同色。 */
 .prose-zh pre {
   background: #1a1a1a !important;
   color: #f3f1ea;
