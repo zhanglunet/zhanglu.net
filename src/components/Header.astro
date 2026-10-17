@@ -2,27 +2,29 @@
 import aboutZh from '../data/about.json';
 import aboutEn from '../data/about.en.json';
 import { getLangFromUrl, localizePath, altPath, stripLang } from '../i18n/utils';
-import { useTranslations } from '../i18n/ui';
+import { useTranslations, type UIKey } from '../i18n/ui';
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 const about = lang === 'en' ? aboutEn : aboutZh;
 const here = stripLang(Astro.url.pathname);
 
-const nav = [
-  { base: '/', key: 'nav.home' as const },
-  { base: '/projects', key: 'nav.projects' as const },
-  { base: '/c-suite', key: 'nav.csuite' as const },
-  { base: '/presentations', key: 'nav.presentations' as const },
-  { base: '/articles', key: 'nav.writing' as const },
-  { base: '/weekly', key: 'nav.weekly' as const },
-  { base: '/skills', key: 'nav.skills' as const },
-  { base: '/agents', key: 'nav.agents' as const },
-  { base: '/npm', key: 'nav.npm' as const },
-  { base: '/how-it-works', key: 'nav.arch' as const },
-  { base: '/about', key: 'nav.about' as const },
+const nav: Array<{ key: UIKey; base?: string; href?: string }> = [
+  { base: '/', key: 'nav.home' },
+  { base: '/projects', key: 'nav.projects' },
+  { base: '/c-suite', key: 'nav.csuite' },
+  { base: '/presentations', key: 'nav.presentations' },
+  { base: '/articles', key: 'nav.writing' },
+  { base: '/weekly', key: 'nav.weekly' },
+  { href: 'https://trend.zhanglu.net/', key: 'nav.trend' },
+  { base: '/skills', key: 'nav.skills' },
+  { base: '/agents', key: 'nav.agents' },
+  { base: '/npm', key: 'nav.npm' },
+  { base: '/how-it-works', key: 'nav.arch' },
+  { base: '/about', key: 'nav.about' },
 ];
-const isActive = (base: string) => (base === '/' ? here === '/' : here.startsWith(base));
+const isActive = (item: (typeof nav)[number]) =>
+  item.base ? (item.base === '/' ? here === '/' : here.startsWith(item.base)) : false;
 
 const target = lang === 'en' ? 'zh' : 'en';
 const toggleHref = altPath(Astro.url.pathname, target);
@@ -37,10 +39,10 @@ const homeHref = localizePath('/', lang);
     <nav class="flex items-center gap-4 sm:gap-5 text-sm max-w-full overflow-x-auto whitespace-nowrap [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
       {nav.map((item) => (
         <a
-          href={localizePath(item.base, lang)}
+          href={item.href ?? localizePath(item.base!, lang)}
           class:list={[
             'transition-colors shrink-0',
-            isActive(item.base)
+            isActive(item)
               ? 'text-[var(--color-ink)] font-medium'
               : 'text-[var(--color-muted)] hover:text-[var(--color-ink)]',
           ]}
